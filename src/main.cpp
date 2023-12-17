@@ -1,5 +1,9 @@
 
 #include"Bitboard.h"
+#include <iostream>
+#include <ostream>
+
+using namespace std;
 
 void test_print_macros(){
 
@@ -44,27 +48,19 @@ void test_print_macros(){
     Paisho::Bitboards::pretty(Legal);
     Paisho::Bitboards::pretty(Red);
     Paisho::Bitboards::pretty(White);
-/*
-    Bitboard a = Legal;
-    Bitboard b = White;
-    Paisho::Bitboards::pretty(a);
-    Paisho::Bitboards::pretty(b);
-    Paisho::Bitboards::pretty(a^b);
-*/
     Paisho::Bitboards::pretty(Neutral);
-
-
 }
 
 void test_board_ops(){
     Paisho::Bitboards::pretty(Rank10BB & FileFBB);
-
-
+    Paisho::Bitboards::pretty(Rank10BB);
+    Paisho::Bitboards::pretty(get_bit(Rank10BB, Paisho::Bitboards::f10));
+    
 }
 
 
 int main(){
     test_print_macros();
-    //test_board_ops();
+    test_board_ops();
     return 1;
 }
