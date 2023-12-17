@@ -45,6 +45,25 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 #define Rank16BB Rank1BB << (17 * 15)
 #define Rank17BB Rank1BB << (17 * 16)
 
+#define Gates (Bitboard(1)<<Paisho::Bitboards::i1) | (Bitboard(1)<<Paisho::Bitboards::i17) | (Bitboard(1)<<Paisho::Bitboards::a9) | (Bitboard(1)<<Paisho::Bitboards::q9)
+
+#define Illegal Bitboard("11110000000001111") |\
+    (Bitboard("11100000000000111") << Paisho::NORTH) |\
+    (Bitboard("11000000000000011") << 2*Paisho::NORTH) |\
+    (Bitboard("10000000000000001") << 3*Paisho::NORTH) | \
+    (Bitboard("11110000000001111") << 16*Paisho::NORTH) |\
+    (Bitboard("11100000000000111") << 15*Paisho::NORTH) |\
+    (Bitboard("11000000000000011") << 14*Paisho::NORTH) |\
+    (Bitboard("10000000000000001") << 13*Paisho::NORTH)
+
+
+
+#define Legal ~Illegal
+#define Red 
+#define White
+#define neutral
+
+#define get_bit(bitboard, square) (bitboard & (Bitboard(1) << square))
 
 
 namespace Paisho{
@@ -76,7 +95,7 @@ namespace Paisho{
     };
 
     enum Direction: int{
-        NORTH = 16,
+        NORTH = 17,
         EAST = 1,
         SOUTH = -NORTH,
         WEST = -EAST,
@@ -88,42 +107,27 @@ namespace Paisho{
     };
 
     namespace Bitboards{
-/*
-        constexpr Bitboard FileABB("0001000100010001000100010001000100010001000100010001000100010001");
-        Bitboard FileBBB = FileABB << 1;
-        Bitboard FileCBB = FileABB << 2;
-        Bitboard FileDBB = FileABB << 3;
-        Bitboard FileEBB = FileABB << 4;
-        Bitboard FileFBB = FileABB << 5;
-        Bitboard FileGBB = FileABB << 6;
-        Bitboard FileHBB = FileABB << 7;
-        Bitboard FileIBB = FileABB << 8;
-        Bitboard FileJBB = FileABB << 9;
-        Bitboard FileKBB = FileABB << 10;
-        Bitboard FileLBB = FileABB << 11;
-        Bitboard FileMBB = FileABB << 12;
-        Bitboard FileNBB = FileABB << 13;
-        Bitboard FileOBB = FileABB << 14;
-        Bitboard FilePBB = FileABB << 15;
-        Bitboard FileQBB = FileABB << 16;
 
-        Bitboard Rank1BB(0xFFFF);
-        Bitboard Rank2BB = Rank1BB << (8 * 1);
-        Bitboard Rank3BB = Rank1BB << (8 * 2);
-        Bitboard Rank4BB = Rank1BB << (8 * 3);
-        Bitboard Rank5BB = Rank1BB << (8 * 4);
-        Bitboard Rank6BB = Rank1BB << (8 * 5);
-        Bitboard Rank7BB = Rank1BB << (8 * 6);
-        Bitboard Rank8BB = Rank1BB << (8 * 7);
-        Bitboard Rank9BB = Rank1BB << (8 * 8);
-        Bitboard Rank10BB = Rank1BB << (8 * 9);
-        Bitboard Rank11BB = Rank1BB << (8 * 10);
-        Bitboard Rank12BB = Rank1BB << (8 * 11);
-        Bitboard Rank13BB = Rank1BB << (8 * 12);
-        Bitboard Rank14BB = Rank1BB << (8 * 13);
-        Bitboard Rank15BB = Rank1BB << (8 * 14);
-        Bitboard Rank16BB = Rank1BB << (8 * 15);
-*/
+        enum Squares{
+            a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
+            a16,b16,c16,d16,e16,f16,g16,h16,i16,j16,k16,l16,m16,n16,o16,p16,q16,
+            a15,b15,c15,d15,e15,f15,g15,h15,i15,j15,k15,l15,m15,n15,o15,p15,q15,
+            a14,b14,c14,d14,e14,f14,g14,h14,i14,j14,k14,l14,m14,n14,o14,p14,q14,
+            a13,b13,c13,d13,e13,f13,g13,h13,i13,j13,k13,l13,m13,n13,o13,p13,q13,
+            a12,b12,c12,d12,e12,f12,g12,h12,i12,j12,k12,l12,m12,n12,o12,p12,q12,
+            a11,b11,c11,d11,e11,f11,g11,h11,i11,j11,k11,l11,m11,n11,o11,p11,q11,
+            a10,b10,c10,d10,e10,f10,g10,h10,i10,j10,k10,l10,m10,n10,o10,p10,q10,
+            a9,b9,c9,d9,e9,f9,g9,h9,i9,j9,k9,l9,m9,n9,o9,p9,q9,
+            a8,b8,c8,d8,e8,f8,g8,h8,i8,j8,k8,l8,m8,n8,o8,p8,q8,
+            a7,b7,c7,d7,e7,f7,g7,h7,i7,j7,k7,l7,m7,n7,o7,p7,q7,
+            a6,b6,c6,d6,e6,f6,g6,h6,i6,j6,k6,l6,m6,n6,o6,p6,q6,
+            a5,b5,c5,d5,e5,f5,g5,h5,i5,j5,k5,l5,m5,n5,o5,p5,q5,
+            a4,b4,c4,d4,e4,f4,g4,h4,i4,j4,k4,l4,m4,n4,o4,p4,q4,
+            a3,b3,c3,d3,e3,f3,g3,h3,i3,j3,k3,l3,m3,n3,o3,p3,q3,
+            a2,b2,c2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,o2,p2,q2,
+            a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,o1,p1,q1,
+        };
+
         std::string pretty(Bitboard b);
         void init();
 

@@ -94,7 +94,7 @@ namespace Paisho{
         for (int i = 4; i <= 12; i++){
             std::cout << " " << b[i];
         }
-        std::cout << "        " << std::endl;;
+        std::cout << "        " << std::endl << std::endl;
 
 
         return "hello";

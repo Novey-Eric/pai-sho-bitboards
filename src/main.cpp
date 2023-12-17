@@ -38,6 +38,11 @@ void test_print_macros(){
     Paisho::Bitboards::pretty(Rank15BB);
     Paisho::Bitboards::pretty(Rank16BB);
     Paisho::Bitboards::pretty(Rank17BB);
+    
+    Paisho::Bitboards::pretty(Gates);
+    Paisho::Bitboards::pretty(Illegal);
+    Paisho::Bitboards::pretty(Legal);
+
 
 }
 
@@ -49,8 +54,7 @@ void test_board_ops(){
 
 
 int main(){
-    Bitboard test("0000001");
     test_print_macros();
-    test_board_ops();
+    //test_board_ops();
     return 1;
 }
