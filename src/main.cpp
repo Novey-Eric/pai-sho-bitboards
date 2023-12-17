@@ -5,6 +5,7 @@
 
 using namespace std;
 using namespace Paisho::Bitboards;
+using namespace Paisho;
 
 void test_print_macros(){
 
@@ -55,15 +56,18 @@ void test_print_macros(){
 void test_board_ops(){
     pretty(Rank10BB & FileFBB);
     pretty(Rank10BB);
-    pretty(get_bit(Rank10BB, f10));
+    cout << Rank10BB[f10] << endl;
+    //pretty(get_bit(Rank10BB, f10));
 
-    pretty(mask_2_move(a10));
+    pretty(mask_2_move(q10));
+    pretty(mask_3_move(q10));
+    pretty(mask_3_move(g16));
 
 }
 
 
 int main(){
-    test_print_macros();
+    //test_print_macros();
     test_board_ops();
     return 1;
 }

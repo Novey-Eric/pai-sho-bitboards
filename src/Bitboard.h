@@ -3,49 +3,52 @@
 #define BITBOARD_H_INCLUDED
 
 #include <bitset>
+#include "types.h"
 //using Bitboard = std::bitset<224>;
 
 typedef std::bitset<290> Bitboard;
 std::string GetBinaryStringFromHexString (std::string sHex);
 
+#define FullFile (Bitboard(GetBinaryStringFromHexString("100008000400020001000080004000200010000800040002000100008000400020001")))
+#define FileABB ((FullFile) & Legal)
+#define FileBBB ((FullFile << 1) & Legal)
+#define FileCBB ((FullFile << 2) & Legal)
+#define FileDBB ((FullFile << 3) & Legal)
+#define FileEBB ((FullFile << 4) & Legal)
+#define FileFBB ((FullFile << 5) & Legal)
+#define FileGBB ((FullFile << 6) & Legal)
+#define FileHBB ((FullFile << 7) & Legal)
+#define FileIBB ((FullFile << 8) & Legal)
+#define FileJBB ((FullFile << 9) & Legal)
+#define FileKBB ((FullFile << 10) & Legal)
+#define FileLBB ((FullFile << 11) & Legal)
+#define FileMBB ((FullFile << 12) & Legal)
+#define FileNBB ((FullFile << 13) & Legal)
+#define FileOBB ((FullFile << 14) & Legal)
+#define FilePBB ((FullFile << 15) & Legal)
+#define FileQBB ((FullFile << 16) & Legal)
 
-#define FileABB (Bitboard(GetBinaryStringFromHexString("100008000400020001000080004000200010000800040002000100008000400020001")) & Legal)
-#define FileBBB ((FileABB << 1) & Legal)
-#define FileCBB ((FileABB << 2) & Legal)
-#define FileDBB ((FileABB << 3) & Legal)
-#define FileEBB ((FileABB << 4) & Legal)
-#define FileFBB ((FileABB << 5) & Legal)
-#define FileGBB ((FileABB << 6) & Legal)
-#define FileHBB ((FileABB << 7) & Legal)
-#define FileIBB ((FileABB << 8) & Legal)
-#define FileJBB ((FileABB << 9) & Legal)
-#define FileKBB ((FileABB << 10) & Legal)
-#define FileLBB ((FileABB << 11) & Legal)
-#define FileMBB ((FileABB << 12) & Legal)
-#define FileNBB ((FileABB << 13) & Legal)
-#define FileOBB ((FileABB << 14) & Legal)
-#define FilePBB ((FileABB << 15) & Legal)
-#define FileQBB ((FileABB << 16) & Legal)
+#define FullRank (Bitboard(GetBinaryStringFromHexString("ffff")+"1"))
 
-#define Rank1BB (Bitboard(GetBinaryStringFromHexString("ffff")+"1") & Legal)
-#define Rank2BB ((Rank1BB << (17 * 1)) & Legal)
-#define Rank3BB ((Rank1BB << (17 * 2)) & Legal)
-#define Rank4BB ((Rank1BB << (17 * 3)) & Legal)
-#define Rank5BB ((Rank1BB << (17 * 4)) & Legal)
-#define Rank6BB ((Rank1BB << (17 * 5)) & Legal)
-#define Rank7BB ((Rank1BB << (17 * 6)) & Legal)
-#define Rank8BB ((Rank1BB << (17 * 7)) & Legal)
-#define Rank9BB ((Rank1BB << (17 * 8)) & Legal)
-#define Rank10BB ((Rank1BB << (17 * 9)) & Legal)
-#define Rank11BB ((Rank1BB << (17 * 10)) & Legal)
-#define Rank12BB ((Rank1BB << (17 * 11)) & Legal)
-#define Rank13BB ((Rank1BB << (17 * 12)) & Legal)
-#define Rank14BB ((Rank1BB << (17 * 13)) & Legal)
-#define Rank15BB ((Rank1BB << (17 * 14)) & Legal)
-#define Rank16BB ((Rank1BB << (17 * 15)) & Legal)
-#define Rank17BB ((Rank1BB << (17 * 16)) & Legal)
+#define Rank1BB (FullRank & Legal)
+#define Rank2BB ((FullRank << (17 * 1)) & Legal)
+#define Rank3BB ((FullRank << (17 * 2)) & Legal)
+#define Rank4BB ((FullRank << (17 * 3)) & Legal)
+#define Rank5BB ((FullRank << (17 * 4)) & Legal)
+#define Rank6BB ((FullRank << (17 * 5)) & Legal)
+#define Rank7BB ((FullRank << (17 * 6)) & Legal)
+#define Rank8BB ((FullRank << (17 * 7)) & Legal)
+#define Rank9BB ((FullRank << (17 * 8)) & Legal)
+#define Rank10BB ((FullRank << (17 * 9)) & Legal)
+#define Rank11BB ((FullRank << (17 * 10)) & Legal)
+#define Rank12BB ((FullRank << (17 * 11)) & Legal)
+#define Rank13BB ((FullRank << (17 * 12)) & Legal)
+#define Rank14BB ((FullRank << (17 * 13)) & Legal)
+#define Rank15BB ((FullRank << (17 * 14)) & Legal)
+#define Rank16BB ((FullRank << (17 * 15)) & Legal)
+#define Rank17BB ((FullRank << (17 * 16)) & Legal)
 
-#define Gates ((Bitboard(1)<<Paisho::Bitboards::i1) | (Bitboard(1)<<Paisho::Bitboards::i17) | (Bitboard(1)<<Paisho::Bitboards::a9) | (Bitboard(1)<<Paisho::Bitboards::q9))
+#define Gates ((Bitboard(1)<<Paisho::i1) | (Bitboard(1)<<Paisho::i17) | (Bitboard(1)<<Paisho::a9) | (Bitboard(1)<<Paisho::q9))
 
 #define Illegal ((Bitboard("11110000000001111") |\
     (Bitboard("11100000000000111") << Paisho::NORTH) |\
@@ -83,8 +86,6 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 
 #define Neutral (Legal^Red^White^Gates)
 
-#define get_bit(bitboard, square) (bitboard & (Bitboard(1) << square))
-#define set_bit(bitboard, square) (bitboard |= (Bitboard(1) << square))
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (Bitboard(1) << square) : 0)
 
 namespace Paisho{
@@ -129,36 +130,13 @@ namespace Paisho{
 
     namespace Bitboards{
 
-        enum Squares: int{
-            a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1,o1,p1,q1,
-            a2,b2,c2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2,o2,p2,q2,
-            a3,b3,c3,d3,e3,f3,g3,h3,i3,j3,k3,l3,m3,n3,o3,p3,q3,
-            a4,b4,c4,d4,e4,f4,g4,h4,i4,j4,k4,l4,m4,n4,o4,p4,q4,
-            a5,b5,c5,d5,e5,f5,g5,h5,i5,j5,k5,l5,m5,n5,o5,p5,q5,
-            a6,b6,c6,d6,e6,f6,g6,h6,i6,j6,k6,l6,m6,n6,o6,p6,q6,
-            a7,b7,c7,d7,e7,f7,g7,h7,i7,j7,k7,l7,m7,n7,o7,p7,q7,
-            a8,b8,c8,d8,e8,f8,g8,h8,i8,j8,k8,l8,m8,n8,o8,p8,q8,
-            a9,b9,c9,d9,e9,f9,g9,h9,i9,j9,k9,l9,m9,n9,o9,p9,q9,
-            a10,b10,c10,d10,e10,f10,g10,h10,i10,j10,k10,l10,m10,n10,o10,p10,q10,
-            a11,b11,c11,d11,e11,f11,g11,h11,i11,j11,k11,l11,m11,n11,o11,p11,q11,
-            a12,b12,c12,d12,e12,f12,g12,h12,i12,j12,k12,l12,m12,n12,o12,p12,q12,
-            a13,b13,c13,d13,e13,f13,g13,h13,i13,j13,k13,l13,m13,n13,o13,p13,q13,
-            a14,b14,c14,d14,e14,f14,g14,h14,i14,j14,k14,l14,m14,n14,o14,p14,q14,
-            a15,b15,c15,d15,e15,f15,g15,h15,i15,j15,k15,l15,m15,n15,o15,p15,q15,
-            a16,b16,c16,d16,e16,f16,g16,h16,i16,j16,k16,l16,m16,n16,o16,p16,q16,
-            a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
-        };
-
         std::string pretty(Bitboard b);
         void init();
-        Bitboard mask_2_move(int square);
-        Bitboard mask_3_move(int square);
-        Bitboard mask_4_move(int square);
-        Bitboard mask_5_move(int square);
-        Bitboard mask_6_move(int square);
-    
-
-
+        Bitboard mask_2_move(enum Squares square);
+        Bitboard mask_3_move(enum Squares square);
+        Bitboard mask_4_move(enum Squares square);
+        Bitboard mask_5_move(enum Squares square);
+        Bitboard mask_6_move(enum Squares square);
 
     } //namespace bitboards
 

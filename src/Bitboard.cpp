@@ -1,5 +1,6 @@
 
 #include "Bitboard.h"
+#include "types.h"
 #include <iostream>
 #include <ostream>
 
@@ -106,13 +107,10 @@ namespace Paisho{
             return;
         }
 
-        Bitboard mask_2_move(int square){
+        Bitboard mask_2_move(enum Squares square){
             Bitboard bb(0);
             Bitboard moves(0);
-            set_bit(bb, square);
-
-
-            
+            bb.set(square);
             //East, East2, West, West2, S, S2, NE, NW, SE, SW
             //Never be able to move into a gate, or wrong color, or same square
             //Check for wrapping
@@ -132,6 +130,55 @@ namespace Paisho{
             moves = (s2 | s | n2 | n | w | w2 | e | e2 | ne | se | nw | sw) & ~Gates;
             return moves;
         } 
-    }
+
+
+
+        Bitboard mask_3_move(enum Squares square){
+            Bitboard bb(0);
+            Bitboard moves(0);
+            bb.set(square);
+            //East, East2, West, West2, S, S2, NE, NW, SE, SW
+            //Never be able to move into a gate, or wrong color, or same square
+            //Check for wrapping
+            Bitboard s3 = (bb >> 3*NORTH);
+            Bitboard s2 = (bb >> 2*NORTH);
+            Bitboard s = (bb >> NORTH);
+            Bitboard n3 = (bb << 3*NORTH);
+            Bitboard n2 = (bb << 2*NORTH);
+            Bitboard n = (bb << NORTH);
+
+            Bitboard w3 = (bb & ~FileABB & ~FileBBB & ~FileCBB) >> 3*EAST;
+            Bitboard w2 = (bb & ~FileABB & ~FileBBB) >> 2*EAST;
+            Bitboard w = (bb & ~FileABB) >> EAST;
+
+            Bitboard e3 = (bb & ~FileQBB & ~FilePBB & ~FileOBB) << 3*EAST;
+            Bitboard e2 = (bb & ~FileQBB & ~FilePBB) << 2*EAST;
+            Bitboard e = (bb & ~FileQBB) << EAST;
+
+            Bitboard nne = ((bb & ~FileQBB) << EAST) << 2*NORTH;
+            Bitboard nnw = ((bb & ~FileABB) >> EAST) << 2*NORTH;
+
+            Bitboard sse = ((bb & ~FileQBB) << EAST) >> 2*NORTH;
+            Bitboard ssw = ((bb & ~FileABB) >> EAST) >> 2*NORTH;
+
+            Bitboard nww = ((bb & ~FileABB & ~FileBBB) >> 2*EAST) << NORTH;
+            Bitboard nee = ((bb & ~FileQBB & ~FilePBB) << 2*EAST) << NORTH;
+
+            Bitboard see = ((bb & ~FileQBB & ~FilePBB) << 2*EAST) >> NORTH;
+            Bitboard sww = ((bb & ~FileABB & ~FileBBB) >> 2*EAST) >> NORTH;
+
+            Bitboard ne = ((bb & ~FileQBB) << EAST) << NORTH;
+            Bitboard se = ((bb & ~FileQBB) << EAST) >> NORTH;
+            Bitboard nw = ((bb & ~FileABB) >> EAST) << NORTH;
+            Bitboard sw = ((bb & ~FileABB) >> EAST) >> NORTH;
+            
+            moves = (s2|s|n2|n|w|w2|e|e2|ne|se|nw|sw|s3|n3|w3|e3|nne|nnw|sse|ssw|nww|nee|see|sww) & ~Gates;
+            return moves;
+        } 
+
+
+
+
+    }//namespace bitboards
 
 }
