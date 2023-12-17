@@ -62,7 +62,23 @@ void test_board_ops(){
     pretty(mask_2_move(q10));
     pretty(mask_3_move(q10));
     pretty(mask_3_move(g16));
+    pretty(mask_4_move(i8));
+    pretty(mask_4_move(g16));
 
+    pretty(mask_5_move(a8));
+    pretty(mask_5_move(b8));
+    pretty(mask_5_move(c8));
+    pretty(mask_5_move(d8));
+    pretty(mask_5_move(e8));
+
+    pretty(mask_5_move(q8));
+    pretty(mask_5_move(p8));
+    pretty(mask_5_move(o8));
+    pretty(mask_5_move(m8));
+    pretty(mask_5_move(n8));
+
+    pretty(mask_5_move(i8));
+    pretty(mask_6_move(i8));
 }
 
 
