@@ -4,58 +4,61 @@
 #include <ostream>
 
 using namespace std;
+using namespace Paisho::Bitboards;
 
 void test_print_macros(){
 
-    Paisho::Bitboards::pretty(FileABB);
-    Paisho::Bitboards::pretty(FileBBB);
-    Paisho::Bitboards::pretty(FileCBB);
-    Paisho::Bitboards::pretty(FileDBB);
-    Paisho::Bitboards::pretty(FileEBB);
-    Paisho::Bitboards::pretty(FileFBB);
-    Paisho::Bitboards::pretty(FileGBB);
-    Paisho::Bitboards::pretty(FileHBB);
-    Paisho::Bitboards::pretty(FileIBB);
-    Paisho::Bitboards::pretty(FileJBB);
-    Paisho::Bitboards::pretty(FileKBB);
-    Paisho::Bitboards::pretty(FileLBB);
-    Paisho::Bitboards::pretty(FileMBB);
-    Paisho::Bitboards::pretty(FileNBB);
-    Paisho::Bitboards::pretty(FileOBB);
-    Paisho::Bitboards::pretty(FilePBB);
-    Paisho::Bitboards::pretty(FileQBB);
+    pretty(FileABB);
+    pretty(FileBBB);
+    pretty(FileCBB);
+    pretty(FileDBB);
+    pretty(FileEBB);
+    pretty(FileFBB);
+    pretty(FileGBB);
+    pretty(FileHBB);
+    pretty(FileIBB);
+    pretty(FileJBB);
+    pretty(FileKBB);
+    pretty(FileLBB);
+    pretty(FileMBB);
+    pretty(FileNBB);
+    pretty(FileOBB);
+    pretty(FilePBB);
+    pretty(FileQBB);
 
-    Paisho::Bitboards::pretty(Rank1BB);
-    Paisho::Bitboards::pretty(Rank2BB);
-    Paisho::Bitboards::pretty(Rank3BB);
-    Paisho::Bitboards::pretty(Rank4BB);
-    Paisho::Bitboards::pretty(Rank5BB);
-    Paisho::Bitboards::pretty(Rank6BB);
-    Paisho::Bitboards::pretty(Rank7BB);
-    Paisho::Bitboards::pretty(Rank8BB);
-    Paisho::Bitboards::pretty(Rank9BB);
-    Paisho::Bitboards::pretty(Rank10BB);
-    Paisho::Bitboards::pretty(Rank11BB);
-    Paisho::Bitboards::pretty(Rank12BB);
-    Paisho::Bitboards::pretty(Rank13BB);
-    Paisho::Bitboards::pretty(Rank14BB);
-    Paisho::Bitboards::pretty(Rank15BB);
-    Paisho::Bitboards::pretty(Rank16BB);
-    Paisho::Bitboards::pretty(Rank17BB);
+    pretty(Rank1BB);
+    pretty(Rank2BB);
+    pretty(Rank3BB);
+    pretty(Rank4BB);
+    pretty(Rank5BB);
+    pretty(Rank6BB);
+    pretty(Rank7BB);
+    pretty(Rank8BB);
+    pretty(Rank9BB);
+    pretty(Rank10BB);
+    pretty(Rank11BB);
+    pretty(Rank12BB);
+    pretty(Rank13BB);
+    pretty(Rank14BB);
+    pretty(Rank15BB);
+    pretty(Rank16BB);
+    pretty(Rank17BB);
     
-    Paisho::Bitboards::pretty(Gates);
-    Paisho::Bitboards::pretty(Illegal);
-    Paisho::Bitboards::pretty(Legal);
-    Paisho::Bitboards::pretty(Red);
-    Paisho::Bitboards::pretty(White);
-    Paisho::Bitboards::pretty(Neutral);
+    pretty(Gates);
+    pretty(Illegal);
+    pretty(Legal);
+    pretty(Red);
+    pretty(White);
+    pretty(Neutral);
 }
 
 void test_board_ops(){
-    Paisho::Bitboards::pretty(Rank10BB & FileFBB);
-    Paisho::Bitboards::pretty(Rank10BB);
-    Paisho::Bitboards::pretty(get_bit(Rank10BB, Paisho::Bitboards::f10));
-    
+    pretty(Rank10BB & FileFBB);
+    pretty(Rank10BB);
+    pretty(get_bit(Rank10BB, f10));
+
+    pretty(mask_2_move(a10));
+
 }
 
 

@@ -9,41 +9,41 @@ typedef std::bitset<290> Bitboard;
 std::string GetBinaryStringFromHexString (std::string sHex);
 
 
-#define FileABB Bitboard(GetBinaryStringFromHexString("100008000400020001000080004000200010000800040002000100008000400020001"))
-#define FileBBB FileABB << 1
-#define FileCBB FileABB << 2
-#define FileDBB FileABB << 3
-#define FileEBB FileABB << 4
-#define FileFBB FileABB << 5
-#define FileGBB FileABB << 6
-#define FileHBB FileABB << 7
-#define FileIBB FileABB << 8
-#define FileJBB FileABB << 9
-#define FileKBB FileABB << 10
-#define FileLBB FileABB << 11
-#define FileMBB FileABB << 12
-#define FileNBB FileABB << 13
-#define FileOBB FileABB << 14
-#define FilePBB FileABB << 15
-#define FileQBB FileABB << 16
+#define FileABB (Bitboard(GetBinaryStringFromHexString("100008000400020001000080004000200010000800040002000100008000400020001")) & Legal)
+#define FileBBB ((FileABB << 1) & Legal)
+#define FileCBB ((FileABB << 2) & Legal)
+#define FileDBB ((FileABB << 3) & Legal)
+#define FileEBB ((FileABB << 4) & Legal)
+#define FileFBB ((FileABB << 5) & Legal)
+#define FileGBB ((FileABB << 6) & Legal)
+#define FileHBB ((FileABB << 7) & Legal)
+#define FileIBB ((FileABB << 8) & Legal)
+#define FileJBB ((FileABB << 9) & Legal)
+#define FileKBB ((FileABB << 10) & Legal)
+#define FileLBB ((FileABB << 11) & Legal)
+#define FileMBB ((FileABB << 12) & Legal)
+#define FileNBB ((FileABB << 13) & Legal)
+#define FileOBB ((FileABB << 14) & Legal)
+#define FilePBB ((FileABB << 15) & Legal)
+#define FileQBB ((FileABB << 16) & Legal)
 
-#define Rank1BB Bitboard(GetBinaryStringFromHexString("ffff")+"1")
-#define Rank2BB Rank1BB << (17 * 1)
-#define Rank3BB Rank1BB << (17 * 2)
-#define Rank4BB Rank1BB << (17 * 3)
-#define Rank5BB Rank1BB << (17 * 4)
-#define Rank6BB Rank1BB << (17 * 5)
-#define Rank7BB Rank1BB << (17 * 6)
-#define Rank8BB Rank1BB << (17 * 7)
-#define Rank9BB Rank1BB << (17 * 8)
-#define Rank10BB Rank1BB << (17 * 9)
-#define Rank11BB Rank1BB << (17 * 10)
-#define Rank12BB Rank1BB << (17 * 11)
-#define Rank13BB Rank1BB << (17 * 12)
-#define Rank14BB Rank1BB << (17 * 13)
-#define Rank15BB Rank1BB << (17 * 14)
-#define Rank16BB Rank1BB << (17 * 15)
-#define Rank17BB Rank1BB << (17 * 16)
+#define Rank1BB (Bitboard(GetBinaryStringFromHexString("ffff")+"1") & Legal)
+#define Rank2BB ((Rank1BB << (17 * 1)) & Legal)
+#define Rank3BB ((Rank1BB << (17 * 2)) & Legal)
+#define Rank4BB ((Rank1BB << (17 * 3)) & Legal)
+#define Rank5BB ((Rank1BB << (17 * 4)) & Legal)
+#define Rank6BB ((Rank1BB << (17 * 5)) & Legal)
+#define Rank7BB ((Rank1BB << (17 * 6)) & Legal)
+#define Rank8BB ((Rank1BB << (17 * 7)) & Legal)
+#define Rank9BB ((Rank1BB << (17 * 8)) & Legal)
+#define Rank10BB ((Rank1BB << (17 * 9)) & Legal)
+#define Rank11BB ((Rank1BB << (17 * 10)) & Legal)
+#define Rank12BB ((Rank1BB << (17 * 11)) & Legal)
+#define Rank13BB ((Rank1BB << (17 * 12)) & Legal)
+#define Rank14BB ((Rank1BB << (17 * 13)) & Legal)
+#define Rank15BB ((Rank1BB << (17 * 14)) & Legal)
+#define Rank16BB ((Rank1BB << (17 * 15)) & Legal)
+#define Rank17BB ((Rank1BB << (17 * 16)) & Legal)
 
 #define Gates ((Bitboard(1)<<Paisho::Bitboards::i1) | (Bitboard(1)<<Paisho::Bitboards::i17) | (Bitboard(1)<<Paisho::Bitboards::a9) | (Bitboard(1)<<Paisho::Bitboards::q9))
 
@@ -84,7 +84,8 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 #define Neutral (Legal^Red^White^Gates)
 
 #define get_bit(bitboard, square) (bitboard & (Bitboard(1) << square))
-
+#define set_bit(bitboard, square) (bitboard |= (Bitboard(1) << square))
+#define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (Bitboard(1) << square) : 0)
 
 namespace Paisho{
     struct Board {
@@ -150,6 +151,13 @@ namespace Paisho{
 
         std::string pretty(Bitboard b);
         void init();
+        Bitboard mask_2_move(int square);
+        Bitboard mask_3_move(int square);
+        Bitboard mask_4_move(int square);
+        Bitboard mask_5_move(int square);
+        Bitboard mask_6_move(int square);
+    
+
 
 
     } //namespace bitboards
