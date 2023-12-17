@@ -42,6 +42,16 @@ void test_print_macros(){
     Paisho::Bitboards::pretty(Gates);
     Paisho::Bitboards::pretty(Illegal);
     Paisho::Bitboards::pretty(Legal);
+    Paisho::Bitboards::pretty(Red);
+    Paisho::Bitboards::pretty(White);
+/*
+    Bitboard a = Legal;
+    Bitboard b = White;
+    Paisho::Bitboards::pretty(a);
+    Paisho::Bitboards::pretty(b);
+    Paisho::Bitboards::pretty(a^b);
+*/
+    Paisho::Bitboards::pretty(Neutral);
 
 
 }

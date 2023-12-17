@@ -45,23 +45,43 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 #define Rank16BB Rank1BB << (17 * 15)
 #define Rank17BB Rank1BB << (17 * 16)
 
-#define Gates (Bitboard(1)<<Paisho::Bitboards::i1) | (Bitboard(1)<<Paisho::Bitboards::i17) | (Bitboard(1)<<Paisho::Bitboards::a9) | (Bitboard(1)<<Paisho::Bitboards::q9)
+#define Gates ((Bitboard(1)<<Paisho::Bitboards::i1) | (Bitboard(1)<<Paisho::Bitboards::i17) | (Bitboard(1)<<Paisho::Bitboards::a9) | (Bitboard(1)<<Paisho::Bitboards::q9))
 
-#define Illegal Bitboard("11110000000001111") |\
+#define Illegal ((Bitboard("11110000000001111") |\
     (Bitboard("11100000000000111") << Paisho::NORTH) |\
     (Bitboard("11000000000000011") << 2*Paisho::NORTH) |\
     (Bitboard("10000000000000001") << 3*Paisho::NORTH) | \
     (Bitboard("11110000000001111") << 16*Paisho::NORTH) |\
     (Bitboard("11100000000000111") << 15*Paisho::NORTH) |\
     (Bitboard("11000000000000011") << 14*Paisho::NORTH) |\
-    (Bitboard("10000000000000001") << 13*Paisho::NORTH)
+    (Bitboard("10000000000000001") << 13*Paisho::NORTH)))
 
 
 
-#define Legal ~Illegal
-#define Red 
-#define White
-#define neutral
+#define Legal (~Illegal)
+#define Red ((Bitboard("11111") << (7*Paisho::NORTH + 3*Paisho::EAST)) |\
+    (Bitboard("11111") << (9*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("1111") << (6*Paisho::NORTH + 4*Paisho::EAST)) |\
+    (Bitboard("1111") << (10*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("111") << (5*Paisho::NORTH + 5*Paisho::EAST)) |\
+    (Bitboard("111") << (11*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("11") << (4*Paisho::NORTH + 6*Paisho::EAST)) |\
+    (Bitboard("11") << (12*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("1") << (3*Paisho::NORTH + 7*Paisho::EAST)) |\
+    (Bitboard("1") << (13*Paisho::NORTH + 9*Paisho::EAST)))
+
+#define White ((Bitboard("11111") << (7*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("11111") << (9*Paisho::NORTH + 3*Paisho::EAST)) |\
+    (Bitboard("1111") << (6*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("1111") << (10*Paisho::NORTH + 4*Paisho::EAST)) |\
+    (Bitboard("111") << (5*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("111") << (11*Paisho::NORTH + 5*Paisho::EAST)) |\
+    (Bitboard("11") << (4*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("11") << (12*Paisho::NORTH + 6*Paisho::EAST)) |\
+    (Bitboard("1") << (3*Paisho::NORTH + 9*Paisho::EAST)) |\
+    (Bitboard("1") << (13*Paisho::NORTH + 7*Paisho::EAST)))
+
+#define Neutral (Legal^Red^White^Gates)
 
 #define get_bit(bitboard, square) (bitboard & (Bitboard(1) << square))
 
