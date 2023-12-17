@@ -33,9 +33,8 @@ std::string GetBinaryStringFromHexString (std::string sHex)
 		}
 
 namespace Paisho{
+
     std::string Bitboards::pretty(Bitboard b){
-
-
         std::cout << "        ";
         for (int i = 276; i <= 284; i++){
             std::cout << " " << b[i];
@@ -284,7 +283,6 @@ namespace Paisho{
             Bitboard nneeee = ((bb & ~FileQBB & ~FilePBB & ~FileOBB & ~FileNBB) << 4*EAST) << 2*NORTH;
             Bitboard sseeee = ((bb & ~FileQBB & ~FilePBB & ~FileOBB & ~FileNBB) << 4*EAST) >> 2*NORTH;
             Bitboard sswwww = ((bb & ~FileABB & ~FileBBB & ~FileCBB & ~FileDBB) >> 4*EAST) >> 2*NORTH;
-
 
             moves = (m5_mask|\
                     s6|n6|w6|e6|\

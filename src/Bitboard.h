@@ -90,9 +90,27 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 
 namespace Paisho{
     struct Board {
+
+        int bw3;
+        int bw4;
+        int bw5;
+        int br3;
+        int br4;
+        int br5;
+        char blackAccents;
+
+        int ww3;
+        int ww4;
+        int ww5;
+        int wr3;
+        int wr4;
+        int wr5;
+        char blackAccents;
+
         Bitboard AllWhitePieces;
         Bitboard AllBlackPieces;
         Bitboard AllPieces;
+        //save how many are in each hand
 
         Bitboard BlackW3;
         Bitboard BlackW4;
@@ -114,8 +132,30 @@ namespace Paisho{
         Bitboard WhiteOrchid;
         Bitboard WhiteLotus;
 
+        Bitboard HarmR3;
+        Bitboard HarmR4;
+        Bitboard HarmR5;
+        Bitboard HarmW3;
+        Bitboard HarmW4;
+        Bitboard HarmW5;
+        Bitboard HarmLotus;
+
+        Bitboard ClashR3;
+        Bitboard ClashR4;
+        Bitboard ClashR5;
+        Bitboard ClashW3;
+        Bitboard ClashW4;
+        Bitboard ClashW5;
+
+        Bitboard WhiteHarms;
+        Bitboard BlackHarms;
+
     };
 
+    //Used to initialize all the bitboards
+    Board init_board();
+    //use one char (8 bits) to pick from {rock1, r2, knot1, knot2, w1, w2, b1, b2}
+    
     enum Direction: int{
         NORTH = 17,
         EAST = 1,

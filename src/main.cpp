@@ -78,7 +78,7 @@ void test_board_ops(){
     pretty(mask_5_move(n8));
 
     pretty(mask_5_move(i8));
-    pretty(mask_6_move(i8));
+    pretty(mask_6_move(q8));
 }
 
 
