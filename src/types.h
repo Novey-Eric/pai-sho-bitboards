@@ -2,6 +2,18 @@
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
 
+
+#define copy_board()                                                      \
+    U64 bitboards_copy[33] \
+    int side_copy, enpassant_copy, castle_copy;                           \
+    memcpy(bitboards_copy, bitboards, sizeof(bitboards));                                \
+    side_copy = side, enpassant_copy = enpassant, castle_copy = castle;   \
+
+// restore board state
+#define take_back()                                                       \
+    memcpy(bitboards, bitboards_copy, 96);                                \
+    side = side_copy, enpassant = enpassant_copy, castle = castle_copy;   \
+
 namespace Paisho{
 
 
@@ -12,8 +24,15 @@ namespace Paisho{
         HARMACCENT
     };
 
-    enum Piece{
-        W3,W4,W5,R3,R4,R5,Lotus,Orchid
+    enum BitBoardIndex{
+        WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteOrchid,WhiteAccent,
+        BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackOrchid,BlackAccent,
+        BlackHarmR3,BlackHarmR4,BlackHarmR5,BlackHarmW3,BlackHarmW4,BlackHarmW5,
+        WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
+        AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
+        ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
+
+        
     };
 
     enum Accent: char{
@@ -68,7 +87,7 @@ namespace Paisho{
     };    
 
     struct Move{
-        MoveType move_type;
+        enum MoveType move_type;
         enum Squares s1; //This is the square used in a place move, or the source square of a Move
         enum Squares s2; //destination square in move
         enum Piece place_piece; //Used in harmplace move
@@ -76,6 +95,11 @@ namespace Paisho{
         enum Squares s3; //If boat is placed on a flower tile, this will be the destination tile of the moved piece.
     };
 
+
+    struct Moves{
+        Move[1000];
+        int move_count;
+    }
 
 }//Paisho
 

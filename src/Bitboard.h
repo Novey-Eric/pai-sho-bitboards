@@ -91,6 +91,7 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 namespace Paisho{
     struct Board {
 
+        //save how many are in each hand
         int bw3;
         int bw4;
         int bw5;
@@ -107,45 +108,9 @@ namespace Paisho{
         int wr5;
         char blackAccents;
 
-        Bitboard AllWhitePieces;
-        Bitboard AllBlackPieces;
-        Bitboard AllPieces;
-        //save how many are in each hand
+        Bitboard bitboards[41];
 
-        Bitboard BlackW3;
-        Bitboard BlackW4;
-        Bitboard BlackW5;
-        Bitboard BlackR3;
-        Bitboard BlackR4;
-        Bitboard BlackR5;
-        Bitboard BlackAccent;
-        Bitboard BlackOrchid;
-        Bitboard BlackLotus;
-
-        Bitboard WhiteW3;
-        Bitboard WhiteW4;
-        Bitboard WhiteW5;
-        Bitboard WhiteR3;
-        Bitboard WhiteR4;
-        Bitboard WhiteR5;
-        Bitboard WhiteAccent;
-        Bitboard WhiteOrchid;
-        Bitboard WhiteLotus;
-
-        Bitboard HarmR3;
-        Bitboard HarmR4;
-        Bitboard HarmR5;
-        Bitboard HarmW3;
-        Bitboard HarmW4;
-        Bitboard HarmW5;
         Bitboard HarmLotus;
-
-        Bitboard ClashR3;
-        Bitboard ClashR4;
-        Bitboard ClashR5;
-        Bitboard ClashW3;
-        Bitboard ClashW4;
-        Bitboard ClashW5;
 
         Bitboard WhiteHarms;
         Bitboard BlackHarms;
@@ -172,6 +137,8 @@ namespace Paisho{
 
         std::string pretty(Bitboard b);
         void init();
+        Moves get_moves(Bitboard b);
+
         Bitboard mask_2_move(enum Squares square);
         Bitboard mask_3_move(enum Squares square);
         Bitboard mask_4_move(enum Squares square);
