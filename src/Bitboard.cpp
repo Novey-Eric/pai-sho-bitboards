@@ -104,13 +104,8 @@ namespace Paisho{
 
         Moves get_moves(Board b, Color side){
             Moves move_list;
-            int check_pieces[8];
             if (side == WHITE) {
                 
-
-            } else{
-
-
             }
 
 

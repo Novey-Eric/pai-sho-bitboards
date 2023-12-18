@@ -31,18 +31,16 @@ namespace Paisho{
         WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
         ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
-
-        
     };
 
-    enum Accent: char{
-        Rock1=0b10000000,
-        Rock20=0b01000000,
-        Knotweed1=0b00100000,
+    enum Accent: unsigned char{
+        Rock=0b10000000,
+        Rock2=0b01000000,
+        Knotweed=0b00100000,
         Knotweed2=0b00010000,
-        Wheel1=0b00001000,
+        Wheel=0b00001000,
         Wheel2=0b00000100,
-        Boat1=0b00000010,
+        Boat=0b00000010,
         Boat2=0b00000001
     };
 
@@ -86,6 +84,10 @@ namespace Paisho{
         a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
     };    
 
+    enum Piece{
+        w3,w4,w5,r3,r4,r5,lotus,orchid
+    };
+
     struct Move{
         enum MoveType move_type;
         enum Squares s1; //This is the square used in a place move, or the source square of a Move
@@ -95,11 +97,10 @@ namespace Paisho{
         enum Squares s3; //If boat is placed on a flower tile, this will be the destination tile of the moved piece.
     };
 
-
     struct Moves{
-        Move[1000];
+        Move movelist[1000];
         int move_count;
-    }
+    };
 
 }//Paisho
 

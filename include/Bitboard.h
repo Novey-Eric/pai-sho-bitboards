@@ -106,7 +106,7 @@ namespace Paisho{
         int wr3;
         int wr4;
         int wr5;
-        char blackAccents;
+        char whiteAccents;
 
         Bitboard bitboards[41];
 
