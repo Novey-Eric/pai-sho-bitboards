@@ -89,11 +89,28 @@ void test_lsb(){
     pretty(test);
     cout << get_lsb(test) << " "<< square << endl;
 
+    Bitboard t2(0);
+    cout << get_lsb(t2) << endl;
+
 }
+
+void test_gen_moves(){
+    Bitboard w3b(1);
+    w3b <<= i8;
+    pretty(w3b);
+    Board b;
+    b.bitboards[WhiteW3]=w3b;
+    b.bitboards[AllWhiteFlowers] = w3b;
+    
+    get_moves(b, WHITE);
+
+}
+
 
 int main(){
     //test_print_macros();
     //test_board_ops();
-    test_lsb();
+    //test_lsb();
+    test_gen_moves();
     return 1;
 }

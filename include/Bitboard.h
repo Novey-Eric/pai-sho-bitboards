@@ -6,7 +6,6 @@
 #include "types.h"
 //using Bitboard = std::bitset<224>;
 
-typedef std::bitset<290> Bitboard;
 std::string GetBinaryStringFromHexString (std::string sHex);
 
 #define NUM_SQUARES 290
@@ -90,34 +89,6 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (Bitboard(1) << square) : 0)
 
 namespace Paisho{
-    struct Board {
-
-        //save how many are in each hand
-        int bw3;
-        int bw4;
-        int bw5;
-        int br3;
-        int br4;
-        int br5;
-        char blackAccents;
-
-        int ww3;
-        int ww4;
-        int ww5;
-        int wr3;
-        int wr4;
-        int wr5;
-        char whiteAccents;
-
-        Bitboard bitboards[41];
-
-        Bitboard HarmLotus;
-
-        Bitboard WhiteHarms;
-        Bitboard BlackHarms;
-
-    };
-
     //Used to initialize all the bitboards
     Board init_board();
     //use one char (8 bits) to pick from {rock1, r2, knot1, knot2, w1, w2, b1, b2}
@@ -139,13 +110,13 @@ namespace Paisho{
         std::string pretty(Bitboard b);
         void init();
         int get_lsb(Bitboard b);
-        Moves get_moves(Bitboard b);
+        Moves get_moves(Board b, int color);
 
-        Bitboard mask_2_move(enum Squares square);
-        Bitboard mask_3_move(enum Squares square);
-        Bitboard mask_4_move(enum Squares square);
-        Bitboard mask_5_move(enum Squares square);
-        Bitboard mask_6_move(enum Squares square);
+        Bitboard mask_2_move(int square);
+        Bitboard mask_3_move(int square);
+        Bitboard mask_4_move(int square);
+        Bitboard mask_5_move(int square);
+        Bitboard mask_6_move(int square);
 
     } //namespace bitboards
 

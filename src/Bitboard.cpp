@@ -102,13 +102,41 @@ namespace Paisho{
 
     namespace Bitboards{
 
-        Moves get_moves(Board b, Color side){
+        Moves get_moves(Board b, int color){
             Moves move_list;
-            if (side == WHITE) {
-                
+            move_list.move_count = 0;
+            Bitboard zero(0);
+            if (color == WHITE) {
+                //Go through each piece and generate moves for it
+                //W3 case first
+                Bitboard w3_copy = b.bitboards[WhiteW3]; //WHITE 3 case
+                int t_src = get_lsb(w3_copy);
+                Bitboard t_dests;
+                while (t_src != -1){ //First look at quiet moves only
+                    t_dests = mask_3_move(t_src) & \
+                              ~Gates & \
+                              ~b.bitboards[AllWhiteFlowers] & \
+                              ~b.bitboards[AllBlackFlowers] & \
+                              ~b.bitboards[WhiteAccents] & \
+                              ~b.bitboards[BlackAccents] & \
+                              ~b.bitboards[ClashW3];
+
+                    int t_dest = get_lsb(t_dests);
+                    while (t_dest != -1){
+                        Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
+                                        (false << MOVE_CAPTURE_OFFSET) |\
+                                        (t_src << MOVE_S1_OFFSET) |\
+                                        (t_dest << MOVE_S2_OFFSET);
+                        move_list.movelist[move_list.move_count++] = t_move;
+                        t_dests.reset(t_dest);
+                        t_dest = get_lsb(t_dests);
+                    }
+                //~(b.bitboards[AllBlackFlowers] ^ b.bitboards[BlackR3]); //Case for capturing 
+                    w3_copy.reset(t_src);
+                    t_src = get_lsb(w3_copy);
+                }
             }
-
-
+            return move_list;
         }
 
         int get_lsb(Bitboard b){
@@ -128,7 +156,7 @@ namespace Paisho{
             return;
         }
 
-        Bitboard mask_2_move(enum Squares square){
+        Bitboard mask_2_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
             bb.set(square);
@@ -153,7 +181,7 @@ namespace Paisho{
         } 
 
 
-        Bitboard mask_3_move(enum Squares square){
+        Bitboard mask_3_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
             bb.set(square);
@@ -186,7 +214,7 @@ namespace Paisho{
 
 
 
-        Bitboard mask_4_move(enum Squares square){
+        Bitboard mask_4_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
             bb.set(square);
@@ -226,7 +254,7 @@ namespace Paisho{
 
 
 
-        Bitboard mask_5_move(enum Squares square){
+        Bitboard mask_5_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
             bb.set(square);
@@ -270,7 +298,7 @@ namespace Paisho{
             return moves;
         } 
 
-        Bitboard mask_6_move(enum Squares square){
+        Bitboard mask_6_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
             bb.set(square);

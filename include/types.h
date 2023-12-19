@@ -14,7 +14,36 @@
     memcpy(bitboards, bitboards_copy, 96);                                \
     side = side_copy, enpassant = enpassant_copy, castle = castle_copy;   \
 
+
+typedef std::bitset<290> Bitboard;
 namespace Paisho{
+
+    typedef struct {
+        //save how many are in each hand
+        int bw3;
+        int bw4;
+        int bw5;
+        int br3;
+        int br4;
+        int br5;
+        char blackAccents;
+
+        int ww3;
+        int ww4;
+        int ww5;
+        int wr3;
+        int wr4;
+        int wr5;
+        char whiteAccents;
+
+        Bitboard bitboards[41];
+
+        Bitboard HarmLotus;
+
+        Bitboard WhiteHarms;
+        Bitboard BlackHarms;
+
+    } Board;
 
 
     enum MoveType: int{
@@ -87,20 +116,41 @@ namespace Paisho{
     enum Piece{
         w3,w4,w5,r3,r4,r5,lotus,orchid
     };
-
-    struct Move{
+/*
+    typedef struct {
         enum MoveType move_type;
+        bool capture;
         enum Squares s1; //This is the square used in a place move, or the source square of a Move
         enum Squares s2; //destination square in move
         enum Piece place_piece; //Used in harmplace move
         enum Accent aux_piece; //accent tile in harm move
         enum Squares s3; //If boat is placed on a flower tile, this will be the destination tile of the moved piece.
-    };
+    } Move;
+*/
+    // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
+    // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}
+    // Total 37 bits
+    #define MOVE_TYPE_OFFSET (0)
+    #define MOVE_CAPTURE_OFFSET (3)
+    #define MOVE_S1_OFFSET (4)
+    #define MOVE_S2_OFFSET (13)
+    #define MOVE_PIECE_OFFSET (22)
+    #define MOVE_AUXPIECE_OFFSET (25)
+    #define MOVE_S3_OFFSET (28)
 
-    struct Moves{
-        Move movelist[1000];
+    #define MOVE_TYPE_MASK (((uint64_t) 0b111))
+    #define MOVE_CAPTURE_MASK (((uint64_t) 0b1) << 3)
+    #define MOVE_S1_MASK (((uint64_t) 0b111111111) << 4)
+    #define MOVE_S2_MASK (((uint64_t) 0b111111111) << 13)
+    #define MOVE_PIECE_MASK (((uint64_t) 0b111) << 22)
+    #define MOVE_AUXPIECE_MASK (((uint64_t) 0b111) << 25)
+    #define MOVE_S3_MASK (((uint64_t) 0b111111111) << 28)
+    typedef uint64_t Move;
+
+    typedef struct {
+        Move movelist[2000];
         int move_count;
-    };
+    } Moves;
 
 }//Paisho
 
