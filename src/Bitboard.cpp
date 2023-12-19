@@ -111,6 +111,18 @@ namespace Paisho{
 
         }
 
+        int get_lsb(Bitboard b){
+            Bitboard mask(1);
+            Bitboard zero(0);
+            for (int i = 0; i < NUM_SQUARES; i++){
+                if ((mask & b) != zero){
+                    return i;
+                }else{
+                    mask <<= 1;
+                }
+            }
+            return -1; //There is no 1
+        }
 
         void init(){
             return;

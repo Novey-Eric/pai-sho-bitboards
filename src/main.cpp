@@ -2,6 +2,7 @@
 #include"Bitboard.h"
 #include <iostream>
 #include <ostream>
+#include <strings.h>
 
 using namespace std;
 using namespace Paisho::Bitboards;
@@ -82,8 +83,17 @@ void test_board_ops(){
 }
 
 
+void test_lsb(){
+    int square = p8;
+    Bitboard test = mask_2_move(p10);
+    pretty(test);
+    cout << get_lsb(test) << " "<< square << endl;
+
+}
+
 int main(){
     //test_print_macros();
-    test_board_ops();
+    //test_board_ops();
+    test_lsb();
     return 1;
 }

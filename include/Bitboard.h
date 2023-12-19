@@ -9,6 +9,7 @@
 typedef std::bitset<290> Bitboard;
 std::string GetBinaryStringFromHexString (std::string sHex);
 
+#define NUM_SQUARES 290
 #define FullFile (Bitboard(GetBinaryStringFromHexString("100008000400020001000080004000200010000800040002000100008000400020001")))
 #define FileABB ((FullFile) & Legal)
 #define FileBBB ((FullFile << 1) & Legal)
@@ -137,6 +138,7 @@ namespace Paisho{
 
         std::string pretty(Bitboard b);
         void init();
+        int get_lsb(Bitboard b);
         Moves get_moves(Bitboard b);
 
         Bitboard mask_2_move(enum Squares square);
