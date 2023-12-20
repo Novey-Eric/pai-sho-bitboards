@@ -53,9 +53,11 @@ namespace Paisho{
         HARMACCENT
     };
 
+    // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
+    // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
     enum BitBoardIndex{
-        WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteOrchid,WhiteAccent,
-        BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackOrchid,BlackAccent,
+        WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteTameOrchid,WhiteWildOrchid,WhiteAccent,
+        BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackTameOrchid,BlackWildOrchid,BlackAccent,
         BlackHarmR3,BlackHarmR4,BlackHarmR5,BlackHarmW3,BlackHarmW4,BlackHarmW5,
         WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,

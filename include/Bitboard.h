@@ -50,14 +50,14 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 
 #define Gates ((Bitboard(1)<<Paisho::i1) | (Bitboard(1)<<Paisho::i17) | (Bitboard(1)<<Paisho::a9) | (Bitboard(1)<<Paisho::q9))
 
-#define Illegal ((Bitboard("11110000000001111") |\
+#define Illegal (Bitboard("11110000000001111") |\
     (Bitboard("11100000000000111") << Paisho::NORTH) |\
     (Bitboard("11000000000000011") << 2*Paisho::NORTH) |\
     (Bitboard("10000000000000001") << 3*Paisho::NORTH) | \
     (Bitboard("11110000000001111") << 16*Paisho::NORTH) |\
     (Bitboard("11100000000000111") << 15*Paisho::NORTH) |\
     (Bitboard("11000000000000011") << 14*Paisho::NORTH) |\
-    (Bitboard("10000000000000001") << 13*Paisho::NORTH)))
+    (Bitboard("10000000000000001") << 13*Paisho::NORTH))
 
 
 

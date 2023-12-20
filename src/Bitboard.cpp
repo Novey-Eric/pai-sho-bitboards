@@ -158,64 +158,85 @@ namespace Paisho{
 
         void get_flower_quiet_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
             Bitboard (*mask_move_ptr)(int);
-            int clash_board;
+            Bitboard clash_board;
             //Bitboard mask_3_move(int square){
             switch(bbflowerpiece){
                 case WhiteW3:
                     mask_move_ptr = &mask_3_move;
-                    clash_board = ClashW3;
+                    clash_board = b.bitboards[ClashW3];
                     break;
                 case WhiteW4:
                     mask_move_ptr = &mask_4_move;
-                    clash_board = ClashW4;
+                    clash_board = b.bitboards[ClashW4];
                     break;
                 case WhiteW5:
                     mask_move_ptr = &mask_5_move;
-                    clash_board = ClashW5;
+                    clash_board = b.bitboards[ClashW5];
                     break;
                 case WhiteR3:
                     mask_move_ptr = &mask_3_move;
-                    clash_board = ClashR3;
+                    clash_board = b.bitboards[ClashR3];
                     break;
                 case WhiteR4:
                     mask_move_ptr = &mask_4_move;
-                    clash_board = ClashR4;
+                    clash_board = b.bitboards[ClashR4];
                     break;
                 case WhiteR5:
                     mask_move_ptr = &mask_5_move;
-                    clash_board = ClashR5;
+                    clash_board = b.bitboards[ClashR5];
                     break;
                 case BlackW3:
                     mask_move_ptr = &mask_3_move;
-                    clash_board = ClashW3;
+                    clash_board = b.bitboards[ClashW3];
                     break;
                 case BlackW4:
                     mask_move_ptr = &mask_4_move;
-                    clash_board = ClashW4;
+                    clash_board = b.bitboards[ClashW4];
                     break;
                 case BlackW5:
                     mask_move_ptr = &mask_5_move;
-                    clash_board = ClashW5;
+                    clash_board = b.bitboards[ClashW5];
                     break;
                 case BlackR3:
                     mask_move_ptr = &mask_3_move;
-                    clash_board = ClashR3;
+                    clash_board = b.bitboards[ClashR3];
                     break;
                 case BlackR4:
                     mask_move_ptr = &mask_4_move;
-                    clash_board = ClashR4;
+                    clash_board = b.bitboards[ClashR4];
                     break;
                 case BlackR5:
                     mask_move_ptr = &mask_5_move;
-                    clash_board = ClashR5;
+                    clash_board = b.bitboards[ClashR5];
                     break;
-                default:
+                case BlackTameOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    clash_board = Illegal;
+                    break;
+                case WhiteTameOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    clash_board = Illegal;
+                    break;
+                case BlackWildOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    clash_board = Illegal;
+                    break;
+                case WhiteWildOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    clash_board = Illegal;
+                    break;
+                case WhiteLotus:
+                    mask_move_ptr = &mask_2_move;
+                    clash_board = Illegal;
+                    break;
+                case BlackLotus:
+                    mask_move_ptr = &mask_2_move;
+                    clash_board = Illegal;
+                    break;
+              default:
                     std::cout << "bad piece in get quiet moves" << std::endl;
             }
             
-            
-
-
             Bitboard w3_copy = (team == WHITE) ? b.bitboards[bbflowerpiece] : b.bitboards[bbflowerpiece];
 
             //Go through each piece and generate moves for it
@@ -223,12 +244,11 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //First look at quiet moves only
                 t_dests = mask_move_ptr(t_src) & \
-                          ~Gates & \
                           ~b.bitboards[AllWhiteFlowers] & \
                           ~b.bitboards[AllBlackFlowers] & \
                           ~b.bitboards[WhiteAccents] & \
                           ~b.bitboards[BlackAccents] & \
-                          ~b.bitboards[clash_board];
+                          ~clash_board;
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
@@ -247,15 +267,167 @@ namespace Paisho{
             }
         }
 
+        //Note this includes orchid
+        void get_flower_capture_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            Bitboard (*mask_move_ptr)(int);
+            Bitboard cap_board;
 
+            switch(bbflowerpiece){
+                case WhiteW3:
+                    mask_move_ptr = &mask_3_move;
+                    cap_board = b.bitboards[BlackR3];
+                    break;
+                case WhiteW4:
+                    mask_move_ptr = &mask_4_move;
+                    cap_board = b.bitboards[BlackR4];
+                    break;
+                case WhiteW5:
+                    mask_move_ptr = &mask_5_move;
+                    cap_board = b.bitboards[BlackR5];
+                    break;
+                case WhiteR3:
+                    mask_move_ptr = &mask_3_move;
+                    cap_board = b.bitboards[BlackW3];
+                    break;
+                case WhiteR4:
+                    mask_move_ptr = &mask_4_move;
+                    cap_board = b.bitboards[BlackW4];
+                    break;
+                case WhiteR5:
+                    mask_move_ptr = &mask_5_move;
+                    cap_board = b.bitboards[BlackW5];
+                    break;
+                case BlackW3:
+                    mask_move_ptr = &mask_3_move;
+                    cap_board = b.bitboards[WhiteR3];
+                    break;
+                case BlackW4:
+                    mask_move_ptr = &mask_4_move;
+                    cap_board = b.bitboards[WhiteR4];
+                    break;
+                case BlackW5:
+                    mask_move_ptr = &mask_5_move;
+                    cap_board = b.bitboards[WhiteR5];
+                    break;
+                case BlackR3:
+                    mask_move_ptr = &mask_3_move;
+                    cap_board = b.bitboards[WhiteW3];
+                    break;
+                case BlackR4:
+                    mask_move_ptr = &mask_4_move;
+                    cap_board = b.bitboards[WhiteW4];
+                    break;
+                case BlackR5:
+                    mask_move_ptr = &mask_5_move;
+                    cap_board = b.bitboards[WhiteW5];
+                    break;
+                case BlackTameOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    cap_board = Illegal;
+                    break;
+                case WhiteTameOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    cap_board = Illegal;
+                    break;
+                case BlackWildOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    cap_board = b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteLotus];
+                    break;
+                case WhiteWildOrchid:
+                    mask_move_ptr = &mask_6_move;
+                    cap_board = b.bitboards[AllBlackFlowers] & b.bitboards[BlackLotus];
+                    break;
+                case WhiteLotus:
+                    mask_move_ptr = &mask_2_move;
+                    cap_board = Illegal;
+                    break;
+                case BlackLotus:
+                    mask_move_ptr = &mask_2_move;
+                    cap_board = Illegal;
+                    break;
+              default:
+                    std::cout << "bad piece in get capture moves" << std::endl;
+            }
+            
+            Bitboard w3_copy = (team == WHITE) ? b.bitboards[bbflowerpiece] : b.bitboards[bbflowerpiece];
+            //Go through each piece and generate moves for it
+            int t_src = get_lsb(w3_copy);
+            Bitboard t_dests;
+            while (t_src != -1){ //First look at quiet moves only
+                t_dests = mask_move_ptr(t_src) & \
+                          cap_board;
 
+                int t_dest = get_lsb(t_dests);
+                while (t_dest != -1){
+                    //std::cout << std::hex << MOVE  << " " << t_src << " " << t_dest << std::endl;
+                    Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
+                                    (1 << MOVE_CAPTURE_OFFSET) |\
+                                    (t_src << MOVE_S1_OFFSET) |\
+                                    (t_dest << MOVE_S2_OFFSET);
+                    move_list->movelist[move_list->move_count++] = t_move;
+                    t_dests.reset(t_dest);
+                    t_dest = get_lsb(t_dests);
+                }
+            //~(b.bitboards[AllBlackFlowers] ^ b.bitboards[BlackR3]); //Case for capturing 
+                w3_copy.reset(t_src);
+                t_src = get_lsb(w3_copy);
+            }
+        }
+
+        void get_harmony_place_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            if ((team == WHITE) && (b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteTameOrchid] & b.bitboards[WhiteWildOrchid] & b.bitboards[WhiteLotus] & Gates).count() > 0){
+                //Trying to harmony place with a growing tile in gate
+                return;
+            }
+
+            Bitboard (*mask_move_ptr)(int);
+            Bitboard harm_board; //harm1 & harm2
+
+            Bitboard w3_copy = (team == WHITE) ? b.bitboards[bbflowerpiece] : b.bitboards[bbflowerpiece];
+            //Go through each piece and generate moves for it
+            int t_src = get_lsb(w3_copy);
+            Bitboard t_dests;
+            while (t_src != -1){ //First look at quiet moves only
+                t_dests = mask_move_ptr(t_src) & \
+                          cap_board;
+
+                int t_dest = get_lsb(t_dests);
+                while (t_dest != -1){
+                    //std::cout << std::hex << MOVE  << " " << t_src << " " << t_dest << std::endl;
+                    Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
+                                    (1 << MOVE_CAPTURE_OFFSET) |\
+                                    (t_src << MOVE_S1_OFFSET) |\
+                                    (t_dest << MOVE_S2_OFFSET);
+                    move_list->movelist[move_list->move_count++] = t_move;
+                    t_dests.reset(t_dest);
+                    t_dest = get_lsb(t_dests);
+                }
+            //~(b.bitboards[AllBlackFlowers] ^ b.bitboards[BlackR3]); //Case for capturing 
+                w3_copy.reset(t_src);
+                t_src = get_lsb(w3_copy);
+            }
+        }
 
 
         //get_flower_quiet_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
         Moves get_moves(Board b, int team){
             Moves move_list;
             move_list.move_count = 0;
-            get_flower_quiet_moves(b, team, WhiteW3, &move_list);
+            if (team == WHITE){
+                get_flower_quiet_moves(b, team, WhiteW3, &move_list);
+                get_flower_quiet_moves(b, team, WhiteW4, &move_list);
+                get_flower_quiet_moves(b, team, WhiteW5, &move_list);
+                get_flower_quiet_moves(b, team, WhiteR3, &move_list);
+                get_flower_quiet_moves(b, team, WhiteR4, &move_list);
+                get_flower_quiet_moves(b, team, WhiteR5, &move_list);
+            } else{
+                get_flower_quiet_moves(b, team, BlackW3, &move_list);
+                get_flower_quiet_moves(b, team, BlackW4, &move_list);
+                get_flower_quiet_moves(b, team, BlackW5, &move_list);
+                get_flower_quiet_moves(b, team, BlackR3, &move_list);
+                get_flower_quiet_moves(b, team, BlackR4, &move_list);
+                get_flower_quiet_moves(b, team, WhiteR5, &move_list);
+            }
             return move_list;
         }
 
