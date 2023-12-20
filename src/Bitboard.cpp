@@ -389,7 +389,7 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //First look at quiet moves only
                 t_dests = mask_move_ptr(t_src) & \
-                          cap_board;
+                          harm_board;
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
