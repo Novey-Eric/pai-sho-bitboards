@@ -61,18 +61,20 @@ namespace Paisho{
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
         ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
     };
-
+    //Set these like 1<<Rock or something
     enum Accent: unsigned char{
-        Rock=0b10000000,
-        Rock2=0b01000000,
-        Knotweed=0b00100000,
-        Knotweed2=0b00010000,
-        Wheel=0b00001000,
-        Wheel2=0b00000100,
-        Boat=0b00000010,
-        Boat2=0b00000001
+        Rock,
+        Rock2,
+        Knotweed,
+        Knotweed2,
+        Wheel,
+        Wheel2,
+        Boat,
+        Boat2,
     };
 
+    const std::string AccentStrings[] = {"R", "R2", "K", "K2", "W", "W2", "B", "B2"};
+    
 
     enum Color{
         WHITE,
@@ -113,9 +115,33 @@ namespace Paisho{
         a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
     };    
 
+    const std::string SquareStrings[] = {
+        "A1","B1","C1","D1","E1","F1","G1","H1","I1","J1","K1","L1","M1","N1","O1","P1","Q1",
+        "A2","B2","C2","D2","E2","F2","G2","H2","I2","J2","K2","L2","M2","N2","O2","P2","Q2",
+        "A3","B3","C3","D3","E3","F3","G3","H3","I3","J3","K3","L3","M3","N3","O3","P3","Q3",
+        "A4","B4","C4","D4","E4","F4","G4","H4","I4","J4","K4","L4","M4","N4","O4","P4","Q4",
+        "A5","B5","C5","D5","E5","F5","G5","H5","I5","J5","K5","L5","M5","N5","O5","P5","Q5",
+        "A6","B6","C6","D6","E6","F6","G6","H6","I6","J6","K6","L6","M6","N6","O6","P6","Q6",
+        "A7","B7","C7","D7","E7","F7","G7","H7","I7","J7","K7","L7","M7","N7","O7","P7","Q7",
+        "A8","B8","C8","D8","E8","F8","G8","H8","I8","J8","K8","L8","M8","N8","O8","P8","Q8",
+        "A9","B9","C9","D9","E9","F9","G9","H9","I9","J9","K9","L9","M9","N9","O9","P9","Q9",
+        "A10","B10","C10","D10","E10","F10","G10","H10","I10","J10","K10","L10","M10","N10","O10","P10","Q10",
+        "A11","B11","C11","D11","E11","F11","G11","H11","I11","J11","K11","L11","M11","N11","O11","P11","Q11",
+        "A12","B12","C12","D12","E12","F12","G12","H12","I12","J12","K12","L12","M12","N12","O12","P12","Q12",
+        "A13","B13","C13","D13","E13","F13","G13","H13","I13","J13","K13","L13","M13","N13","O13","P13","Q13",
+        "A14","B14","C14","D14","E14","F14","G14","H14","I14","J14","K14","L14","M14","N14","O14","P14","Q14",
+        "A15","B15","C15","D15","E15","F15","G15","H15","I15","J15","K15","L15","M15","N15","O15","P15","Q15",
+        "A16","B16","C16","D16","E16","F16","G16","H16","I16","J16","K16","L16","M16","N16","O16","P16","Q16",
+        "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
+    };    
+
+
+
     enum Piece{
         w3,w4,w5,r3,r4,r5,lotus,orchid
     };
+
+    const std::string PieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "L", "O"};
 /*
     typedef struct {
         enum MoveType move_type;
@@ -128,8 +154,8 @@ namespace Paisho{
     } Move;
 */
     // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
-    // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}
-    // Total 37 bits
+    // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
+    // Total 47 bits
     #define MOVE_TYPE_OFFSET (0)
     #define MOVE_CAPTURE_OFFSET (3)
     #define MOVE_S1_OFFSET (4)
@@ -137,6 +163,8 @@ namespace Paisho{
     #define MOVE_PIECE_OFFSET (22)
     #define MOVE_AUXPIECE_OFFSET (25)
     #define MOVE_S3_OFFSET (28)
+    #define MOVE_S4_OFFSET (37)
+    #define MOVE_BOATMOVE_OFFSET (46)
 
     #define MOVE_TYPE_MASK (((uint64_t) 0b111))
     #define MOVE_CAPTURE_MASK (((uint64_t) 0b1) << 3)
@@ -145,6 +173,8 @@ namespace Paisho{
     #define MOVE_PIECE_MASK (((uint64_t) 0b111) << 22)
     #define MOVE_AUXPIECE_MASK (((uint64_t) 0b111) << 25)
     #define MOVE_S3_MASK (((uint64_t) 0b111111111) << 28)
+    #define MOVE_S4_MASK (((uint64_t) 0b111111111) << 37)
+    #define MOVE_BOATMOVE_MASK (((uint64_t) 0b1) << 46)
     typedef uint64_t Move;
 
     typedef struct {

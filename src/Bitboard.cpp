@@ -34,68 +34,122 @@ std::string GetBinaryStringFromHexString (std::string sHex)
 
 namespace Paisho{
 
+    
+    void print_move(Move m){
+        uint64_t move_type = (m & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET;
+        uint64_t move_capture = (m & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET;
+        uint64_t move_s1 = (m & MOVE_S1_MASK) >> MOVE_S1_OFFSET;
+        uint64_t move_s2 = (m & MOVE_S2_MASK) >> MOVE_S2_OFFSET;
+        uint64_t move_piece = (m & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET;
+        uint64_t move_auxpiece = (m & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET;
+        uint64_t move_s3 = (m & MOVE_S3_MASK) >> MOVE_S3_OFFSET;
+        uint64_t move_s4 = (m & MOVE_S4_MASK) >> MOVE_S4_OFFSET;
+        uint64_t move_boatmove = (m & MOVE_BOATMOVE_MASK) >> MOVE_BOATMOVE_OFFSET;
+
+        switch(move_type){
+            case MOVE:
+                std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
+                break;
+            case PLACE:
+                std::cout << PieceStrings[move_piece] << " " << SquareStrings[move_s1];
+                break;
+            case HARMPLACE:
+                std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
+                std::cout << "+" << PieceStrings[move_piece] << " " << SquareStrings[move_s3];
+                break;
+            case HARMACCENT:
+                if (move_boatmove){
+                    std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
+                    std::cout << "+" << AccentStrings[move_auxpiece] << " " << SquareStrings[move_s3] << "-" << SquareStrings[move_s4];
+                } else{
+                    std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
+                    std::cout << "+" << AccentStrings[move_auxpiece] << " " << SquareStrings[move_s3];
+                }
+                break;
+            default:
+                std::cout << "move type not detected " << std::hex << move_type;
+        }
+        std::cout << std::endl;
+
+    }
+    
+    void print_move_list(Moves mlist){
+        for (int i = 0; i < mlist.move_count; i++){
+            print_move(mlist.movelist[i]);
+        }
+    }
+
+
     std::string Bitboards::pretty(Bitboard b){
-        std::cout << "        ";
+        std::cout << "17 " << "        ";
         for (int i = 276; i <= 284; i++){
             std::cout << " " << b[i];
         }
         std::cout << "        " << std::endl;;
 
-        std::cout << "      ";
+        std::cout << "16 " << "      ";
         for (int i = 258; i <= 268; i++){
             std::cout << " " << b[i];
         }
         std::cout << "      " << std::endl;;
 
 
-        std::cout << "    ";
+        std::cout << "15 " << "    ";
         for (int i = 240; i <= 252; i++){
             std::cout << " " << b[i];
         }
         std::cout << "    " << std::endl;;
 
 
-        std::cout << "  ";
+        std::cout << "14 " << "  ";
         for (int i = 222; i <= 236; i++){
             std::cout << " " << b[i];
         }
         std::cout << "  " << std::endl;;
 
 
-        for (int j = 8; j >=0; j--){
+        for (int j = 8; j >4; j--){
+            std::cout << j+5 << " ";
             for (int i = 68 + j*17; i < 85 + j*17; i++){
                 std::cout << " " << b[i];
             }
             std::cout << std::endl;
         }
 
+        for (int j = 4; j >=0; j--){
+            std::cout << j+5 << "  ";
+            for (int i = 68 + j*17; i < 85 + j*17; i++){
+                std::cout << " " << b[i];
+            }
+            std::cout << std::endl;
+        }
 
-        std::cout << "  ";
+        std::cout << "4  " << "  ";
         for (int i = 52; i <= 66; i++){
             std::cout << " " << b[i];
         }
         std::cout << "  " << std::endl;;
 
-        std::cout << "    ";
+        std::cout << "3  " << "    ";
         for (int i = 36; i <= 48; i++){
             std::cout << " " << b[i];
         }
         std::cout << "    " << std::endl;;
 
 
-        std::cout << "      ";
+        std::cout << "2  " << "      ";
         for (int i = 20; i <= 30; i++){
             std::cout << " " << b[i];
         }
         std::cout << "      " << std::endl;;
 
 
-        std::cout << "        ";
+        std::cout << "1  " << "        ";
         for (int i = 4; i <= 12; i++){
             std::cout << " " << b[i];
         }
-        std::cout << "        " << std::endl << std::endl;
-
+        std::cout << "        " << std::endl;
+        std::cout << "    A B C D E F G H I J K L M N O P Q" << std::endl;
 
         return "hello";
     }
@@ -123,8 +177,9 @@ namespace Paisho{
 
                     int t_dest = get_lsb(t_dests);
                     while (t_dest != -1){
+                        //std::cout << std::hex << MOVE  << " " << t_src << " " << t_dest << std::endl;
                         Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
-                                        (false << MOVE_CAPTURE_OFFSET) |\
+                                        (0 << MOVE_CAPTURE_OFFSET) |\
                                         (t_src << MOVE_S1_OFFSET) |\
                                         (t_dest << MOVE_S2_OFFSET);
                         move_list.movelist[move_list.move_count++] = t_move;

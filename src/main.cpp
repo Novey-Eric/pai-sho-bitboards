@@ -102,7 +102,11 @@ void test_gen_moves(){
     b.bitboards[WhiteW3]=w3b;
     b.bitboards[AllWhiteFlowers] = w3b;
     
-    get_moves(b, WHITE);
+    
+    Moves a = get_moves(b, WHITE);
+    cout<<a.move_count<<endl;
+    cout<< std::hex << a.movelist[0] << endl;
+    print_move(a.movelist[0]);
 
 }
 

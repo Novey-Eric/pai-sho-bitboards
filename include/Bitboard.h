@@ -91,6 +91,8 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 namespace Paisho{
     //Used to initialize all the bitboards
     Board init_board();
+    void print_move(Move m);
+    void print_move_list(Moves ml);
     //use one char (8 bits) to pick from {rock1, r2, knot1, knot2, w1, w2, b1, b2}
     
     enum Direction: int{
