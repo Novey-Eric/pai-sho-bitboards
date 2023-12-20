@@ -156,41 +156,106 @@ namespace Paisho{
 
     namespace Bitboards{
 
-        Moves get_moves(Board b, int color){
+        void get_flower_quiet_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            Bitboard (*mask_move_ptr)(int);
+            int clash_board;
+            //Bitboard mask_3_move(int square){
+            switch(bbflowerpiece){
+                case WhiteW3:
+                    mask_move_ptr = &mask_3_move;
+                    clash_board = ClashW3;
+                    break;
+                case WhiteW4:
+                    mask_move_ptr = &mask_4_move;
+                    clash_board = ClashW4;
+                    break;
+                case WhiteW5:
+                    mask_move_ptr = &mask_5_move;
+                    clash_board = ClashW5;
+                    break;
+                case WhiteR3:
+                    mask_move_ptr = &mask_3_move;
+                    clash_board = ClashR3;
+                    break;
+                case WhiteR4:
+                    mask_move_ptr = &mask_4_move;
+                    clash_board = ClashR4;
+                    break;
+                case WhiteR5:
+                    mask_move_ptr = &mask_5_move;
+                    clash_board = ClashR5;
+                    break;
+                case BlackW3:
+                    mask_move_ptr = &mask_3_move;
+                    clash_board = ClashW3;
+                    break;
+                case BlackW4:
+                    mask_move_ptr = &mask_4_move;
+                    clash_board = ClashW4;
+                    break;
+                case BlackW5:
+                    mask_move_ptr = &mask_5_move;
+                    clash_board = ClashW5;
+                    break;
+                case BlackR3:
+                    mask_move_ptr = &mask_3_move;
+                    clash_board = ClashR3;
+                    break;
+                case BlackR4:
+                    mask_move_ptr = &mask_4_move;
+                    clash_board = ClashR4;
+                    break;
+                case BlackR5:
+                    mask_move_ptr = &mask_5_move;
+                    clash_board = ClashR5;
+                    break;
+                default:
+                    std::cout << "bad piece in get quiet moves" << std::endl;
+            }
+            
+            
+
+
+            Bitboard w3_copy = (team == WHITE) ? b.bitboards[bbflowerpiece] : b.bitboards[bbflowerpiece];
+
+            //Go through each piece and generate moves for it
+            int t_src = get_lsb(w3_copy);
+            Bitboard t_dests;
+            while (t_src != -1){ //First look at quiet moves only
+                t_dests = mask_move_ptr(t_src) & \
+                          ~Gates & \
+                          ~b.bitboards[AllWhiteFlowers] & \
+                          ~b.bitboards[AllBlackFlowers] & \
+                          ~b.bitboards[WhiteAccents] & \
+                          ~b.bitboards[BlackAccents] & \
+                          ~b.bitboards[clash_board];
+
+                int t_dest = get_lsb(t_dests);
+                while (t_dest != -1){
+                    //std::cout << std::hex << MOVE  << " " << t_src << " " << t_dest << std::endl;
+                    Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
+                                    (0 << MOVE_CAPTURE_OFFSET) |\
+                                    (t_src << MOVE_S1_OFFSET) |\
+                                    (t_dest << MOVE_S2_OFFSET);
+                    move_list->movelist[move_list->move_count++] = t_move;
+                    t_dests.reset(t_dest);
+                    t_dest = get_lsb(t_dests);
+                }
+            //~(b.bitboards[AllBlackFlowers] ^ b.bitboards[BlackR3]); //Case for capturing 
+                w3_copy.reset(t_src);
+                t_src = get_lsb(w3_copy);
+            }
+        }
+
+
+
+
+
+        //get_flower_quiet_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+        Moves get_moves(Board b, int team){
             Moves move_list;
             move_list.move_count = 0;
-            Bitboard zero(0);
-            if (color == WHITE) {
-                //Go through each piece and generate moves for it
-                //W3 case first
-                Bitboard w3_copy = b.bitboards[WhiteW3]; //WHITE 3 case
-                int t_src = get_lsb(w3_copy);
-                Bitboard t_dests;
-                while (t_src != -1){ //First look at quiet moves only
-                    t_dests = mask_3_move(t_src) & \
-                              ~Gates & \
-                              ~b.bitboards[AllWhiteFlowers] & \
-                              ~b.bitboards[AllBlackFlowers] & \
-                              ~b.bitboards[WhiteAccents] & \
-                              ~b.bitboards[BlackAccents] & \
-                              ~b.bitboards[ClashW3];
-
-                    int t_dest = get_lsb(t_dests);
-                    while (t_dest != -1){
-                        //std::cout << std::hex << MOVE  << " " << t_src << " " << t_dest << std::endl;
-                        Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
-                                        (0 << MOVE_CAPTURE_OFFSET) |\
-                                        (t_src << MOVE_S1_OFFSET) |\
-                                        (t_dest << MOVE_S2_OFFSET);
-                        move_list.movelist[move_list.move_count++] = t_move;
-                        t_dests.reset(t_dest);
-                        t_dest = get_lsb(t_dests);
-                    }
-                //~(b.bitboards[AllBlackFlowers] ^ b.bitboards[BlackR3]); //Case for capturing 
-                    w3_copy.reset(t_src);
-                    t_src = get_lsb(w3_copy);
-                }
-            }
+            get_flower_quiet_moves(b, team, WhiteW3, &move_list);
             return move_list;
         }
 
@@ -263,7 +328,7 @@ namespace Paisho{
                     n3|s3|e3|w3|\
                     nne|nnw|sse|ssw|\
                     nww|nee|see|sww\
-                    ) & ~Gates;
+                    ) & ~Gates & Legal;
             return moves;
         } 
 
@@ -303,7 +368,7 @@ namespace Paisho{
                     n4|w4|e4|s4|\
                     nnne|nnnw|ssse|sssw|\
                     nwww|neee|swww|seee|\
-                    nnww|nnee|ssee|ssww) & ~Gates;
+                    nnww|nnee|ssee|ssww) & ~Gates & Legal;
             return moves;
         } 
 
@@ -349,7 +414,7 @@ namespace Paisho{
                     neeee|nwwww|seeee|swwww|\
                     nnnww|nnnee|sssee|sssww|\
                     nnwww|nneee|sseee|sswww\
-                    ) & ~Gates;
+                    ) & ~Gates & Legal;
             return moves;
         } 
 
@@ -396,7 +461,7 @@ namespace Paisho{
                     nnnnww|nnnnee|ssssee|ssssww|\
                     nnnwww|nnneee|ssseee|ssswww|\
                     nnwwww|nneeee|sseeee|sswwww\
-                    ) & ~Gates;
+                    ) & ~Gates & Legal;
             return moves;
         }
 
