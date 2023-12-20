@@ -394,7 +394,7 @@ namespace Paisho{
 
 */
         void get_harmony_place_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
-            if ((team == WHITE) && (b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteTameOrchid] & b.bitboards[WhiteWildOrchid] & b.bitboards[WhiteLotus] & Gates).count() > 0){
+            if ((team == WHITE) && (b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteTameOrchid] & b.bitboards[WhiteWildOrchid] & b.bitboards[WhiteLotus] & Gates).any()){
                 //Trying to harmony place with a growing tile in gate
                 return;
             }
@@ -460,9 +460,8 @@ namespace Paisho{
 
         int get_lsb(Bitboard b){
             Bitboard mask(1);
-            Bitboard zero(0);
             for (int i = 0; i < NUM_SQUARES; i++){
-                if ((mask & b) != zero){
+                if ((mask & b).any()){
                     return i;
                 }else{
                     mask <<= 1;
