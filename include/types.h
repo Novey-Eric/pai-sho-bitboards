@@ -63,6 +63,7 @@ namespace Paisho{
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
         ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
     };
+
     //Set these like 1<<Rock or something
     enum Accent: unsigned char{
         Rock,
@@ -169,19 +170,20 @@ namespace Paisho{
     #define MOVE_S2_OFFSET (13)
     #define MOVE_PIECE_OFFSET (22)
     #define MOVE_AUXPIECE_OFFSET (25)
+    //Here you need to start using uint64_t
     #define MOVE_S3_OFFSET (28)
     #define MOVE_S4_OFFSET (37)
     #define MOVE_BOATMOVE_OFFSET (46)
 
     #define MOVE_TYPE_MASK (((uint64_t) 0b111))
-    #define MOVE_CAPTURE_MASK (((uint64_t) 0b1) << 3)
-    #define MOVE_S1_MASK (((uint64_t) 0b111111111) << 4)
-    #define MOVE_S2_MASK (((uint64_t) 0b111111111) << 13)
-    #define MOVE_PIECE_MASK (((uint64_t) 0b111) << 22)
-    #define MOVE_AUXPIECE_MASK (((uint64_t) 0b111) << 25)
-    #define MOVE_S3_MASK (((uint64_t) 0b111111111) << 28)
-    #define MOVE_S4_MASK (((uint64_t) 0b111111111) << 37)
-    #define MOVE_BOATMOVE_MASK (((uint64_t) 0b1) << 46)
+    #define MOVE_CAPTURE_MASK (((uint64_t) 0b1) << MOVE_CAPTURE_OFFSET)
+    #define MOVE_S1_MASK (((uint64_t) 0b111111111) << MOVE_S1_OFFSET)
+    #define MOVE_S2_MASK (((uint64_t) 0b111111111) << MOVE_S2_OFFSET)
+    #define MOVE_PIECE_MASK (((uint64_t) 0b111) << MOVE_PIECE_OFFSET)
+    #define MOVE_AUXPIECE_MASK (((uint64_t) 0b111) << MOVE_AUXPIECE_OFFSET)
+    #define MOVE_S3_MASK (((uint64_t) 0b111111111) << MOVE_S3_OFFSET)
+    #define MOVE_S4_MASK (((uint64_t) 0b111111111) << MOVE_S4_OFFSET)
+    #define MOVE_BOATMOVE_MASK (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET)
     typedef uint64_t Move;
 
     typedef struct {
