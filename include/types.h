@@ -65,19 +65,18 @@ namespace Paisho{
     };
 
     //Set these like 1<<Rock or something
-    enum Accent: unsigned char{
-        Rock,
-        Rock2,
-        Knotweed,
-        Knotweed2,
-        Wheel,
-        Wheel2,
-        Boat,
-        Boat2,
+    enum Accent: int{
+        Rock=0b1,
+        Rock2=0b10,
+        Knotweed=0b100,
+        Knotweed2=0b1000,
+        Wheel=0b10000,
+        Wheel2=0b100000,
+        Boat=0b1000000,
+        Boat2=0b10000000,
     };
 
     const std::string AccentStrings[] = {"R", "R2", "K", "K2", "W", "W2", "B", "B2"};
-    
 
     enum Team{
         WHITE,
@@ -143,24 +142,12 @@ namespace Paisho{
         "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
     };    
 
-
-
     enum Piece{
         w3,w4,w5,r3,r4,r5,lotus,orchid
     };
 
     const std::string PieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "L", "O"};
-/*
-    typedef struct {
-        enum MoveType move_type;
-        bool capture;
-        enum Squares s1; //This is the square used in a place move, or the source square of a Move
-        enum Squares s2; //destination square in move
-        enum Piece place_piece; //Used in harmplace move
-        enum Accent aux_piece; //accent tile in harm move
-        enum Squares s3; //If boat is placed on a flower tile, this will be the destination tile of the moved piece.
-    } Move;
-*/
+
     // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
     // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
     // Total 47 bits

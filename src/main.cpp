@@ -117,10 +117,6 @@ void test_gen_moves(){
     print_move(a.movelist[0]);
     cout << endl;
     print_move_list(a);
-
-    
-    
-
 }
 
 
