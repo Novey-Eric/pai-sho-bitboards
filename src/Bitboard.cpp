@@ -532,8 +532,10 @@ namespace Paisho{
                                                     (post_move_bb << (NORTH - EAST))) &\
                                                     Legal & ~post_move_bb & ~Gates;
                             int auxpiece_square = get_lsb(wheel_squares);
+                            std::cout<<auxpiece_square<<std::endl;
                             while(auxpiece_square != -1){
-                                Bitboard legal_bb = (1 << auxpiece_square); //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
+                                Bitboard legal_bb(1);
+                                legal_bb <<= auxpiece_square; //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
                                 legal_bb = ((legal_bb >> EAST) |\
                                             (legal_bb << EAST) |\
                                             (legal_bb << NORTH) |\
@@ -542,8 +544,8 @@ namespace Paisho{
                                             (legal_bb >> (NORTH - EAST)) |\
                                             (legal_bb << (NORTH + EAST)) |\
                                             (legal_bb << (NORTH - EAST))) &\
-                                            Legal & ~legal_bb & ~Gates;
-                                if (legal_bb.count() == 9){
+                                            Legal & ~Gates;
+                                if (legal_bb.count() == 8){
                                     Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
                                                     (cap_bit << MOVE_CAPTURE_OFFSET) |\
                                                     (t_src << MOVE_S1_OFFSET) |\

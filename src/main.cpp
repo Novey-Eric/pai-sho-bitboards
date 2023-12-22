@@ -99,7 +99,7 @@ void test_gen_moves(){
     w3b <<= i8;
     pretty(w3b);
     Board b={0};
-    b.whiteAccents = Rock | Knotweed | Wheel | Boat;
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
 
     Bitboard w3h(1);
     w3h <<= i10;

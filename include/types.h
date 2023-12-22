@@ -67,14 +67,14 @@ namespace Paisho{
 
     //Set these like 1<<Rock or something
     enum Accent: int{
-        Rock=0b1,
-        Rock2=0b10,
-        Knotweed=0b100,
-        Knotweed2=0b1000,
-        Wheel=0b10000,
-        Wheel2=0b100000,
-        Boat=0b1000000,
-        Boat2=0b10000000,
+        Rock,
+        Rock2,
+        Knotweed,
+        Knotweed2,
+        Wheel,
+        Wheel2,
+        Boat,
+        Boat2,
     };
 
     const std::string AccentStrings[] = {"R", "R", "K", "K", "W", "W", "B", "B"};
