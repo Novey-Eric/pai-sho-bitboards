@@ -98,7 +98,8 @@ void test_gen_moves(){
     Bitboard w3b(1);
     w3b <<= i8;
     pretty(w3b);
-    Board b;
+    Board b={0};
+    b.whiteAccents = Rock | Knotweed | Wheel | Boat;
 
     Bitboard w3h(1);
     w3h <<= i10;
@@ -117,6 +118,11 @@ void test_gen_moves(){
     print_move(a.movelist[0]);
     cout << endl;
     print_move_list(a);
+
+
+
+
+
 }
 
 

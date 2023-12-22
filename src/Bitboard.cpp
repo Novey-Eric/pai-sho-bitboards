@@ -447,6 +447,7 @@ namespace Paisho{
             }
         }
 
+        //This function does NOT include boat moves that move a flower piece from tile to tile.
         void get_harmony_accent_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
 
             mask_ptr mask_move_ptr = get_mask_move_ptr(bbflowerpiece);
@@ -458,15 +459,6 @@ namespace Paisho{
             int num_pieces = 0;
             
             if (team == WHITE){
-                if (b.blackAccents & (Rock | Rock2))
-                    pieces_in_hand[num_pieces++] = Rock;
-                if (b.blackAccents & (Knotweed | Knotweed2))
-                    pieces_in_hand[num_pieces++] = Knotweed;
-                if (b.blackAccents & (Wheel | Wheel2))
-                    pieces_in_hand[num_pieces++] = Wheel;
-                if (b.blackAccents & (Boat | Boat2))
-                    pieces_in_hand[num_pieces++] = Boat;
-            } else{
                 if (b.whiteAccents & (Rock | Rock2))
                     pieces_in_hand[num_pieces++] = Rock;
                 if (b.whiteAccents & (Knotweed | Knotweed2))
@@ -475,35 +467,98 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = Wheel;
                 if (b.whiteAccents & (Boat | Boat2))
                     pieces_in_hand[num_pieces++] = Boat;
+            } else{
+                if (b.blackAccents & (Rock | Rock2))
+                    pieces_in_hand[num_pieces++] = Rock;
+                if (b.blackAccents & (Knotweed | Knotweed2))
+                    pieces_in_hand[num_pieces++] = Knotweed;
+                if (b.blackAccents & (Wheel | Wheel2))
+                    pieces_in_hand[num_pieces++] = Wheel;
+                if (b.blackAccents & (Boat | Boat2))
+                    pieces_in_hand[num_pieces++] = Boat;
             }
 
             Bitboard w3_copy = b.bitboards[bbflowerpiece];
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
-            Bitboard t_open_gates;
-            while (t_src != -1){ //First look at quiet moves only
+            while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
                           harm_board;
 
                 int t_dest = get_lsb(t_dests);
-                while (t_dest != -1){
+                while (t_dest != -1){//square piece is being moved to
                     int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    t_open_gates = Gates & ~b.bitboards[AllPieces];
-                    int t_open_gate = get_lsb(t_open_gates);
-                    while (t_open_gate != -1){
-                        for (int i = 0; i < num_pieces; i++){
-                            int piece_bits = pieces_in_hand[i];
-                            Move t_move = (HARMPLACE << MOVE_TYPE_OFFSET) |\
-                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                            (t_src << MOVE_S1_OFFSET) |\
-                                            (t_dest << MOVE_S2_OFFSET) |\
-                                            (piece_bits << MOVE_PIECE_OFFSET) |\
-                                            ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
-                            move_list->movelist[move_list->move_count++] = t_move;
+                    
+                    for(int i = 0; i < num_pieces; i++){//For each aux piece in the player's hand
+                        int auxpiece = pieces_in_hand[i];
+                        if (auxpiece == Rock || auxpiece == Knotweed){
+                            Bitboard post_move_bb = b.bitboards[AllPieces];
+                            post_move_bb.reset(t_src);
+                            post_move_bb.set(t_dest);
+                            Bitboard rock_squares = ((post_move_bb >> EAST) |\
+                                                    (post_move_bb << EAST) |\
+                                                    (post_move_bb << NORTH) |\
+                                                    (post_move_bb >> NORTH) |\
+                                                    (post_move_bb >> (NORTH + EAST)) |\
+                                                    (post_move_bb >> (NORTH - EAST)) |\
+                                                    (post_move_bb << (NORTH + EAST)) |\
+                                                    (post_move_bb << (NORTH - EAST))) &\
+                                                    Legal & ~post_move_bb & ~Gates;
+                            int auxpiece_square = get_lsb(rock_squares);
+                            while(auxpiece_square != -1){ //Add a move for each square around every tile on the board
+                                Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                (t_src << MOVE_S1_OFFSET) |\
+                                                (t_dest << MOVE_S2_OFFSET) |\
+                                                (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                move_list->movelist[move_list->move_count++] = t_move;
+
+                                rock_squares.reset(auxpiece_square);
+                                auxpiece_square = get_lsb(rock_squares);
+                            }
+                        }else if (auxpiece == Wheel){
+                            Bitboard post_move_bb = b.bitboards[AllPieces];
+                            post_move_bb.reset(t_src);
+                            post_move_bb.set(t_dest);
+                            Bitboard wheel_squares = ((post_move_bb >> EAST) |\
+                                                    (post_move_bb << EAST) |\
+                                                    (post_move_bb << NORTH) |\
+                                                    (post_move_bb >> NORTH) |\
+                                                    (post_move_bb >> (NORTH + EAST)) |\
+                                                    (post_move_bb >> (NORTH - EAST)) |\
+                                                    (post_move_bb << (NORTH + EAST)) |\
+                                                    (post_move_bb << (NORTH - EAST))) &\
+                                                    Legal & ~post_move_bb & ~Gates;
+                            int auxpiece_square = get_lsb(wheel_squares);
+                            while(auxpiece_square != -1){
+                                Bitboard legal_bb = (1 << auxpiece_square); //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
+                                legal_bb = ((legal_bb >> EAST) |\
+                                            (legal_bb << EAST) |\
+                                            (legal_bb << NORTH) |\
+                                            (legal_bb >> NORTH) |\
+                                            (legal_bb >> (NORTH + EAST)) |\
+                                            (legal_bb >> (NORTH - EAST)) |\
+                                            (legal_bb << (NORTH + EAST)) |\
+                                            (legal_bb << (NORTH - EAST))) &\
+                                            Legal & ~legal_bb & ~Gates;
+                                if (legal_bb.count() == 9){
+                                    Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                    (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                    (t_src << MOVE_S1_OFFSET) |\
+                                                    (t_dest << MOVE_S2_OFFSET) |\
+                                                    (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                    ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                    move_list->movelist[move_list->move_count++] = t_move;
+                                }
+                                wheel_squares.reset(auxpiece_square);
+                                auxpiece_square = get_lsb(wheel_squares);
+                            }
+
+                        }else if (auxpiece == Boat){
                         }
-                        t_open_gates.reset(t_open_gate);
-                        t_open_gate = get_lsb(t_open_gates);
+                        //if (boat etc...)
                     }
                     t_dests.reset(t_dest);
                     t_dest = get_lsb(t_dests);
@@ -611,6 +666,7 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = r4;
                 if (b.wr5)
                     pieces_in_hand[num_pieces++] = r5;
+                
             } else{
                 if (b.bw3)
                     pieces_in_hand[num_pieces++] = w3;
@@ -635,17 +691,13 @@ namespace Paisho{
                                     (0 << MOVE_CAPTURE_OFFSET) |\
                                     (t_open_gate << MOVE_S1_OFFSET) |\
                                     (piece_bits << MOVE_PIECE_OFFSET);
-                    move_list->movelist[move_list->move_count++] = t_move;
+                    move_list->movelist[(move_list->move_count)++] = t_move;
                 }
                 t_open_gates.reset(t_open_gate);
                 t_open_gate = get_lsb(t_open_gates);
             }
         }
         
-
-
-
-
 
 
         //get_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
@@ -663,13 +715,12 @@ namespace Paisho{
                 p_end = 17;
             }
             for (int i = p_start; i <= p_end; i++){
-                get_flower_moves(b, team, piece_list[i], &move_list);
-                get_harmony_place_moves(b, team, piece_list[i], &move_list);
+                //get_flower_moves(b, team, piece_list[i], &move_list);
+                //get_harmony_place_moves(b, team, piece_list[i], &move_list);
                 get_harmony_accent_moves(b, team, piece_list[i], &move_list);
-                //get harmony accent moves
                 //get harmony boat moves
             }
-            get_place_moves(b, team, &move_list);
+            //get_place_moves(b, team, &move_list);
             return move_list;
         }
 

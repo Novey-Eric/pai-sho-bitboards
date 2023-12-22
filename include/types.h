@@ -60,6 +60,7 @@ namespace Paisho{
         BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackTameOrchid,BlackWildOrchid,BlackAccent,
         BlackHarmR3,BlackHarmR4,BlackHarmR5,BlackHarmW3,BlackHarmW4,BlackHarmW5,
         WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
+        Rocks,
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
         ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
     };
@@ -76,7 +77,7 @@ namespace Paisho{
         Boat2=0b10000000,
     };
 
-    const std::string AccentStrings[] = {"R", "R2", "K", "K2", "W", "W2", "B", "B2"};
+    const std::string AccentStrings[] = {"R", "R", "K", "K", "W", "W", "B", "B"};
 
     enum Team{
         WHITE,
@@ -146,7 +147,7 @@ namespace Paisho{
         w3,w4,w5,r3,r4,r5,lotus,orchid
     };
 
-    const std::string PieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "L", "O"};
+    const std::string PieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "l", "o"};
 
     // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
     // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
