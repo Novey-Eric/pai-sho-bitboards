@@ -14,7 +14,8 @@
     memcpy(bitboards, bitboards_copy, 96);                                \
     side = side_copy, enpassant = enpassant_copy, castle = castle_copy;   \
 
-
+#define NUM_OTHER_BOARDS (13)
+#define NUM_BOARDS (16)
 typedef std::bitset<290> Bitboard;
 namespace Paisho{
 
@@ -26,6 +27,9 @@ namespace Paisho{
         int br3;
         int br4;
         int br5;
+        bool bo;
+        bool bl;
+        bool bwild;
         char blackAccents;
 
         int ww3;
@@ -34,20 +38,23 @@ namespace Paisho{
         int wr3;
         int wr4;
         int wr5;
+        bool wo;
+        bool wl;
+        bool wwild;
         char whiteAccents;
 
-        Bitboard whiteBoards[16];
-        Bitboard blackBoards[16];
+        Bitboard whiteBoards[NUM_BOARDS];
+        Bitboard blackBoards[NUM_BOARDS];
         //Bitboard bitboards[41];
 
-        Bitboard otherBoards[9];
+        Bitboard otherBoards[NUM_OTHER_BOARDS];
         //Bitboard HarmLotus;
 
     } Board;
 
     enum OtherBoards: int{
         clashw3,clashw4,clashw5,clashr3,clashr4,clashr5,
-        Accents,
+        Accents,Rocks,Knotweeds,
         AllPieces,WhiteHarms,BlackHarms,Nothing
     };
 
@@ -60,22 +67,11 @@ namespace Paisho{
 
     // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
     // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
-    enum BitBoardIndex{
-/*
-        WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteTameOrchid,WhiteWildOrchid,WhiteAccent,
-        BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackTameOrchid,BlackWildOrchid,BlackAccent,
-        BlackHarmR3,BlackHarmR4,BlackHarmR5,BlackHarmW3,BlackHarmW4,BlackHarmW5,
-        WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
-        Rocks,
-        AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
-        ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5,
-        Nothing
-*/  
-  };
 
-
+    //Note: harm<piece> really means a piece will get a harmony bonus for landing in it.
+    // It does not actually have anything to do with harmony rings or points
     enum Boards{
-        w3,w4,w5,r3,r4,r5,lotus,tameorchid,wildorchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,
+        w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,
         allflowers
     };
     //Set these like 1<<Rock or something

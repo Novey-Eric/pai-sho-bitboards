@@ -680,7 +680,6 @@ namespace Paisho{
             move_list.move_count = 0;
             int piece_list[] = {w3,w4,w5,r3,r4,r5,lotus,orchid};
 
-            int p_start, p_end;
             for (int i = 0; i < 8; i++){
                 get_flower_moves(b, team, piece_list[i], &move_list);
                 get_harmony_place_moves(b, team, piece_list[i], &move_list);
@@ -834,10 +833,18 @@ namespace Paisho{
             } else if (auxpiece == Wheel){
                 Board *copy;
                 memcpy(copy, b, sizeof(Board));
-                int hmoves[4] = {EAST, EAST+NORTH, NORTH, NORTH-EAST};
-
+                int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
                 
-                //for
+                
+                for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){
+                    b->whiteBoards[t_board][auxsq + hmoves[0]] = copy->whiteBoards[t_board][auxsq + hmoves[7]];
+                    for (int t_move=1; t_move<8; t_move++){
+                        b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy->whiteBoards[t_board][auxsq + hmoves[t_move-1]];
+                    
+                        //this is SUPER cursed, going through all arrays in 
+                        //whiteboards and blackboards by doubling the length of the first
+                    }
+                }
                 
                 
                 //insane

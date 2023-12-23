@@ -125,8 +125,12 @@ void test_gen_moves(){
     cout<<"move count "<< a.move_count<<endl;
     cout<<"first move in hex: " << std::hex << a.movelist[0] << endl;
     print_move(a.movelist[0]);
-    cout << endl;
+    cout << std::dec<<endl;
     print_move_list(a);
+        
+    cout<<"WEST "<<endl;
+    pretty(w3b);
+    pretty(w3b<<NORTH);
 
 }
 
