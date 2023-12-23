@@ -77,8 +77,7 @@ namespace Paisho{
     
     void print_move_list(Moves mlist){
         for (int i = 0; i < mlist.move_count; i++){
-            //std::cout << "About to print " << std::hex << mlist.movelist[i] << std::endl;
-            
+            std::cout<<i<<": ";
             print_move(mlist.movelist[i]);
         }
     }
@@ -831,15 +830,14 @@ namespace Paisho{
             if (auxpiece == Rock){
                 b->otherBoards[Rocks].set(auxsq);
             } else if (auxpiece == Wheel){
-                Board *copy;
-                memcpy(copy, b, sizeof(Board));
-                int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
-                
-                
+                Board copy;
+                memcpy(&copy, b, sizeof(Board));
+                //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
+                int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
                 for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){
-                    b->whiteBoards[t_board][auxsq + hmoves[0]] = copy->whiteBoards[t_board][auxsq + hmoves[7]];
-                    for (int t_move=1; t_move<8; t_move++){
-                        b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy->whiteBoards[t_board][auxsq + hmoves[t_move-1]];
+                    //b->whiteBoards[t_board][auxsq << hmoves[0]] = copy.whiteBoards[t_board][auxsq << hmoves[7]];
+                    for (int t_move=4; t_move<8; t_move++){
+                        b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy.whiteBoards[t_board][auxsq + hmoves[t_move-1]]; //TODO: THIS DOESNT WORK
                     
                         //this is SUPER cursed, going through all arrays in 
                         //whiteboards and blackboards by doubling the length of the first
@@ -874,14 +872,19 @@ namespace Paisho{
             uint64_t boatmove = (m & MOVE_BOATMOVE_MASK) >> MOVE_BOATMOVE_OFFSET;
             
             if (type == MOVE){
+                std::cout<<"in move"<< std::endl;
                 make_move_move(b, team, piece, s1, s2, cap);
             }else if(type == PLACE){
+                std::cout<<"place"<< std::endl;
                 make_place_move(b, team, piece, s1);
             }else if(type == HARMPLACE){
+                std::cout<<"harmplace"<< std::endl;
                 make_harm_place_move(b, team, piece, s1, s2, piece, s3, cap);
             }else if(type == HARMACCENT && !boatmove){
+                std::cout<<"harmacc"<< std::endl;
                 make_harm_accent_move(b, team, piece, s1, s2, auxpiece, s3, cap);
             }else if(type == HARMACCENT && boatmove){
+                std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
         }
