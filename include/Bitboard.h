@@ -119,6 +119,7 @@ namespace Paisho{
         Bitboard mask_6_move(int square);
 
         Moves get_moves(Board b, int team);
+        void make_move(Board *b, int team, Move m);
 
         std::string pretty(Bitboard b);
         void init();

@@ -159,83 +159,52 @@ namespace Paisho{
     namespace Bitboards{
 
         std::map<int, mask_ptr> mask_move_map{
-                                {WhiteW3, &mask_3_move},
-                                {WhiteW4, &mask_4_move},
-                                {WhiteW5, &mask_5_move},
-                                {WhiteR3, &mask_3_move},
-                                {WhiteR4, &mask_4_move},
-                                {WhiteR5, &mask_5_move},
-                                {BlackW3, &mask_3_move},
-                                {BlackW4, &mask_4_move},
-                                {BlackW5, &mask_5_move},
-                                {BlackR3, &mask_3_move},
-                                {BlackR4, &mask_4_move},
-                                {BlackR5, &mask_5_move},
-                                {WhiteTameOrchid, &mask_6_move},
-                                {BlackTameOrchid, &mask_6_move},
-                                {WhiteWildOrchid, &mask_6_move},
-                                {BlackWildOrchid, &mask_6_move},
-                                {WhiteLotus, &mask_2_move},
-                                {BlackLotus, &mask_2_move},
+                                {w3, &mask_3_move},
+                                {w4, &mask_4_move},
+                                {w5, &mask_5_move},
+                                {r3, &mask_3_move},
+                                {r4, &mask_4_move},
+                                {r5, &mask_5_move},
+                                {tameorchid, &mask_6_move},
+                                {wildorchid, &mask_6_move},
+                                {lotus, &mask_2_move},
                                 };
 
-
-
-        Bitboard get_harm_board(Board b, int flower){
+        Bitboard get_harm_board(Board b, int team, int flower){
             Bitboard harm_board;
+            Bitboard *t_board;
+            if (team == WHITE)
+                t_board = &b.whiteBoards[0];
+            if (team == BLACK)
+                t_board = &b.blackBoards[0];
+            
             switch(flower){
-                case WhiteW3:
-                    harm_board = b.bitboards[WhiteHarmW4] | b.bitboards[WhiteHarmR5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case w3:
+                    harm_board = t_board[harmw4] | t_board[harmr5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
-                case WhiteW4:
-                    harm_board = b.bitboards[WhiteHarmW3] | b.bitboards[WhiteHarmW5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case w4:
+                    harm_board = t_board[harmw3] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
-                case WhiteW5:
-                    harm_board = b.bitboards[WhiteHarmW4] | b.bitboards[WhiteHarmR3] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case w5:
+                    harm_board = t_board[harmw4] | t_board[harmr3] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
-                case WhiteR3:
-                    harm_board = b.bitboards[WhiteHarmR4] | b.bitboards[WhiteHarmW5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case r3:
+                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
-                case WhiteR4:
-                    harm_board = b.bitboards[WhiteHarmR5] | b.bitboards[WhiteHarmR3] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case r4:
+                    harm_board = t_board[harmr5] | t_board[harmr3] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
-                case WhiteR5:
-                    harm_board = b.bitboards[WhiteHarmR4] | b.bitboards[WhiteHarmW5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackW3:
-                    harm_board = b.bitboards[BlackHarmW4] | b.bitboards[BlackHarmW5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackW4:
-                    harm_board = b.bitboards[BlackHarmW5] | b.bitboards[BlackHarmW3] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackW5:
-                    harm_board = b.bitboards[BlackHarmW4] | b.bitboards[BlackHarmR3] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackR3:
-                    harm_board = b.bitboards[BlackHarmW5] | b.bitboards[BlackHarmR4] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackR4:
-                    harm_board = b.bitboards[BlackHarmR3] | b.bitboards[BlackHarmR5] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
-                    break;
-                case BlackR5:
-                    harm_board = b.bitboards[BlackHarmR4] | b.bitboards[BlackHarmW3] | b.bitboards[WhiteLotus] | b.bitboards[BlackLotus];
+                case r5:
+                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
                     break;
                 //Lotus only harmonizes with own team.
-                case BlackTameOrchid:
-                    harm_board = Illegal;
-                case WhiteTameOrchid:
+                case tameorchid:
                     harm_board = Illegal;
                     break;
-                case BlackWildOrchid:
+                case wildorchid:
                     harm_board = Illegal;
                     break;
-                case WhiteWildOrchid:
-                    harm_board = Illegal;
-                    break;
-                case WhiteLotus:
-                    harm_board = Illegal;
-                    break;
-                case BlackLotus:
+                case lotus:
                     harm_board = Illegal;
                     break;
               default:
@@ -245,103 +214,64 @@ namespace Paisho{
         }
 
         std::map<int, Bitboard> correct_color{
-                                {WhiteW3, White | Neutral},
-                                {WhiteW4, White | Neutral},
-                                {WhiteW5, White | Neutral},
-                                {BlackW3, White | Neutral},
-                                {BlackW4, White | Neutral},
-                                {BlackW5, White | Neutral},
-                                {WhiteR3, Red | Neutral},
-                                {WhiteR4, Red | Neutral},
-                                {WhiteR5, Red | Neutral},
-                                {BlackR3, Red | Neutral},
-                                {BlackR4, Red | Neutral},
-                                {BlackR5, Red | Neutral},
-                                {WhiteTameOrchid, Legal},
-                                {BlackTameOrchid, Legal},
-                                {WhiteWildOrchid, Legal},
-                                {BlackWildOrchid, Legal},
-                                {WhiteLotus, Legal},
-                                {BlackLotus, Legal},
+                                {w3, White | Neutral},
+                                {w4, White | Neutral},
+                                {w5, White | Neutral},
+                                {r3, Red | Neutral},
+                                {r4, Red | Neutral},
+                                {r5, Red | Neutral},
+                                {tameorchid, Legal},
+                                {wildorchid, Legal},
+                                {lotus, Legal},
                                 };
 
         std::map<int, int> clash_map{
-                                {WhiteW3, ClashW3},
-                                {WhiteW4, ClashW4},
-                                {WhiteW5, ClashW5},
-                                {BlackW3, ClashW3},
-                                {BlackW4, ClashW4},
-                                {BlackW5, ClashW5},
-                                {WhiteR3, ClashR3},
-                                {WhiteR4, ClashR4},
-                                {WhiteR5, ClashR5},
-                                {BlackR3, ClashR3},
-                                {BlackR4, ClashR4},
-                                {BlackR5, ClashR5},
-                                {WhiteTameOrchid, Nothing},
-                                {BlackTameOrchid, Nothing},
-                                {WhiteWildOrchid, Nothing},
-                                {BlackWildOrchid, Nothing},
-                                {WhiteLotus, Nothing},
-                                {BlackLotus, Nothing},
+                                {w3, clashw3},
+                                {w4, clashw4},
+                                {w5, clashw5},
+                                {r3, clashr3},
+                                {r4, clashr4},
+                                {r5, clashr5},
+                                {tameorchid, Nothing},
+                                {wildorchid, Nothing},
+                                {lotus, Nothing},
                                 };
 
 
-        Bitboard get_cap_board(Board b, int bbpiece){
+        Bitboard get_cap_board(Board b, int team, int bbpiece){
             Bitboard cap_board;
+            Bitboard *t_board;
+            if (team == WHITE)
+                t_board = &b.whiteBoards[0];
+            if (team == BLACK)
+                t_board = &b.blackBoards[0];
+            
             switch(bbpiece){
-                case WhiteW3:
-                    cap_board = b.bitboards[BlackR3];
+                case w3:
+                    cap_board = t_board[r3];
                     break;
-                case WhiteW4:
-                    cap_board = b.bitboards[BlackR4];
+                case w4:
+                    cap_board = t_board[r4];
                     break;
-                case WhiteW5:
-                    cap_board = b.bitboards[BlackR5];
+                case w5:
+                    cap_board = t_board[r5];
                     break;
-                case WhiteR3:
-                    cap_board = b.bitboards[BlackW3];
+                case r3:
+                    cap_board = t_board[w3];
                     break;
-                case WhiteR4:
-                    cap_board = b.bitboards[BlackW4];
+                case r4:
+                    cap_board = t_board[w4];
                     break;
-                case WhiteR5:
-                    cap_board = b.bitboards[BlackW4];
+                case r5:
+                    cap_board = t_board[w4];
                     break;
-                case BlackW3:
-                    cap_board = b.bitboards[WhiteR3];
-                    break;
-                case BlackW4:
-                    cap_board = b.bitboards[WhiteR4];
-                    break;
-                case BlackW5:
-                    cap_board = b.bitboards[WhiteR5];
-                    break;
-                case BlackR3:
-                    cap_board = b.bitboards[WhiteW3];
-                    break;
-                case BlackR4:
-                    cap_board = b.bitboards[WhiteW4];
-                    break;
-                case BlackR5:
-                    cap_board = b.bitboards[WhiteW5];
-                    break;
-                case BlackTameOrchid:
+                case tameorchid:
                     cap_board = Illegal & Legal;
                     break;
-                case WhiteTameOrchid:
-                    cap_board = Illegal & Legal;
+                case wildorchid:
+                    cap_board = t_board[allflowers] & t_board[lotus];
                     break;
-                case BlackWildOrchid:
-                    cap_board = b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteLotus];
-                    break;
-                case WhiteWildOrchid:
-                    cap_board = b.bitboards[AllBlackFlowers] & b.bitboards[BlackLotus];
-                    break;
-                case WhiteLotus:
-                    cap_board = Illegal & Legal;
-                    break;
-                case BlackLotus:
+                case lotus:
                     cap_board = Illegal & Legal;
                     break;
               default:
@@ -351,17 +281,24 @@ namespace Paisho{
         }
 
         void get_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            Bitboard *team_board;
+            if(team == WHITE){
+                team_board = &b.whiteBoards[0];
+            }else{
+                team_board = &b.blackBoards[0];
+            }
+
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
-            Bitboard cap_board = get_cap_board(b, bbflowerpiece);
-            Bitboard clash_board = b.bitboards[clash_map[bbflowerpiece]];
-            Bitboard w3_copy = b.bitboards[bbflowerpiece];
+            Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
+            Bitboard clash_board = team_board[clash_map[bbflowerpiece]];
+            Bitboard w3_copy = team_board[bbflowerpiece];
 
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
             while (t_src != -1){ //First look at quiet moves only
                 t_dests = mask_move_ptr(t_src) & \
-                          ~(b.bitboards[AllPieces] ^ cap_board) & \
+                          ~(b.otherBoards[AllPieces] ^ cap_board) & \
                           ~clash_board & correct_color[bbflowerpiece];
 
                 int t_dest = get_lsb(t_dests);
@@ -382,10 +319,16 @@ namespace Paisho{
 
         //This function does NOT include boat moves that move a flower piece from tile to tile.
         void get_harmony_accent_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            Bitboard *team_board;
+            if(team == WHITE){
+                team_board = &b.whiteBoards[0];
+            }else{
+                team_board = &b.blackBoards[0];
+            }
 
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
-            Bitboard harm_board = get_harm_board(b, bbflowerpiece); //harm1 & harm2
-            Bitboard cap_board = get_cap_board(b, bbflowerpiece);
+            Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
+            Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
@@ -411,7 +354,7 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = Boat;
             }
 
-            Bitboard w3_copy = b.bitboards[bbflowerpiece];
+            Bitboard w3_copy = team_board[bbflowerpiece];
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
@@ -426,7 +369,7 @@ namespace Paisho{
                     for(int i = 0; i < num_pieces; i++){//For each aux piece in the player's hand
                         int auxpiece = pieces_in_hand[i];
                         if (auxpiece == Rock || auxpiece == Knotweed){
-                            Bitboard post_move_bb = b.bitboards[AllPieces];
+                            Bitboard post_move_bb = b.otherBoards[AllPieces];
                             post_move_bb.reset(t_src);
                             post_move_bb.set(t_dest);
                             Bitboard rock_squares = ((post_move_bb >> EAST) |\
@@ -452,7 +395,7 @@ namespace Paisho{
                                 auxpiece_square = get_lsb(rock_squares);
                             }
                         }else if (auxpiece == Wheel){
-                            Bitboard post_move_bb = b.bitboards[AllPieces];
+                            Bitboard post_move_bb = b.otherBoards[AllPieces];
                             post_move_bb.reset(t_src);
                             post_move_bb.set(t_dest);
                             Bitboard wheel_squares = ((post_move_bb >> EAST) |\
@@ -491,7 +434,7 @@ namespace Paisho{
                             }
 
                         }else if (auxpiece == Boat){
-                            Bitboard all_accents = b.bitboards[WhiteAccents] | b.bitboards[BlackAccents];
+                            Bitboard all_accents = b.otherBoards[Accents];
                             int t_accent = get_lsb(all_accents);
                             while (t_accent != -1){
                                 Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
@@ -515,14 +458,21 @@ namespace Paisho{
         }
 
         void get_harmony_place_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
-            if ((team == WHITE) && (b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteTameOrchid] & b.bitboards[WhiteWildOrchid] & b.bitboards[WhiteLotus] & Gates).any()){
+            Bitboard *team_board;
+            if(team == WHITE){
+                team_board = &b.whiteBoards[0];
+            }else{
+                team_board = &b.blackBoards[0];
+            }
+
+            if ((team_board[allflowers] & team_board[tameorchid] & team_board[wildorchid] & team_board[lotus] & Gates).any()){
                 //Trying to harmony place with a growing tile in gate
                 return;
             }
 
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
-            Bitboard harm_board = get_harm_board(b, bbflowerpiece); //harm1 & harm2
-            Bitboard cap_board = get_cap_board(b, bbflowerpiece);
+            Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
+            Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
@@ -556,7 +506,7 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = r5;
             }
 
-            Bitboard w3_copy = b.bitboards[bbflowerpiece];
+            Bitboard w3_copy = team_board[bbflowerpiece];
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
@@ -568,7 +518,7 @@ namespace Paisho{
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
                     int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    t_open_gates = Gates & ~b.bitboards[AllPieces];
+                    t_open_gates = Gates & ~b.otherBoards[AllPieces];
                     int t_open_gate = get_lsb(t_open_gates);
                     while (t_open_gate != -1){
                         for (int i = 0; i < num_pieces; i++){
@@ -627,7 +577,7 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = r5;
             }
 
-            Bitboard t_open_gates = Gates & ~b.bitboards[AllPieces];
+            Bitboard t_open_gates = Gates & ~b.otherBoards[AllPieces];
             int t_open_gate = get_lsb(t_open_gates);
             while (t_open_gate != -1){
                 for (int i = 0; i < num_pieces; i++){
@@ -645,18 +595,26 @@ namespace Paisho{
         
 
         void get_boat_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
-            if (team == WHITE && !(b.whiteAccents | Boat | Boat2)){
-                return;
-            }else if (team == BLACK && !(b.blackAccents | Boat | Boat2)){
-                return;
+            Bitboard *team_board;
+            if(team == WHITE){
+                if(!(b.whiteAccents | Boat | Boat2)){
+                    return;
+                }
+                team_board = &b.whiteBoards[0];
+            }else{
+                if(!(b.blackAccents | Boat | Boat2)){
+                    return;
+                }
+                team_board = &b.blackBoards[0];
             }
+
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
-            Bitboard harm_board = get_harm_board(b, bbflowerpiece); //harm1 & harm2
-            Bitboard cap_board = get_cap_board(b, bbflowerpiece);
+            Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
+            Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
             //Note have to add lotus to harm board cases
             
-            Bitboard w3_copy = b.bitboards[bbflowerpiece];
+            Bitboard w3_copy = team_board[bbflowerpiece];
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
@@ -667,7 +625,7 @@ namespace Paisho{
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){//square piece is being moved to
                     int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    Bitboard post_move_bb = b.bitboards[AllBlackFlowers] & b.bitboards[AllWhiteFlowers];
+                    Bitboard post_move_bb = b.whiteBoards[allflowers] & b.blackBoards[allflowers];
                     post_move_bb.reset(t_src);
                     post_move_bb.set(t_dest);
                     int boat_square = get_lsb(post_move_bb);
@@ -714,8 +672,8 @@ namespace Paisho{
         Moves get_moves(Board b, int team){
             Moves move_list;
             move_list.move_count = 0;
-            int piece_list[] = {WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteTameOrchid,WhiteWildOrchid,
-                                BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackTameOrchid,BlackWildOrchid};
+            int piece_list[] = {w3,w4,w5,r3,r4,r5,lotus,tameorchid,wildorchid};
+
             int p_start, p_end;
             if (team == WHITE){
                 p_start = 0;
@@ -750,6 +708,49 @@ namespace Paisho{
         void init(){
             return;
         }
+
+        void make_place_move(Board *b, int team, int piece, int square, bool cap){
+            
+        }
+
+        void make_move_move(Board *b, int team, int piece, int src, int dst, bool cap){
+        }
+
+        void make_harm_place_move(Board *b, int team, int piece, int src, int dst, int auxflower, int placesq, bool cap){
+        }
+
+        
+        void make_harm_accent_move(Board *b, int team, int piece, int src, int dst, int auxpiece, int auxsq, bool cap){
+        }
+
+        void make_harm_accent_boatmove(Board *b, int team, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap){
+        }
+
+        void make_move(Board *b, int team, Move m){
+            uint64_t type = (m & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET;
+            uint64_t cap = (m & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET;
+            uint64_t s1 = (m & MOVE_S1_MASK) >> MOVE_S1_OFFSET;
+            uint64_t s2 = (m & MOVE_S2_MASK) >> MOVE_S2_OFFSET;
+            uint64_t piece = (m & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET;
+            uint64_t auxpiece = (m & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET;
+            uint64_t s3 = (m & MOVE_S3_MASK) >> MOVE_S3_OFFSET;
+            uint64_t s4 = (m & MOVE_S4_MASK) >> MOVE_S4_OFFSET;
+            uint64_t boatmove = (m & MOVE_BOATMOVE_MASK) >> MOVE_BOATMOVE_OFFSET;
+            
+            if (type == MOVE){
+                make_move_move(b, team, piece, s1, s2, cap);
+            }else if(type == PLACE){
+                make_place_move(b, team, piece, s1, cap);
+            }else if(type == HARMPLACE){
+                make_harm_place_move(b, team, piece, s1, s2, piece, s3, cap);
+            }else if(type == HARMACCENT && !boatmove){
+                make_harm_accent_move(b, team, piece, s1, s2, auxpiece, s3, cap);
+            }else if(type == HARMACCENT && boatmove){
+                make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
+            }
+        }
+
+
 
         Bitboard mask_2_move(int square){
             Bitboard bb(0);

@@ -36,15 +36,20 @@ namespace Paisho{
         int wr5;
         char whiteAccents;
 
-        Bitboard bitboards[41];
+        Bitboard whiteBoards[16];
+        Bitboard blackBoards[16];
+        //Bitboard bitboards[41];
 
-        Bitboard HarmLotus;
-
-        Bitboard WhiteHarms;
-        Bitboard BlackHarms;
+        Bitboard otherBoards[9];
+        //Bitboard HarmLotus;
 
     } Board;
 
+    enum OtherBoards: int{
+        clashw3,clashw4,clashw5,clashr3,clashr4,clashr5,
+        Accents,
+        AllPieces,WhiteHarms,BlackHarms,Nothing
+    };
 
     enum MoveType: int{
         MOVE,
@@ -56,6 +61,7 @@ namespace Paisho{
     // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
     // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
     enum BitBoardIndex{
+/*
         WhiteW3,WhiteW4,WhiteW5,WhiteR3,WhiteR4,WhiteR5,WhiteLotus,WhiteTameOrchid,WhiteWildOrchid,WhiteAccent,
         BlackW3,BlackW4,BlackW5,BlackR3,BlackR4,BlackR5,BlackLotus,BlackTameOrchid,BlackWildOrchid,BlackAccent,
         BlackHarmR3,BlackHarmR4,BlackHarmR5,BlackHarmW3,BlackHarmW4,BlackHarmW5,
@@ -64,8 +70,14 @@ namespace Paisho{
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
         ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5,
         Nothing
-    };
+*/  
+  };
 
+
+    enum Boards{
+        w3,w4,w5,r3,r4,r5,lotus,tameorchid,wildorchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,
+        allflowers
+    };
     //Set these like 1<<Rock or something
     enum Accent: int{
         Rock,
@@ -143,10 +155,6 @@ namespace Paisho{
         "A16","B16","C16","D16","E16","F16","G16","H16","I16","J16","K16","L16","M16","N16","O16","P16","Q16",
         "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
     };    
-
-    enum Piece{
-        w3,w4,w5,r3,r4,r5,lotus,orchid
-    };
 
     const std::string PieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "l", "o"};
 

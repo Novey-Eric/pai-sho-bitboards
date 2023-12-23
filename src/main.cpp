@@ -104,18 +104,18 @@ void test_gen_moves(){
     b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
 
     Bitboard w3h(1);
-    w3h <<= j10;
+    w3h <<= i10;
     pretty(w3h);
-    b.bitboards[WhiteHarmW4] = w3h;
+    b.whiteBoards[harmw4] = w3h;
 
-    b.bitboards[WhiteW3]=w3b;
-    b.bitboards[AllWhiteFlowers] = w3b;
+    b.whiteBoards[w3]=w3b;
+    b.whiteBoards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
-    b.bitboards[WhiteAccents]=waccent;
+    b.otherBoards[Accents]=waccent;
 
-    b.bitboards[AllPieces] = waccent | w3b | w3h;
+    b.otherBoards[AllPieces]= waccent | w3b | w3h;
 
     b.ww3=2;
     b.ww4=1;
