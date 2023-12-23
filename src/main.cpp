@@ -134,7 +134,7 @@ void test_gen_moves(){
 
 }
 
-void test_make_move(){
+void test_wheel(){
     
     Bitboard w3b(1);
     w3b <<= i6;
@@ -168,15 +168,91 @@ void test_make_move(){
     cout<<"making move"<<endl;
     make_move(&b, WHITE, a.movelist[125]);
     pretty(b.otherBoards[AllPieces]);
-    
 
 }
+void test_wheel2(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    b.whiteBoards[allflowers] = w3b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b;
+    b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    cout<<"move count "<< a.move_count<<endl;
+    pretty(b.otherBoards[AllPieces]);
+    cout<<"making move"<<endl;
+    make_move(&b, WHITE, a.movelist[125]);
+    pretty(b.otherBoards[AllPieces]);
+
+}
+
+void test_boat(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    b.whiteBoards[allflowers] = w3b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b;
+    b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    cout<<"move count "<< a.move_count<<endl;
+    pretty(b.otherBoards[AllPieces]);
+    cout<<"making move"<<endl;
+    make_move(&b, WHITE, a.movelist[159]);
+    pretty(b.otherBoards[AllPieces]);
+
+}
+
+
+
 
 int main(){
     //test_print_macros();
     //test_board_ops();
     //test_lsb();
     //test_gen_moves();
-    test_make_move();
+    //test_wheel2();
+    test_boat();
     return 1;
 }

@@ -828,6 +828,7 @@ namespace Paisho{
 
             b->otherBoards[Accents].set(auxsq);
             b->otherBoards[AllPieces].set(auxsq);
+
             if (auxpiece == Rock){
                 b->otherBoards[Rocks].set(auxsq);
             } else if (auxpiece == Wheel){
@@ -835,18 +836,15 @@ namespace Paisho{
                 memcpy(&copy, b, sizeof(Board));
                 //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
                 int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
-                for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){
+                for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){ //TODO: this can be optimized since half the boards are harmonies.
                     b->whiteBoards[t_board][auxsq + hmoves[0]] = copy.whiteBoards[t_board][auxsq + hmoves[7]];
                     for (int t_move=1; t_move<8; t_move++){
-                        b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy.whiteBoards[t_board][auxsq + hmoves[t_move-1]]; //TODO: THIS DOESNT WORK
-                        
+                        b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy.whiteBoards[t_board][auxsq + hmoves[t_move-1]];
                         //this is SUPER cursed, going through all arrays in 
                         //whiteboards and blackboards by doubling the length of the first
                     }
                 }
                 
-                
-                //insane
             } else if (auxpiece == Boat){
                 b->otherBoards[Rocks].reset(auxsq);
                 b->otherBoards[Knotweeds].reset(auxsq);
@@ -858,7 +856,28 @@ namespace Paisho{
 
         void make_harm_accent_boatmove(Board *b, int team, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap){
             make_move_move(b, team, piece, src, dst, cap);
-            
+            if (team == WHITE){
+                if (Boat & b->whiteAccents)
+                    b->whiteAccents ^= Boat;
+                else
+                    b->whiteAccents ^= Boat+1;
+                
+            }else{
+                if (Boat & b->blackAccents)
+                    b->blackAccents ^= Boat;
+                else
+                    b->blackAccents ^= Boat+1;
+            }
+
+            b->otherBoards[Accents].set(boatsq);
+            b->otherBoards[AllPieces].set(boat_move_sq);
+            //Need all pieces move too
+            for(int t_board = 0; t_board < (2*NUM_BOARDS); t_board++){
+                b->whiteBoards[t_board].set(boat_move_sq);
+                b->whiteBoards[t_board].reset(boatsq);
+                //this is SUPER cursed, going through all arrays in 
+                //whiteboards and blackboards by doubling the length of the first
+            }
         }
 
         void make_move(Board *b, int team, Move m){
