@@ -37,7 +37,7 @@ namespace Paisho{
     
     void print_move(Move m){
         uint64_t move_type = (m & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET;
-        uint64_t move_capture = (m & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET;
+        //uint64_t move_capture = (m & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET;
         uint64_t move_s1 = (m & MOVE_S1_MASK) >> MOVE_S1_OFFSET;
         uint64_t move_s2 = (m & MOVE_S2_MASK) >> MOVE_S2_OFFSET;
         uint64_t move_piece = (m & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET;
@@ -391,10 +391,10 @@ namespace Paisho{
                     cap_board = b.bitboards[WhiteW5];
                     break;
                 case BlackTameOrchid:
-                    cap_board = Illegal;
+                    cap_board = Illegal & Legal;
                     break;
                 case WhiteTameOrchid:
-                    cap_board = Illegal;
+                    cap_board = Illegal & Legal;
                     break;
                 case BlackWildOrchid:
                     cap_board = b.bitboards[AllWhiteFlowers] & b.bitboards[WhiteLotus];
@@ -403,10 +403,10 @@ namespace Paisho{
                     cap_board = b.bitboards[AllBlackFlowers] & b.bitboards[BlackLotus];
                     break;
                 case WhiteLotus:
-                    cap_board = Illegal;
+                    cap_board = Illegal & Legal;
                     break;
                 case BlackLotus:
-                    cap_board = Illegal;
+                    cap_board = Illegal & Legal;
                     break;
               default:
                     std::cout << "bad piece in get cap board" << std::endl;
@@ -532,7 +532,6 @@ namespace Paisho{
                                                     (post_move_bb << (NORTH - EAST))) &\
                                                     Legal & ~post_move_bb & ~Gates;
                             int auxpiece_square = get_lsb(wheel_squares);
-                            std::cout<<auxpiece_square<<std::endl;
                             while(auxpiece_square != -1){
                                 Bitboard legal_bb(1);
                                 legal_bb <<= auxpiece_square; //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
@@ -559,8 +558,20 @@ namespace Paisho{
                             }
 
                         }else if (auxpiece == Boat){
+                            Bitboard all_accents = b.bitboards[WhiteAccents] | b.bitboards[BlackAccents];
+                            int t_accent = get_lsb(all_accents);
+                            while (t_accent != -1){
+                                Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                (t_src << MOVE_S1_OFFSET) |\
+                                                (t_dest << MOVE_S2_OFFSET) |\
+                                                (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                ((uint64_t) t_accent << MOVE_S3_OFFSET);
+                                move_list->movelist[move_list->move_count++] = t_move;
+                                all_accents.reset(t_accent);
+                                t_accent = get_lsb(all_accents);
+                            }
                         }
-                        //if (boat etc...)
                     }
                     t_dests.reset(t_dest);
                     t_dest = get_lsb(t_dests);
@@ -569,6 +580,9 @@ namespace Paisho{
                 t_src = get_lsb(w3_copy);
             }
         }
+
+
+
 
 
         void get_harmony_place_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
@@ -701,6 +715,71 @@ namespace Paisho{
         }
         
 
+        void get_boat_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
+            if (team == WHITE && !(b.whiteAccents | Boat | Boat2)){
+                return;
+            }else if (team == BLACK && !(b.blackAccents | Boat | Boat2)){
+                return;
+            }
+            mask_ptr mask_move_ptr = get_mask_move_ptr(bbflowerpiece);
+            Bitboard harm_board = get_harm_board(b, bbflowerpiece); //harm1 & harm2
+            Bitboard cap_board = get_cap_board(b, bbflowerpiece);
+
+            //Note have to add lotus to harm board cases
+            
+            Bitboard w3_copy = b.bitboards[bbflowerpiece];
+            //Go through each piece and generate moves for it
+            int t_src = get_lsb(w3_copy);
+            Bitboard t_dests;
+            while (t_src != -1){ //square piece is being moved from
+                t_dests = mask_move_ptr(t_src) & \
+                          harm_board;
+
+                int t_dest = get_lsb(t_dests);
+                while (t_dest != -1){//square piece is being moved to
+                    int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
+                    Bitboard post_move_bb = b.bitboards[AllBlackFlowers] & b.bitboards[AllWhiteFlowers];
+                    post_move_bb.reset(t_src);
+                    post_move_bb.set(t_dest);
+                    int boat_square = get_lsb(post_move_bb);
+                    while (boat_square != -1){
+                        Bitboard s4_squares = ((post_move_bb >> EAST) |\
+                                                (post_move_bb << EAST) |\
+                                                (post_move_bb << NORTH) |\
+                                                (post_move_bb >> NORTH) |\
+                                                (post_move_bb >> (NORTH + EAST)) |\
+                                                (post_move_bb >> (NORTH - EAST)) |\
+                                                (post_move_bb << (NORTH + EAST)) |\
+                                                (post_move_bb << (NORTH - EAST))) &\
+                                                Legal & ~post_move_bb & ~Gates;
+                        int s4_square = get_lsb(s4_squares);
+                        while(s4_square != -1){
+                            Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                            (t_src << MOVE_S1_OFFSET) |\
+                                            (t_dest << MOVE_S2_OFFSET) |\
+                                            (Boat << MOVE_AUXPIECE_OFFSET) |\
+                                            ((uint64_t) boat_square << MOVE_S3_OFFSET) |\
+                                            ((uint64_t) s4_square << MOVE_S4_OFFSET) |\
+                                            ((uint64_t) 1 << MOVE_BOATMOVE_OFFSET);
+                            move_list->movelist[move_list->move_count++] = t_move;
+                            
+                            s4_squares.reset(s4_square);
+                            s4_square = get_lsb(s4_squares);
+                        }
+                        post_move_bb.reset(boat_square);
+                        boat_square = get_lsb(post_move_bb);
+                    }
+                    t_dests.reset(t_dest);
+                    t_dest = get_lsb(t_dests);
+                }
+                w3_copy.reset(t_src);
+                t_src = get_lsb(w3_copy);
+            }
+        }
+
+
+
 
         //get_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
         Moves get_moves(Board b, int team){
@@ -717,12 +796,13 @@ namespace Paisho{
                 p_end = 17;
             }
             for (int i = p_start; i <= p_end; i++){
-                //get_flower_moves(b, team, piece_list[i], &move_list);
-                //get_harmony_place_moves(b, team, piece_list[i], &move_list);
+                get_flower_moves(b, team, piece_list[i], &move_list);
+                get_harmony_place_moves(b, team, piece_list[i], &move_list);
                 get_harmony_accent_moves(b, team, piece_list[i], &move_list);
+                get_boat_flower_moves(b, team, piece_list[i], &move_list);
                 //get harmony boat moves
             }
-            //get_place_moves(b, team, &move_list);
+            get_place_moves(b, team, &move_list);
             return move_list;
         }
 

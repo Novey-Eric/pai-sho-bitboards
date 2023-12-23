@@ -108,20 +108,21 @@ void test_gen_moves(){
 
     b.bitboards[WhiteW3]=w3b;
     b.bitboards[AllWhiteFlowers] = w3b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.bitboards[WhiteAccents]=waccent;
+
     b.ww3=2;
     b.ww4=1;
     b.ww5=3;
     
     Moves a = get_moves(b, WHITE);
-    cout<<a.move_count<<endl;
-    cout<< std::hex << a.movelist[0] << endl;
+    cout<<"move count "<< a.move_count<<endl;
+    cout<<"first move in hex: " << std::hex << a.movelist[0] << endl;
     print_move(a.movelist[0]);
     cout << endl;
     print_move_list(a);
-
-
-
-
 
 }
 
