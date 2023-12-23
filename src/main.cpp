@@ -162,11 +162,11 @@ void test_make_move(){
     b.ww5=3;
 
     Moves a = get_moves(b, WHITE);
+    print_move_list(a);
     cout<<"move count "<< a.move_count<<endl;
     pretty(b.otherBoards[AllPieces]);
-    //print_move_list(a);
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[118]);
+    make_move(&b, WHITE, a.movelist[125]);
     pretty(b.otherBoards[AllPieces]);
     
 

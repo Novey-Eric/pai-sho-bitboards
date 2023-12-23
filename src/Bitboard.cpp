@@ -827,6 +827,7 @@ namespace Paisho{
             }
 
             b->otherBoards[Accents].set(auxsq);
+            b->otherBoards[AllPieces].set(auxsq);
             if (auxpiece == Rock){
                 b->otherBoards[Rocks].set(auxsq);
             } else if (auxpiece == Wheel){
@@ -835,10 +836,10 @@ namespace Paisho{
                 //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
                 int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
                 for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){
-                    //b->whiteBoards[t_board][auxsq << hmoves[0]] = copy.whiteBoards[t_board][auxsq << hmoves[7]];
-                    for (int t_move=4; t_move<8; t_move++){
+                    b->whiteBoards[t_board][auxsq + hmoves[0]] = copy.whiteBoards[t_board][auxsq + hmoves[7]];
+                    for (int t_move=1; t_move<8; t_move++){
                         b->whiteBoards[t_board][auxsq + hmoves[t_move]] = copy.whiteBoards[t_board][auxsq + hmoves[t_move-1]]; //TODO: THIS DOESNT WORK
-                    
+                        
                         //this is SUPER cursed, going through all arrays in 
                         //whiteboards and blackboards by doubling the length of the first
                     }
