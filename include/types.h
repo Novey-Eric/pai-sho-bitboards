@@ -62,7 +62,8 @@ namespace Paisho{
         WhiteHarmR3,WhiteHarmR4,WhiteHarmR5,WhiteHarmW3,WhiteHarmW4,WhiteHarmW5,
         Rocks,
         AllWhiteFlowers,AllBlackFlowers,BlackAccents,WhiteAccents,AllPieces,
-        ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5
+        ClashR3,ClashR4,ClashR5,ClashW3,ClashW4,ClashW5,
+        Nothing
     };
 
     //Set these like 1<<Rock or something

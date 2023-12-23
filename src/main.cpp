@@ -96,13 +96,15 @@ void test_lsb(){
 
 void test_gen_moves(){
     Bitboard w3b(1);
-    w3b <<= i8;
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
     pretty(w3b);
     Board b={0};
     b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
 
     Bitboard w3h(1);
-    w3h <<= i10;
+    w3h <<= j10;
     pretty(w3h);
     b.bitboards[WhiteHarmW4] = w3h;
 
@@ -112,6 +114,8 @@ void test_gen_moves(){
     Bitboard waccent(1);
     waccent <<= e3;
     b.bitboards[WhiteAccents]=waccent;
+
+    b.bitboards[AllPieces] = waccent | w3b | w3h;
 
     b.ww3=2;
     b.ww4=1;
@@ -125,6 +129,13 @@ void test_gen_moves(){
     print_move_list(a);
 
 }
+
+void test_make_move(){
+    
+
+
+}
+
 
 
 int main(){

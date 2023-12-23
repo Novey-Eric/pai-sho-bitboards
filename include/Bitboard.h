@@ -4,6 +4,7 @@
 
 #include <bitset>
 #include "types.h"
+#include <map>
 //using Bitboard = std::bitset<224>;
 
 std::string GetBinaryStringFromHexString (std::string sHex);
@@ -86,7 +87,7 @@ std::string GetBinaryStringFromHexString (std::string sHex);
 
 #define Neutral (Legal^Red^White^Gates)
 
-#define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (Bitboard(1) << square) : 0)
+//#define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (Bitboard(1) << square) : 0)
 
 namespace Paisho{
     //Used to initialize all the bitboards
@@ -94,6 +95,9 @@ namespace Paisho{
     void print_move(Move m);
     void print_move_list(Moves ml);
     //use one char (8 bits) to pick from {rock1, r2, knot1, knot2, w1, w2, b1, b2}
+    typedef Bitboard (*mask_ptr)(int);
+
+
     
     enum Direction: int{
         NORTH = 17,
@@ -108,17 +112,18 @@ namespace Paisho{
     };
 
     namespace Bitboards{
-
-        std::string pretty(Bitboard b);
-        void init();
-        int get_lsb(Bitboard b);
-        Moves get_moves(Board b, int color);
-
         Bitboard mask_2_move(int square);
         Bitboard mask_3_move(int square);
         Bitboard mask_4_move(int square);
         Bitboard mask_5_move(int square);
         Bitboard mask_6_move(int square);
+
+        Moves get_moves(Board b, int team);
+
+        std::string pretty(Bitboard b);
+        void init();
+        int get_lsb(Bitboard b);
+        Moves get_moves(Board b, int color);
 
     } //namespace bitboards
 
