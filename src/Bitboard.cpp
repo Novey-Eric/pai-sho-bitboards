@@ -177,6 +177,7 @@ namespace Paisho{
                                     {r3, harmr3},
                                     {r4, harmr4},
                                     {r5, harmr5},
+                                    {lotus, harmlotus},
                                     };
 
 
@@ -190,22 +191,22 @@ namespace Paisho{
             
             switch(flower){
                 case w3:
-                    harm_board = t_board[harmw4] | t_board[harmr5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmw4] | t_board[harmr5] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 case w4:
-                    harm_board = t_board[harmw3] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmw3] | t_board[harmw5] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 case w5:
-                    harm_board = t_board[harmw4] | t_board[harmr3] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmw4] | t_board[harmr3] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 case r3:
-                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 case r4:
-                    harm_board = t_board[harmr5] | t_board[harmr3] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmr5] | t_board[harmr3] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 case r5:
-                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[lotus] | b.blackBoards[lotus];
+                    harm_board = t_board[harmr4] | t_board[harmw5] | b.whiteBoards[harmlotus] | b.blackBoards[harmlotus];
                     break;
                 //Lotus only harmonizes with own team.
                 case orchid:
@@ -443,6 +444,7 @@ namespace Paisho{
                                                     (t_dest << MOVE_S2_OFFSET) |\
                                                     (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                     ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                    std::cout<<move_list->move_count<<std::endl;
                                     move_list->movelist[move_list->move_count++] = t_move;
                                 }
                                 wheel_squares.reset(auxpiece_square);
@@ -928,6 +930,7 @@ namespace Paisho{
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
             update_harms_clash(b);
+            update_team_harms(b);
         }
 
 
@@ -1043,12 +1046,58 @@ namespace Paisho{
 
 
         void update_harms_clash(Board *b){
-            for (int t_piece = 0; t_piece <= 5; t_piece++){
+            for (int t_piece = 0; t_piece <= 6; t_piece++){
                 find_clashes(b, t_piece);
                 find_harms(b, t_piece, WHITE);
-                find_harms(b, t_piece, BLACK);
+                //find_harms(b, t_piece, BLACK);
             }
         }
+
+
+        //take harmboard index as input, return bitbord of which pieces can harmonize with that piece
+        Bitboard reverse_harm_lookup(Board *b, int harm_index, int team){
+            Bitboard ret;
+            Bitboard *teamboard;
+            if (team == WHITE){
+                teamboard = &b->whiteBoards[0];
+            }else{
+                teamboard = &b->blackBoards[0];
+            }
+            switch(harm_index){
+                case harmr3:
+                    ret = teamboard[r4] | teamboard[w5];
+                    break;
+                case harmr4:
+                    ret = teamboard[r5] | teamboard[r3];
+                    break;
+                case harmr5:
+                    ret = teamboard[w3] | teamboard[r4];
+                    break;
+                case harmw3:
+                    ret = teamboard[w4] | teamboard[r5];
+                    break;
+                case harmw4:
+                    ret = teamboard[w5] | teamboard[w3];
+                    break;
+                case harmw5:
+                    ret = teamboard[w5] | teamboard[r3];
+                    break;
+                case harmlotus:
+                    ret = teamboard[w5] | teamboard[r3];
+                    break;
+            }
+            return ret;
+        }
+
+        void update_team_harms(Board *b){
+            b->otherBoards[WhiteHarms] = Bitboard(0);
+
+            for(int i = 8; i<=14; i++){
+                Bitboard harm_pieces = reverse_harm_lookup(b, i, WHITE);
+                b->otherBoards[WhiteHarms] |= harm_pieces & b->whiteBoards[i];
+            }
+        }
+
 
 
         Bitboard mask_2_move(int square){

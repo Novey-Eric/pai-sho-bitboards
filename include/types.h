@@ -69,7 +69,7 @@ namespace Paisho{
     // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
 
     enum Boards{
-        w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,
+        w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,harmlotus,
         allflowers
     };
     //Set these like 1<<Rock or something
@@ -178,7 +178,7 @@ namespace Paisho{
     typedef uint64_t Move;
 
     typedef struct {
-        Move movelist[2000];
+        Move movelist[5000];
         int move_count;
     } Moves;
 

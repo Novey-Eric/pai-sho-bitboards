@@ -121,6 +121,7 @@ namespace Paisho{
         Moves get_moves(Board b, int team);
         void make_move(Board *b, int team, Move m);
         void update_harms_clash(Board *b);
+        void update_team_harms(Board *b);
 
         std::string pretty(Bitboard b);
         void init();
