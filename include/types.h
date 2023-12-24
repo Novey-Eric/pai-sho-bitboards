@@ -68,8 +68,6 @@ namespace Paisho{
     // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
     // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
 
-    //Note: harm<piece> really means a piece will get a harmony bonus for landing in it.
-    // It does not actually have anything to do with harmony rings or points
     enum Boards{
         w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,
         allflowers

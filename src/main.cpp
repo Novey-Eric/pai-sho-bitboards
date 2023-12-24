@@ -245,6 +245,54 @@ void test_boat(){
 }
 
 
+void test_harm_clashes(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    b.whiteBoards[allflowers] = w3b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b;
+    b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    cout<<"move count "<< a.move_count<<endl;
+    //pretty(b.otherBoards[AllPieces]);
+    cout<<"making move"<<endl;
+    pretty(b.whiteBoards[harmw3]);
+    make_move(&b, WHITE, a.movelist[159]);
+    //pretty(b.otherBoards[AllPieces]);
+    cout<<"PRINTING ALL white FLOWERS"<<endl;
+    pretty(b.whiteBoards[allflowers]);
+    cout<<"printing all pieces"<<endl;
+    pretty(b.otherBoards[AllPieces]);
+    cout<<"printing harmw3"<<endl;
+    pretty(b.whiteBoards[harmw3]);
+    cout<<"printing clashr3"<<endl;
+    pretty(b.otherBoards[clashr3]);
+    
+    
+
+}
+
 
 
 int main(){
@@ -253,6 +301,7 @@ int main(){
     //test_lsb();
     //test_gen_moves();
     //test_wheel2();
-    test_boat();
+    //test_boat();
+    test_harm_clashes();
     return 1;
 }

@@ -170,6 +170,16 @@ namespace Paisho{
                                 {lotus, &mask_2_move},
                                 };
 
+        std::map<int, int> harm_map{
+                                    {w3, harmw3},
+                                    {w4, harmw4},
+                                    {w5, harmw5},
+                                    {r3, harmr3},
+                                    {r4, harmr4},
+                                    {r5, harmr5},
+                                    };
+
+
         Bitboard get_harm_board(Board b, int team, int flower){
             Bitboard harm_board;
             Bitboard *t_board;
@@ -220,6 +230,16 @@ namespace Paisho{
                                 {orchid, Legal},
                                 {lotus, Legal},
                                 };
+
+        std::map<int, int> clash_piece{
+                                        {w3, r3},
+                                        {w4, r4},
+                                        {w5, r5},
+                                        {r3, w3},
+                                        {r4, w4},
+                                        {r5, w5},
+                                        };
+
         std::map<int, int> clash_map{
                                 {w3, clashw3},
                                 {w4, clashw4},
@@ -907,8 +927,128 @@ namespace Paisho{
                 std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
+            update_harms_clash(b);
         }
 
+
+        void find_clashes(Board *b, int t_piece){
+
+            Bitboard cw3_pieces = b->whiteBoards[clash_piece[t_piece]] | b->blackBoards[clash_piece[t_piece]];
+            int cw3_piece = get_lsb(cw3_pieces);
+            int tmp_square;
+            int current_row;
+            while(cw3_piece != -1){ //for each r3 piece on the board:
+                tmp_square = cw3_piece + EAST;
+                current_row = cw3_piece / 17;
+                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    tmp_square += EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+
+                tmp_square = cw3_piece - EAST;
+                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    tmp_square -= EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+
+                tmp_square = cw3_piece + NORTH;
+                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    tmp_square += NORTH;
+                }
+                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+
+                tmp_square = cw3_piece - NORTH;
+                while(tmp_square >= 0 && tmp_square && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    tmp_square -= NORTH;
+                }
+                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+
+
+                //go up and down, left and right from the piece.
+                //until hitting another piece. All those squares should be set to 1
+                //for clashes, it should be un-inclusive of the flowers
+                
+                //For harmonies, it should be inclusive of the tile on the board.
+                cw3_pieces.reset(cw3_piece);
+                cw3_piece = get_lsb(cw3_pieces);
+            }
+            
+        }
+
+        void find_harms(Board *b, int t_piece, int team){
+            //HARM CASE
+            //int t_piece = w3;
+            Bitboard w3_pieces = b->whiteBoards[t_piece];
+            int w3_piece = get_lsb(w3_pieces);
+            Bitboard *teamboard;
+            if (team == WHITE){
+                teamboard = &(b->whiteBoards)[0];
+            }else{
+                teamboard = &(b->blackBoards)[0];
+            }
+
+            int tmp_square;
+            int current_row;
+            while(w3_piece != -1){ //for each r3 piece on the board:
+                tmp_square = w3_piece + EAST;
+                current_row = w3_piece / 17;
+                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    tmp_square += EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+
+                tmp_square = w3_piece - EAST;
+                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    tmp_square -= EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+
+                tmp_square = w3_piece + NORTH;
+                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    tmp_square += NORTH;
+                }
+                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+
+                tmp_square = w3_piece - NORTH;
+                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    tmp_square -= NORTH;
+                }
+                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                    teamboard[harm_map[t_piece]].set(tmp_square);
+
+                //go up and down, left and right from the piece.
+                //until hitting another piece. All those squares should be set to 1
+                //for clashes, it should be un-inclusive of the flowers
+                
+                //For harmonies, it should be inclusive of the tile on the board.
+                w3_pieces.reset(w3_piece);
+                w3_piece = get_lsb(w3_pieces);
+            }
+        }
+
+
+        void update_harms_clash(Board *b){
+            for (int t_piece = 0; t_piece <= 5; t_piece++){
+                find_clashes(b, t_piece);
+                find_harms(b, t_piece, WHITE);
+                find_harms(b, t_piece, BLACK);
+            }
+        }
 
 
         Bitboard mask_2_move(int square){
