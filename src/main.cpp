@@ -314,9 +314,9 @@ void test_total_harms(){
     waccent <<= e3;
     b.otherBoards[Accents]=waccent;
 
-    b.otherBoards[AllPieces]= waccent | w3b;
-    b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
-
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
     b.ww3=2;
     b.ww4=1;
     b.ww5=3;
@@ -326,14 +326,26 @@ void test_total_harms(){
     print_move_list(a);
     cout<<"move count "<< a.move_count<<endl;
     //pretty(b.otherBoards[AllPieces]);
+
     cout<<"making move"<<endl;
+    make_move(&b, WHITE, a.movelist[1364]);
+    Move tm = a.movelist[1364];
+    cout<< ((tm & MOVE_PIECE_MASK)>>MOVE_PIECE_OFFSET) << endl;
+    cout<< w3<< endl;
+    cout<<"printing w3 "<< endl;
+    pretty(b.whiteBoards[w3]);
+    cout<<"printing harmw3 "<< endl;
     pretty(b.whiteBoards[harmw3]);
-    //make_move(&b, WHITE, a.movelist[159]);
+    cout<<"printing w4 "<< endl;
+    pretty(b.whiteBoards[w4]);
+    cout<<"printing harmw4 "<< endl;
+    pretty(b.whiteBoards[harmw4]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoards[allflowers]);
-
-
+    cout<<"PRINTING WHITE HARMONIES"<<endl;
+    pretty(b.otherBoards[WhiteHarms]);
+    
 }
 
 int main(){

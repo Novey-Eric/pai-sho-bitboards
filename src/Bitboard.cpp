@@ -323,6 +323,7 @@ namespace Paisho{
                     int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
                     Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
                                     (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                    (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                     (t_src << MOVE_S1_OFFSET) |\
                                     (t_dest << MOVE_S2_OFFSET);
                     move_list->movelist[move_list->move_count++] = t_move;
@@ -402,6 +403,7 @@ namespace Paisho{
                             while(auxpiece_square != -1){ //Add a move for each square around every tile on the board
                                 Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
                                                 (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                                 (t_src << MOVE_S1_OFFSET) |\
                                                 (t_dest << MOVE_S2_OFFSET) |\
                                                 (auxpiece << MOVE_AUXPIECE_OFFSET) |\
@@ -440,6 +442,7 @@ namespace Paisho{
                                 if (legal_bb.count() == 8){
                                     Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
                                                     (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                    (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                                     (t_src << MOVE_S1_OFFSET) |\
                                                     (t_dest << MOVE_S2_OFFSET) |\
                                                     (auxpiece << MOVE_AUXPIECE_OFFSET) |\
@@ -457,6 +460,7 @@ namespace Paisho{
                             while (t_accent != -1){
                                 Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
                                                 (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                                 (t_src << MOVE_S1_OFFSET) |\
                                                 (t_dest << MOVE_S2_OFFSET) |\
                                                 (auxpiece << MOVE_AUXPIECE_OFFSET) |\
@@ -997,6 +1001,7 @@ namespace Paisho{
             }else{
                 teamboard = &(b->blackBoards)[0];
             }
+            teamboard[harm_map[t_piece]] = Bitboard(0);
 
             int tmp_square;
             int current_row;
@@ -1049,7 +1054,7 @@ namespace Paisho{
             for (int t_piece = 0; t_piece <= 6; t_piece++){
                 find_clashes(b, t_piece);
                 find_harms(b, t_piece, WHITE);
-                //find_harms(b, t_piece, BLACK);
+                find_harms(b, t_piece, BLACK);
             }
         }
 
@@ -1094,7 +1099,11 @@ namespace Paisho{
 
             for(int i = 8; i<=14; i++){
                 Bitboard harm_pieces = reverse_harm_lookup(b, i, WHITE);
+                std::cout<<"Make it stop "<<i<<std::endl;
+                pretty(harm_pieces);
+                pretty(b->whiteBoards[i]);
                 b->otherBoards[WhiteHarms] |= harm_pieces & b->whiteBoards[i];
+
             }
         }
 
