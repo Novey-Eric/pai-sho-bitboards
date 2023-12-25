@@ -351,8 +351,10 @@ namespace Paisho{
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
             int num_pieces = 0;
+            Bitboard *teamboard;
             
             if (team == WHITE){
+                teamboard = &b.whiteBoards[0];
                 if (b.whiteAccents & (Rock | Rock2))
                     pieces_in_hand[num_pieces++] = Rock;
                 if (b.whiteAccents & (Knotweed | Knotweed2))
@@ -362,6 +364,7 @@ namespace Paisho{
                 if (b.whiteAccents & (Boat | Boat2))
                     pieces_in_hand[num_pieces++] = Boat;
             } else{
+                teamboard = &b.blackBoards[0];
                 if (b.blackAccents & (Rock | Rock2))
                     pieces_in_hand[num_pieces++] = Rock;
                 if (b.blackAccents & (Knotweed | Knotweed2))
@@ -378,7 +381,7 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece];
+                          harm_board & correct_color[bbflowerpiece] & (~teamboard[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){//square piece is being moved to
@@ -499,8 +502,10 @@ namespace Paisho{
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
             int num_pieces = 0;
+            Bitboard *teamboard;
             
             if (team == WHITE){
+                teamboard = &b.whiteBoards[0];
                 if (b.ww3)
                     pieces_in_hand[num_pieces++] = w3;
                 if (b.ww4)
@@ -519,6 +524,7 @@ namespace Paisho{
                     pieces_in_hand[num_pieces++] = lotus;
                 
             } else{
+                teamboard = &b.blackBoards[0];
                 if (b.bw3)
                     pieces_in_hand[num_pieces++] = w3;
                 if (b.bw4)
@@ -544,7 +550,7 @@ namespace Paisho{
             Bitboard t_open_gates;
             while (t_src != -1){ //First look at quiet moves only
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece];
+                          harm_board & correct_color[bbflowerpiece] & (~teamboard[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
@@ -651,7 +657,7 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece];
+                          harm_board & correct_color[bbflowerpiece] & (~team_board[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){//square piece is being moved to
@@ -1099,11 +1105,7 @@ namespace Paisho{
 
             for(int i = 8; i<=14; i++){
                 Bitboard harm_pieces = reverse_harm_lookup(b, i, WHITE);
-                std::cout<<"Make it stop "<<i<<std::endl;
-                pretty(harm_pieces);
-                pretty(b->whiteBoards[i]);
                 b->otherBoards[WhiteHarms] |= harm_pieces & b->whiteBoards[i];
-
             }
         }
 
