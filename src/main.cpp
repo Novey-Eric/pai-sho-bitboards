@@ -3,6 +3,7 @@
 #include <iostream>
 #include <ostream>
 #include <strings.h>
+#include"Computer.h"
 
 using namespace std;
 using namespace Paisho::Bitboards;
@@ -328,8 +329,8 @@ void test_total_harms(){
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[1364]);
-    Move tm = a.movelist[1364];
+    make_move(&b, WHITE, a.movelist[2806]);
+    Move tm = a.movelist[2806];
     cout<< ((tm & MOVE_PIECE_MASK)>>MOVE_PIECE_OFFSET) << endl;
     cout<< w3<< endl;
     cout<<"printing w3 "<< endl;
@@ -345,8 +346,55 @@ void test_total_harms(){
     pretty(b.whiteBoards[allflowers]);
     cout<<"PRINTING WHITE HARMONIES"<<endl;
     pretty(b.otherBoards[WhiteHarms]);
+    cout<<"all tiles"<<endl;
+    pretty(b.otherBoards[AllPieces]);
+    
     
 }
+
+
+
+void test_minimax(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+
+    update_harms_clash(&b);
+    Moves a = get_moves(b, WHITE);
+    //print_move_list(a);
+    cout<<"move count "<< a.move_count<<endl;
+    //pretty(b.otherBoards[AllPieces]);
+
+    cout<<"making move"<<endl;
+    make_move(&b, WHITE, a.movelist[1353]);
+    Move bestmove;
+    Move t = minimax(b, 2, WHITE, &bestmove);
+}
+
 
 int main(){
     //test_print_macros();
@@ -356,6 +404,7 @@ int main(){
     //test_wheel2();
     //test_boat();
     //test_harm_clashes();
-    test_total_harms();
+    //test_total_harms();
+    test_minimax();
     return 1;
 }

@@ -450,7 +450,6 @@ namespace Paisho{
                                                     (t_dest << MOVE_S2_OFFSET) |\
                                                     (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                     ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
-                                    std::cout<<move_list->move_count<<std::endl;
                                     move_list->movelist[move_list->move_count++] = t_move;
                                 }
                                 wheel_squares.reset(auxpiece_square);
@@ -1109,6 +1108,9 @@ namespace Paisho{
             }
         }
 
+        int check_win(Board *b){
+            return -1;
+        }
 
 
         Bitboard mask_2_move(int square){
