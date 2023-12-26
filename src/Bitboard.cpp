@@ -450,6 +450,8 @@ namespace Paisho{
                                                     (t_dest << MOVE_S2_OFFSET) |\
                                                     (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                     ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                    std::cout << move_list->move_count << " ";
+                                    print_move(t_move);
                                     move_list->movelist[move_list->move_count++] = t_move;
                                 }
                                 wheel_squares.reset(auxpiece_square);
@@ -682,6 +684,7 @@ namespace Paisho{
                                             (t_src << MOVE_S1_OFFSET) |\
                                             (t_dest << MOVE_S2_OFFSET) |\
                                             (Boat << MOVE_AUXPIECE_OFFSET) |\
+                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                             ((uint64_t) boat_square << MOVE_S3_OFFSET) |\
                                             ((uint64_t) s4_square << MOVE_S4_OFFSET) |\
                                             ((uint64_t) 1 << MOVE_BOATMOVE_OFFSET);
@@ -828,11 +831,17 @@ namespace Paisho{
             } else{
                 b->otherBoards[AllPieces].set(dst); //if capturing piece, allpieces already set. only set if not capping.
             }
+            
+            std::cout<< "before resetting printing w4 " <<src << k9 << " " << dst<<std::endl;
+            std::cout << "piece "<< piece << w4<<std::endl;
+            pretty(b->whiteBoards[w4]);
             b->otherBoards[AllPieces].reset(src);
             team_board[piece].reset(src);
             team_board[allflowers].reset(src);
             team_board[piece].set(dst);
             team_board[allflowers].set(dst);
+            std::cout<< "after resetting printing w4 "<<std::endl;
+            pretty(b->whiteBoards[w4]);
 
         }
 
@@ -923,21 +932,22 @@ namespace Paisho{
             uint64_t boatmove = (m & MOVE_BOATMOVE_MASK) >> MOVE_BOATMOVE_OFFSET;
             
             if (type == MOVE){
-                std::cout<<"in move"<< std::endl;
+                //std::cout<<"in move"<< std::endl;
                 make_move_move(b, team, piece, s1, s2, cap);
             }else if(type == PLACE){
-                std::cout<<"place"<< std::endl;
+                //std::cout<<"place"<< std::endl;
                 make_place_move(b, team, piece, s1);
             }else if(type == HARMPLACE){
-                std::cout<<"harmplace"<< std::endl;
+                //std::cout<<"harmplace"<< std::endl;
                 make_harm_place_move(b, team, piece, s1, s2, piece, s3, cap);
             }else if(type == HARMACCENT && !boatmove){
-                std::cout<<"harmacc"<< std::endl;
+                //std::cout<<"harmacc"<< std::endl;
                 make_harm_accent_move(b, team, piece, s1, s2, auxpiece, s3, cap);
             }else if(type == HARMACCENT && boatmove){
-                std::cout<<"harmacc boatmove"<< std::endl;
+                //std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
+            pretty(b->whiteBoards[harmw3]);
             update_harms_clash(b);
             update_team_harms(b);
         }
@@ -945,10 +955,13 @@ namespace Paisho{
 
         void find_clashes(Board *b, int t_piece){
 
+            b->otherBoards[clash_map[t_piece]] = Bitboard(0);
+            
             Bitboard cw3_pieces = b->whiteBoards[clash_piece[t_piece]] | b->blackBoards[clash_piece[t_piece]];
             int cw3_piece = get_lsb(cw3_pieces);
             int tmp_square;
             int current_row;
+            
             while(cw3_piece != -1){ //for each r3 piece on the board:
                 tmp_square = cw3_piece + EAST;
                 current_row = cw3_piece / 17;
