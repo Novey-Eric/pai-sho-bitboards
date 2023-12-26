@@ -450,8 +450,8 @@ namespace Paisho{
                                                     (t_dest << MOVE_S2_OFFSET) |\
                                                     (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                     ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
-                                    std::cout << move_list->move_count << " ";
-                                    print_move(t_move);
+                                    //std::cout << move_list->move_count << " ";
+                                    //print_move(t_move);
                                     move_list->movelist[move_list->move_count++] = t_move;
                                 }
                                 wheel_squares.reset(auxpiece_square);
@@ -500,6 +500,7 @@ namespace Paisho{
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
+            pretty(harm_board);
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
             int num_pieces = 0;
@@ -551,7 +552,9 @@ namespace Paisho{
             Bitboard t_open_gates;
             while (t_src != -1){ //First look at quiet moves only
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece] & (~teamboard[allflowers] | cap_board);
+                          harm_board & \
+                          correct_color[bbflowerpiece] & \
+                          (~teamboard[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
@@ -567,6 +570,7 @@ namespace Paisho{
                                             (t_dest << MOVE_S2_OFFSET) |\
                                             (piece_bits << MOVE_PIECE_OFFSET) |\
                                             ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
+                            print_move(t_move);
                             move_list->movelist[move_list->move_count++] = t_move;
                         }
                         t_open_gates.reset(t_open_gate);
@@ -832,16 +836,11 @@ namespace Paisho{
                 b->otherBoards[AllPieces].set(dst); //if capturing piece, allpieces already set. only set if not capping.
             }
             
-            std::cout<< "before resetting printing w4 " <<src << k9 << " " << dst<<std::endl;
-            std::cout << "piece "<< piece << w4<<std::endl;
-            pretty(b->whiteBoards[w4]);
             b->otherBoards[AllPieces].reset(src);
             team_board[piece].reset(src);
             team_board[allflowers].reset(src);
             team_board[piece].set(dst);
             team_board[allflowers].set(dst);
-            std::cout<< "after resetting printing w4 "<<std::endl;
-            pretty(b->whiteBoards[w4]);
 
         }
 
@@ -913,8 +912,10 @@ namespace Paisho{
             b->otherBoards[AllPieces].set(boat_move_sq);
             //Need all pieces move too
             for(int t_board = 0; t_board < (2*NUM_BOARDS); t_board++){
-                b->whiteBoards[t_board].set(boat_move_sq);
-                b->whiteBoards[t_board].reset(boatsq);
+                if (b->whiteBoards[t_board][boatsq]){
+                    b->whiteBoards[t_board].set(boat_move_sq);
+                    b->whiteBoards[t_board].reset(boatsq);
+                }
                 //this is SUPER cursed, going through all arrays in 
                 //whiteboards and blackboards by doubling the length of the first
             }
@@ -947,7 +948,6 @@ namespace Paisho{
                 //std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
-            pretty(b->whiteBoards[harmw3]);
             update_harms_clash(b);
             update_team_harms(b);
         }
@@ -1026,7 +1026,7 @@ namespace Paisho{
             while(w3_piece != -1){ //for each r3 piece on the board:
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
-                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_map[t_piece]].set(tmp_square);
                     tmp_square += EAST;
                 }
