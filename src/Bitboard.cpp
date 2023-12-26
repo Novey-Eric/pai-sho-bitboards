@@ -381,7 +381,10 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece] & (~teamboard[allflowers] | cap_board);
+                          ~b.otherBoards[Accents] & \
+                          harm_board & \
+                          correct_color[bbflowerpiece] & \
+                          (~teamboard[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){//square piece is being moved to
@@ -500,7 +503,7 @@ namespace Paisho{
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
-            pretty(harm_board);
+            //pretty(harm_board);
             //Note have to add lotus to harm board cases
             int pieces_in_hand[8];
             int num_pieces = 0;
@@ -554,6 +557,7 @@ namespace Paisho{
                 t_dests = mask_move_ptr(t_src) & \
                           harm_board & \
                           correct_color[bbflowerpiece] & \
+                          ~b.otherBoards[Accents] & \
                           (~teamboard[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
@@ -570,7 +574,6 @@ namespace Paisho{
                                             (t_dest << MOVE_S2_OFFSET) |\
                                             (piece_bits << MOVE_PIECE_OFFSET) |\
                                             ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
-                            print_move(t_move);
                             move_list->movelist[move_list->move_count++] = t_move;
                         }
                         t_open_gates.reset(t_open_gate);
@@ -662,7 +665,10 @@ namespace Paisho{
             Bitboard t_dests;
             while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & correct_color[bbflowerpiece] & (~team_board[allflowers] | cap_board);
+                          harm_board & \
+                          correct_color[bbflowerpiece] & \
+                          ~b.otherBoards[Accents] & \
+                          (~team_board[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){//square piece is being moved to
@@ -973,11 +979,11 @@ namespace Paisho{
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
 
                 tmp_square = cw3_piece - EAST;
-                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
                     tmp_square -= EAST;
                 }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                if (tmp_square/17 == current_row && tmp_square >= 0)
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
 
                 tmp_square = cw3_piece + NORTH;
@@ -989,11 +995,11 @@ namespace Paisho{
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
 
                 tmp_square = cw3_piece - NORTH;
-                while(tmp_square >= 0 && tmp_square && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square >= 0 && tmp_square && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
                     tmp_square -= NORTH;
                 }
-                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                if (tmp_square >= 0 && tmp_square >= 0)
                     b->otherBoards[clash_map[t_piece]].set(tmp_square);
 
 
@@ -1026,19 +1032,19 @@ namespace Paisho{
             while(w3_piece != -1){ //for each r3 piece on the board:
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
-                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_map[t_piece]].set(tmp_square);
                     tmp_square += EAST;
                 }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1)
                     teamboard[harm_map[t_piece]].set(tmp_square);
 
                 tmp_square = w3_piece - EAST;
-                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_map[t_piece]].set(tmp_square);
                     tmp_square -= EAST;
                 }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
+                if (tmp_square/17 == current_row && tmp_square >= 0)
                     teamboard[harm_map[t_piece]].set(tmp_square);
 
                 tmp_square = w3_piece + NORTH;
@@ -1050,11 +1056,11 @@ namespace Paisho{
                     teamboard[harm_map[t_piece]].set(tmp_square);
 
                 tmp_square = w3_piece - NORTH;
-                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_map[t_piece]].set(tmp_square);
                     tmp_square -= NORTH;
                 }
-                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                if (tmp_square >= 0)
                     teamboard[harm_map[t_piece]].set(tmp_square);
 
                 //go up and down, left and right from the piece.

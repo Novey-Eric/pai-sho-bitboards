@@ -24,9 +24,6 @@ int ply;
             curr_moves = Bitboards::get_moves(b_copy, WHITE);
             for(int i = 0; i < curr_moves.move_count; i++){
                 ply++;
-                Bitboards::pretty(b_copy.otherBoards[AllPieces]);
-                std::cout<< curr_moves.movelist[i] << " ";
-                print_move(curr_moves.movelist[i]);
                 Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
                 int t_val = minimax(&b_copy, depth-1, BLACK, &out_move);
                 ply--;
@@ -43,7 +40,6 @@ int ply;
             curr_moves = Bitboards::get_moves(b_copy, BLACK);
             for(int i = 0; i < curr_moves.move_count; i++){
                 ply++;
-                print_move(curr_moves.movelist[i]);
                 Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
                 int t_val = minimax(&b_copy, depth-1, WHITE, &out_move);
                 ply--;
