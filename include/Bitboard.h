@@ -112,6 +112,31 @@ namespace Paisho{
     };
 
     namespace Bitboards{
+
+
+
+        static std::map<int, int> clash_map{
+                                {w3, clashw3},
+                                {w4, clashw4},
+                                {w5, clashw5},
+                                {r3, clashr3},
+                                {r4, clashr4},
+                                {r5, clashr5},
+                                {orchid, Nothing},
+                                {lotus, Nothing},
+                                };
+        static std::map<int, int> harm_map{
+                                    {w3, harmw3},
+                                    {w4, harmw4},
+                                    {w5, harmw5},
+                                    {r3, harmr3},
+                                    {r4, harmr4},
+                                    {r5, harmr5},
+                                    {lotus, harmlotus},
+                                    };
+
+
+
         Bitboard mask_2_move(int square);
         Bitboard mask_3_move(int square);
         Bitboard mask_4_move(int square);
@@ -123,6 +148,7 @@ namespace Paisho{
         void update_harms_clash(Board *b);
         void update_team_harms(Board *b);
         int check_win(Board *b); //returns WHITE, BLACK or -1
+        Bitboard reverse_harm_lookup(Board *b, int harm_index, int team);
 
         std::string pretty(Bitboard b);
         void init();

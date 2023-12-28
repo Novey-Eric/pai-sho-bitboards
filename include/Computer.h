@@ -6,6 +6,8 @@
 namespace Paisho{
     Move minimax(Board *b, int depth, int player, Move *out);
     Move negamax(Board *b, int depth, int player, Move *out);
+    Move ab_prune_neg(Board *b, int depth, int alpha, int beta, int player, Move *out);
+    Move ab_prune(Board *b, int depth, int alpha, int beta, int player, Move *out);
     int evaluate(Board *b);
 
 }

@@ -4,7 +4,9 @@
 #include <ostream>
 #include <strings.h>
 #include"Computer.h"
+#include <chrono>
 
+using namespace std::chrono;
 using namespace std;
 using namespace Paisho::Bitboards;
 using namespace Paisho;
@@ -289,6 +291,7 @@ void test_harm_clashes(){
     pretty(b.whiteBoards[harmw3]);
     cout<<"printing clashr3"<<endl;
     pretty(b.otherBoards[clashr3]);
+    cout<<evaluate(&b)<<endl;
 
 }
 
@@ -348,11 +351,59 @@ void test_total_harms(){
     pretty(b.otherBoards[WhiteHarms]);
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
-    
+    cout<<evaluate(&b)<<endl;
     
 }
 
 
+void test_abprune(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+
+    update_harms_clash(&b);
+    Moves a = get_moves(b, WHITE);
+    cout<<"move count "<< a.move_count<<endl;
+    //pretty(b.otherBoards[AllPieces]);
+
+    cout<<"making move"<<endl;
+    make_move(&b, WHITE, a.movelist[1353]);
+    cout<<"done making move"<<endl;
+    Move bestmove;
+    auto start = high_resolution_clock::now();
+    Move t = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
+    auto after_mm = high_resolution_clock::now();
+    auto duration_mm = duration_cast<microseconds>(after_mm-start);
+    cout << "minimax duration: " << duration_mm.count() << endl;
+
+}
 
 void test_minimax(){
     
@@ -395,7 +446,16 @@ void test_minimax(){
     cout<<"making move"<<endl;
     make_move(&b, WHITE, a.movelist[1353]);
     Move bestmove;
-    Move t = minimax(&b, 3, WHITE, &bestmove);
+    auto start = high_resolution_clock::now();
+    Move t = minimax(&b, 2, WHITE, &bestmove);
+    auto after_mm = high_resolution_clock::now();
+    auto duration_mm = duration_cast<microseconds>(after_mm-start);
+    cout << "minimax duration: " << duration_mm.count() << endl;
+
+    Move t2 = negamax(&b, 2, WHITE, &bestmove);
+    auto after_nm = high_resolution_clock::now();
+    auto duration_nm = duration_cast<microseconds>(after_nm-after_mm);
+    cout << "negamax duration: " << duration_nm.count() << endl;
 }
 
 void test_move_types(){
@@ -459,8 +519,9 @@ int main(){
     //test_wheel2();
     //test_boat();
     //test_harm_clashes();
-    test_total_harms();
+    //test_total_harms();
     //test_minimax();
+    test_abprune();
     //test_move_types();
     return 1;
 }

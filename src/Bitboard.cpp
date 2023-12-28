@@ -159,6 +159,8 @@ namespace Paisho{
 
     namespace Bitboards{
 
+
+
         std::map<int, mask_ptr> mask_move_map{
                                 {w3, &mask_3_move},
                                 {w4, &mask_4_move},
@@ -169,16 +171,6 @@ namespace Paisho{
                                 {orchid, &mask_6_move},
                                 {lotus, &mask_2_move},
                                 };
-
-        std::map<int, int> harm_map{
-                                    {w3, harmw3},
-                                    {w4, harmw4},
-                                    {w5, harmw5},
-                                    {r3, harmr3},
-                                    {r4, harmr4},
-                                    {r5, harmr5},
-                                    {lotus, harmlotus},
-                                    };
 
 
         Bitboard get_harm_board(Board b, int team, int flower){
@@ -240,17 +232,6 @@ namespace Paisho{
                                         {r4, w4},
                                         {r5, w5},
                                         };
-
-        std::map<int, int> clash_map{
-                                {w3, clashw3},
-                                {w4, clashw4},
-                                {w5, clashw5},
-                                {r3, clashr3},
-                                {r4, clashr4},
-                                {r5, clashr5},
-                                {orchid, Nothing},
-                                {lotus, Nothing},
-                                };
 
         Bitboard get_cap_board(Board b, int team, int bbpiece){
             Bitboard cap_board;
@@ -1136,7 +1117,6 @@ namespace Paisho{
                     while (check_square / 17 == row && check_square < NUM_SQUARES){
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
-                            pretty(t_harm);
                             b->otherBoards[WhiteHarms] |= t_harm;
                             break;
                         }
@@ -1159,8 +1139,6 @@ namespace Paisho{
                     while (check_square % 17 == col && check_square < NUM_SQUARES){
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
-                            std::cout << "settinNOTHERg whiteharms here" << std::endl;
-                            pretty(t_harm);
                             b->otherBoards[WhiteHarms] |= t_harm;
                             break;
                         }
@@ -1172,8 +1150,6 @@ namespace Paisho{
                     while (check_square % 17 == col && check_square >= 0){
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
-                            std::cout << "STOUH setting whiteharms here" << std::endl;
-                            pretty(t_harm);
                             b->otherBoards[WhiteHarms] |= t_harm;
                             break;
                         }
@@ -1181,10 +1157,8 @@ namespace Paisho{
                     }
                     t_pieces.reset(t_piece);
                     t_piece = get_lsb(t_pieces);
-                    
                 }
             }
-            
         }
 
         int check_win(Board *b){
