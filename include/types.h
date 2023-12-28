@@ -178,7 +178,7 @@ namespace Paisho{
     typedef uint64_t Move;
 
     typedef struct {
-        Move movelist[5000];
+        Move movelist[10000];
         int move_count;
     } Moves;
 

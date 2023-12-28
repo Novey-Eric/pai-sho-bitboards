@@ -4,8 +4,8 @@
 #include"Bitboard.h"
 
 namespace Paisho{
-    Move minimax(Board b, int depth, int player, Move *out);
-    Move negamax(Board b, int depth, int player, Move *out);
+    Move minimax(Board *b, int depth, int player, Move *out);
+    Move negamax(Board *b, int depth, int player, Move *out);
     int evaluate(Board *b);
 
 }

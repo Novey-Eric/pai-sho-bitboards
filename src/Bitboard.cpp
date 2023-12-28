@@ -1121,10 +1121,70 @@ namespace Paisho{
         void update_team_harms(Board *b){
             b->otherBoards[WhiteHarms] = Bitboard(0);
 
-            for(int i = 8; i<=14; i++){
-                Bitboard harm_pieces = reverse_harm_lookup(b, i, WHITE);
-                b->otherBoards[WhiteHarms] |= harm_pieces & b->whiteBoards[i];
+            for(int i = 0; i<=7; i++){
+                Bitboard t_pieces = b->whiteBoards[i];
+                Bitboard t_harm(0);
+                Bitboard harm_pieces = reverse_harm_lookup(b, harm_map[i], WHITE);
+                int t_piece = get_lsb(t_pieces);
+                while(t_piece != -1){
+                    int row = t_piece/17;
+                    int col = t_piece%17;
+                    //extend from t_piece east west north south. As you extend, set the bit in t_harm. If you hit a harm_piece, set that bit, and then "OR" whiteharms with t_harm.
+                    //if you never hit something. Don't do anything.
+                    int check_square = t_piece + EAST;
+                    t_harm = Bitboard(0);
+                    while (check_square / 17 == row && check_square < NUM_SQUARES){
+                        t_harm.set(check_square);
+                        if (harm_pieces[check_square]){
+                            pretty(t_harm);
+                            b->otherBoards[WhiteHarms] |= t_harm;
+                            break;
+                        }
+                        check_square += EAST;
+                    }
+
+                    t_harm = Bitboard(0);
+                    check_square = t_piece - EAST;
+                    while (check_square / 17 == row && check_square >= 0){
+                        t_harm.set(check_square);
+                        if (harm_pieces[check_square]){
+                            b->otherBoards[WhiteHarms] |= t_harm;
+                            break;
+                        }
+                        check_square -= EAST;
+                    }
+
+                    t_harm = Bitboard(0);
+                    check_square = t_piece + NORTH;
+                    while (check_square % 17 == col && check_square < NUM_SQUARES){
+                        t_harm.set(check_square);
+                        if (harm_pieces[check_square]){
+                            std::cout << "settinNOTHERg whiteharms here" << std::endl;
+                            pretty(t_harm);
+                            b->otherBoards[WhiteHarms] |= t_harm;
+                            break;
+                        }
+                        check_square += NORTH;
+                    }
+                    
+                    t_harm = Bitboard(0);
+                    check_square = t_piece - NORTH;
+                    while (check_square % 17 == col && check_square >= 0){
+                        t_harm.set(check_square);
+                        if (harm_pieces[check_square]){
+                            std::cout << "STOUH setting whiteharms here" << std::endl;
+                            pretty(t_harm);
+                            b->otherBoards[WhiteHarms] |= t_harm;
+                            break;
+                        }
+                        check_square -= NORTH;
+                    }
+                    t_pieces.reset(t_piece);
+                    t_piece = get_lsb(t_pieces);
+                    
+                }
             }
+            
         }
 
         int check_win(Board *b){
