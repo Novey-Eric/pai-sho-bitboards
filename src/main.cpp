@@ -515,6 +515,113 @@ void test_move_types(){
     
 }
 
+void comp_v_comp(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+
+    int player = WHITE;
+    update_harms_clash(&b);
+    for(;;){
+        Move bestmove;
+        pretty(b.otherBoards[AllPieces]);
+        auto start = high_resolution_clock::now();
+        int eval = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
+        auto after_mm = high_resolution_clock::now();
+        auto duration_mm = duration_cast<microseconds>(after_mm-start);
+        cout << "minimax duration: " << duration_mm.count() << endl;
+        cout<< "eval: " << eval << " found move: ";
+        print_move(bestmove);
+        make_move(&b, player, bestmove);
+        player = WHITE ? BLACK : WHITE;
+        
+    }
+}
+
+
+
+
+void test_fail1(){
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+
+    update_harms_clash(&b);
+    Moves a = get_moves(b, WHITE);
+    //print_move_list(a);
+
+    Move bestmove;
+    int eval = ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
+    print_move(bestmove);
+    make_move(&b, WHITE, bestmove);
+    pretty(b.otherBoards[AllPieces]);
+
+    ab_prune(&b, 4, -99999, 99999, BLACK, &bestmove);
+    print_move(bestmove);
+    ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
+    print_move(bestmove);
+    ab_prune(&b, 4, -99999, 99999, BLACK, &bestmove);
+    print_move(bestmove);
+    //make_move(&b, WHITE, a.movelist[2819]);
+    //Moves c = get_moves(b, BLACK);
+    //print_move_list(c);
+
+}
+
+
 
 int main(){
     //test_print_macros();
@@ -526,7 +633,9 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    test_abprune();
+    //test_abprune();
     //test_move_types();
+    //comp_v_comp();
+    test_fail1();
     return 1;
 }

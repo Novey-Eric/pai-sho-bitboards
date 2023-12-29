@@ -324,7 +324,6 @@ int ply;
             black_score += bn_harm_pieces*harm_pieces_w;
         }
 
-        std::cout<<"about to eval" << std::endl;
         white_score += eval_helper_harms(b, WHITE);
         black_score += eval_helper_harms(b, BLACK);
 
