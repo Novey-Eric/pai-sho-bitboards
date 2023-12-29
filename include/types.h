@@ -14,7 +14,7 @@
     memcpy(bitboards, bitboards_copy, 96);                                \
     side = side_copy, enpassant = enpassant_copy, castle = castle_copy;   \
 
-#define NUM_OTHER_BOARDS (13)
+#define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
 typedef std::bitset<290> Bitboard;
 namespace Paisho{
@@ -177,8 +177,9 @@ namespace Paisho{
     #define MOVE_BOATMOVE_MASK (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET)
     typedef uint64_t Move;
 
+    #define MOVELIST_LEN (8000)
     typedef struct {
-        Move movelist[10000];
+        Move movelist[MOVELIST_LEN];
         int move_count;
     } Moves;
 

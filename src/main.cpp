@@ -398,10 +398,13 @@ void test_abprune(){
     cout<<"done making move"<<endl;
     Move bestmove;
     auto start = high_resolution_clock::now();
-    Move t = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
+    cout<< "eval: " << eval << " found move: ";
+    print_move(bestmove);
+
 
 }
 

@@ -1100,7 +1100,9 @@ namespace Paisho{
         }
 
         void update_team_harms(Board *b){
+
             b->otherBoards[WhiteHarms] = Bitboard(0);
+            //b->otherBoards[BlackHarms] = Bitboard(0);
 
             for(int i = 0; i<=7; i++){
                 Bitboard t_pieces = b->whiteBoards[i];
