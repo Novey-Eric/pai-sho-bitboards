@@ -2,6 +2,7 @@
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
 
+#include <map>
 
 #define copy_board()                                                      \
     U64 bitboards_copy[33] \
@@ -42,6 +43,9 @@ namespace Paisho{
         bool wl;
         bool wwild;
         char whiteAccents;
+    
+        std::map<int,int> white_harm_pairs;
+        std::map<int,int> black_harm_pairs;
 
         Bitboard whiteBoards[NUM_BOARDS];
         Bitboard blackBoards[NUM_BOARDS];

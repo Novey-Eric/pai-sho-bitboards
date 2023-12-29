@@ -5,6 +5,8 @@
 
 namespace Paisho{
 
+using namespace Bitboards;
+
 int ply;
     
     void order_moves(Moves *in, Moves *out){
@@ -28,7 +30,7 @@ int ply;
     }
 
     int ab_prune(Board *b, int depth, int alpha, int beta, int player, Move *best_move){
-        int p_mult = player ? -1 : 1; //WHITEs enum value is 0
+        //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
         if (depth <= 0 || Bitboards::check_win(b) != -1){
             //std::cout<<"eval: "<<eval<<std::endl;
@@ -38,14 +40,15 @@ int ply;
         int value;
         Moves curr_moves;
         Move out_move;
-        Moves ordered_moves;
+        //Moves ordered_moves;
 
         if (player == WHITE){
             value = -999999;
             curr_moves = Bitboards::get_moves(b_copy, WHITE);
             //order_moves(&curr_moves, &ordered_moves);
             for(int i = 0; i < curr_moves.move_count; i++){
-                memcpy(&b_copy, b, sizeof(Board));
+                //memcpy(&b_copy, b, sizeof(Board));
+                b_copy = *b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
                 Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
@@ -66,7 +69,8 @@ int ply;
             curr_moves = Bitboards::get_moves(b_copy, BLACK);
             //order_moves(&curr_moves, &ordered_moves);
             for(int i = 0; i < curr_moves.move_count; i++){
-                memcpy(&b_copy, b, sizeof(Board));
+                //memcpy(&b_copy, b, sizeof(Board));
+                b_copy = *b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
                 Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
@@ -95,7 +99,8 @@ int ply;
         }
         int next_player = player ? WHITE : BLACK;
         Board b_copy;
-        memcpy(&b_copy, b, sizeof(Board));
+        //memcpy(&b_copy, b, sizeof(Board));
+        b_copy = *b;
         int value;
         Moves curr_moves;
         Move out_move;
@@ -111,7 +116,8 @@ int ply;
                 value = t_val;
                 *best_move = curr_moves.movelist[i];
             }
-            memcpy(&b_copy, b, sizeof(Board));
+            //memcpy(&b_copy, b, sizeof(Board));
+            b_copy = *b;
             alpha = std::max(alpha, value);
             if (alpha >= beta){
                 break;
@@ -130,7 +136,8 @@ int ply;
         int next_player = player ? WHITE : BLACK;
 
         Board b_copy;
-        memcpy(&b_copy, b, sizeof(Board));
+        //memcpy(&b_copy, b, sizeof(Board));
+        b_copy = *b;
         int value;
         Moves curr_moves;
         Move out_move;
@@ -139,20 +146,21 @@ int ply;
         for(int i = 0; i < curr_moves.move_count; i++){
             ply++;
             Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
-            int t_val = -minimax(&b_copy, depth-1, next_player, &out_move);
+            int t_val = -negamax(&b_copy, depth-1, next_player, &out_move);
             ply--;
             if (t_val > value){
                 value = t_val;
                 *best_move = curr_moves.movelist[i];
             }
-            memcpy(&b_copy, b, sizeof(Board));
+            //memcpy(&b_copy, b, sizeof(Board));
+            b_copy = *b;
             
         }
         return value;
     }
 
     
-
+/*
     int minimax(Board *b, int depth, int player, Move *best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
@@ -161,7 +169,8 @@ int ply;
         }
 
         Board b_copy;
-        memcpy(&b_copy, b, sizeof(Board));
+        //memcpy(&b_copy, b, sizeof(Board));
+        b_copy = *b;
         int value;
         Moves curr_moves;
         Move out_move;
@@ -177,7 +186,8 @@ int ply;
                     value = t_val;
                     *best_move = curr_moves.movelist[i];
                 }
-                memcpy(&b_copy, b, sizeof(Board));
+                //memcpy(&b_copy, b, sizeof(Board));
+                b_copy = *b;
                 
             }
             return value;
@@ -193,13 +203,35 @@ int ply;
                     value = t_val;
                     *best_move = curr_moves.movelist[i];
                 }
-                memcpy(&b_copy, b, sizeof(Board));
+                //memcpy(&b_copy, b, sizeof(Board));
+                b_copy = *b;
             }
             return value;
         }
     }
-
+*/
     
+
+
+
+    int get_quadrant(int square){
+        int row = square/17;
+        int col = square%17;
+        if (row < 9 && col < 9){
+            return 4;
+        } else if (row > 9 && col < 9){
+            return 1;
+        } else if (row < 9 && col > 9){
+            return 3;
+        } else if (row > 9 && col > 9){
+            return 2;
+        } else{
+            return -1;
+        }
+
+    }
+
+
     std::map<int, int> piece_onboard_score{
                             {w3, 30},
                             {w4, 35},
@@ -210,6 +242,47 @@ int ply;
                             {lotus, 150},
                             {orchid, 100},
                             };
+
+    
+    int eval_helper_harms(Board *b, int team){
+        //keep a map of all the corners registered so far. 
+        //Start at one of the corners, remove the connection in the bitboard to another corner.
+        //register that new corner
+        //If there is no connection from that corner to somewhere else, continue, but remove the corner from the bitboard
+        //the map should be (square, corners_shared) pairs
+  
+        std::map<int, int> square_cnt;
+        int harm_cnt = 0;
+        std::map<int, int> *team_pairs;
+        if (team == WHITE){
+            team_pairs = &b->white_harm_pairs;
+        } else{
+            team_pairs = &b->black_harm_pairs;
+        }
+
+        int doub_cnt = 0;
+        for (auto i = team_pairs->begin(); i != team_pairs->end(); i++){
+            int q1 = get_quadrant(i->first);
+            int q2 = get_quadrant(i->second);
+            if (q1 != q2 && q1 != -1 && q2 != -1){
+                harm_cnt++;
+                if(square_cnt.count(q1)){
+                    square_cnt[q1]++;
+                    doub_cnt++;
+                } else{ 
+                    square_cnt[q1] = 1;
+                }
+
+                if(square_cnt.count(q2)){
+                    square_cnt[q2]++;
+                    doub_cnt++;
+                } else{ 
+                    square_cnt[q2] = 1;
+                }
+            }
+        }
+        return 100*harm_cnt + 300*doub_cnt;
+    }
 
 
     int evaluate(Board *b){
@@ -251,50 +324,9 @@ int ply;
             black_score += bn_harm_pieces*harm_pieces_w;
         }
 
-        //keep a map of all the corners registered so far. 
-        //Start at one of the corners, remove the connection in the bitboard to another corner.
-        //register that new corner
-        //If there is no connection from that corner to somewhere else, continue, but remove the corner from the bitboard
-        //the map should be (square, corners_shared) pairs
-        std::map<int, int> corner_map;
-        Bitboard wh_copy = b->otherBoards[WhiteHarms];
-        int c1 = get_lsb(wh_copy);
-        corner_map[c1] = 1;
-        int move;
-        int t_square = get_lsb(wh_copy);
-        while(t_square != -1){
-            if(wh_copy[c1 + EAST]){
-                move = EAST:
-            } else if (wh_copy[c1 - EAST]){
-                move = -EAST:
-            } else if (wh_copy[c1 + NORTH]){
-                move = NORTH:
-            } else if (wh_copy[c1 - NORTH]){
-                move = -NORTH:
-            } else {
-                wh_copy.reset(c1);
-                continue;
-            }
-            
-            c1 += move;
-            while(wh_copy[c1]){
-                wh_copy.reset(c1);
-                c1 += move;
-            }
-
-            c1 -= move;
-            wh_copy.set(c1);
-
-            if (corner_map.contains(c1)){
-                corner_map[c1]++;
-            } else{
-                corner_map[c1] = 1;
-            }
-            
-            t_square = get_lsb(wh_copy);
-        }
-        //Here we should have a corner_map with number of corners and shared corners having a value >1
-        
+        std::cout<<"about to eval" << std::endl;
+        white_score += eval_helper_harms(b, WHITE);
+        black_score += eval_helper_harms(b, BLACK);
 
         return white_score - black_score;
     }

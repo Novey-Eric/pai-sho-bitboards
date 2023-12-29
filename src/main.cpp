@@ -398,7 +398,7 @@ void test_abprune(){
     cout<<"done making move"<<endl;
     Move bestmove;
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
@@ -408,6 +408,7 @@ void test_abprune(){
 
 }
 
+/*
 void test_minimax(){
     
     Bitboard w3b(1);
@@ -461,6 +462,7 @@ void test_minimax(){
     cout << "negamax duration: " << duration_nm.count() << endl;
 }
 
+*/
 void test_move_types(){
     
     Bitboard w3b(1);

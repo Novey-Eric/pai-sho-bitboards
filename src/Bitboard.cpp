@@ -859,7 +859,8 @@ namespace Paisho{
                 b->otherBoards[Rocks].set(auxsq);
             } else if (auxpiece == Wheel){
                 Board copy;
-                memcpy(&copy, b, sizeof(Board));
+                //memcpy(&copy, b, sizeof(Board));
+                copy = *b;
                 //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
                 int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
                 for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){ //TODO: this can be optimized since half the boards are harmonies.
@@ -1103,6 +1104,8 @@ namespace Paisho{
 
             b->otherBoards[WhiteHarms] = Bitboard(0);
             //b->otherBoards[BlackHarms] = Bitboard(0);
+            b->white_harm_pairs.clear();
+            
 
             for(int i = 0; i<=7; i++){
                 Bitboard t_pieces = b->whiteBoards[i];
@@ -1120,6 +1123,7 @@ namespace Paisho{
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
                             b->otherBoards[WhiteHarms] |= t_harm;
+                            b->white_harm_pairs[t_piece]= check_square;
                             break;
                         }
                         check_square += EAST;
@@ -1131,6 +1135,7 @@ namespace Paisho{
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
                             b->otherBoards[WhiteHarms] |= t_harm;
+                            b->white_harm_pairs[t_piece]= check_square;
                             break;
                         }
                         check_square -= EAST;
@@ -1142,6 +1147,7 @@ namespace Paisho{
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
                             b->otherBoards[WhiteHarms] |= t_harm;
+                            b->white_harm_pairs[t_piece]= check_square;
                             break;
                         }
                         check_square += NORTH;
@@ -1153,6 +1159,7 @@ namespace Paisho{
                         t_harm.set(check_square);
                         if (harm_pieces[check_square]){
                             b->otherBoards[WhiteHarms] |= t_harm;
+                            b->white_harm_pairs[t_piece]= check_square;
                             break;
                         }
                         check_square -= NORTH;
