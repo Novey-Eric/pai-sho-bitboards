@@ -408,23 +408,23 @@ namespace Paisho{
             
             if (team == WHITE){
                 teamboard = &b.whiteBoards[0];
-                if (b.whiteAccents & (Rock | Rock2))
+                if (b.whiteAccents & (1<<Rock | 1<<Rock2))
                     pieces_in_hand[num_pieces++] = Rock;
-                if (b.whiteAccents & (Knotweed | Knotweed2))
+                if (b.whiteAccents & (1<<Knotweed | 1<<Knotweed2))
                     pieces_in_hand[num_pieces++] = Knotweed;
-                if (b.whiteAccents & (Wheel | Wheel2))
+                if (b.whiteAccents & (1<<Wheel | 1<<Wheel2))
                     pieces_in_hand[num_pieces++] = Wheel;
-                if (b.whiteAccents & (Boat | Boat2))
+                if (b.whiteAccents & (1<<Boat | 1<<Boat2))
                     pieces_in_hand[num_pieces++] = Boat;
             } else{
                 teamboard = &b.blackBoards[0];
-                if (b.blackAccents & (Rock | Rock2))
+                if (b.blackAccents & (1<<Rock | 1<<Rock2))
                     pieces_in_hand[num_pieces++] = Rock;
-                if (b.blackAccents & (Knotweed | Knotweed2))
+                if (b.blackAccents & (1<<Knotweed | 1<<Knotweed2))
                     pieces_in_hand[num_pieces++] = Knotweed;
-                if (b.blackAccents & (Wheel | Wheel2))
+                if (b.blackAccents & (1<<Wheel | 1<<Wheel2))
                     pieces_in_hand[num_pieces++] = Wheel;
-                if (b.blackAccents & (Boat | Boat2))
+                if (b.blackAccents & (1<<Boat | 1<<Boat2))
                     pieces_in_hand[num_pieces++] = Boat;
             }
 
@@ -700,12 +700,12 @@ namespace Paisho{
         void get_boat_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
             Bitboard *team_board;
             if(team == WHITE){
-                if(!(b.whiteAccents | Boat | Boat2)){
+                if(!(b.whiteAccents & (1<<Boat | 1<<Boat2))){
                     return;
                 }
                 team_board = &b.whiteBoards[0];
             }else{
-                if(!(b.blackAccents | Boat | Boat2)){
+                if(!(b.blackAccents & (1<<Boat | 1<<Boat2))){
                     return;
                 }
                 team_board = &b.blackBoards[0];
@@ -918,15 +918,15 @@ namespace Paisho{
             make_move_move(b, team, piece, src, dst, cap);
             if (team == WHITE){
                 if (auxpiece & b->whiteAccents)
-                    b->whiteAccents ^= auxpiece;
+                    b->whiteAccents ^= 1<<auxpiece;
                 else
-                    b->whiteAccents ^= auxpiece+1;
+                    b->whiteAccents ^= 1<<(auxpiece+1);
                 
             }else{
                 if (auxpiece & b->blackAccents)
-                    b->blackAccents ^= auxpiece;
+                    b->blackAccents ^= 1<<auxpiece;
                 else
-                    b->blackAccents ^= auxpiece+1;
+                    b->blackAccents ^= 1<<(auxpiece+1);
             }
 
             b->otherBoards[Accents].set(auxsq);
@@ -962,15 +962,15 @@ namespace Paisho{
             make_move_move(b, team, piece, src, dst, cap);
             if (team == WHITE){
                 if (Boat & b->whiteAccents)
-                    b->whiteAccents ^= Boat;
+                    b->whiteAccents ^= 1<<Boat;
                 else
-                    b->whiteAccents ^= Boat+1;
+                    b->whiteAccents ^= 1<<(Boat+1);
                 
             }else{
                 if (Boat & b->blackAccents)
-                    b->blackAccents ^= Boat;
+                    b->blackAccents ^= 1<<Boat;
                 else
-                    b->blackAccents ^= Boat+1;
+                    b->blackAccents ^= 1<<(Boat+1);
             }
 
             b->otherBoards[Accents].set(boatsq);

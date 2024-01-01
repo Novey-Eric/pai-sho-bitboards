@@ -574,7 +574,7 @@ void test_fail1(){
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
     Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) ;//| (1<<Boat);
 
     Bitboard w3h(1);
     w3h <<= i10;
