@@ -604,21 +604,17 @@ void test_fail1(){
     //print_move_list(a);
 
     Move bestmove;
-    int eval = ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(&b, 2, -99999, 99999, WHITE, &bestmove);
     print_move(bestmove);
     make_move(&b, WHITE, bestmove);
+    bestmove = 0;
     pretty(b.otherBoards[AllPieces]);
 
-    ab_prune(&b, 4, -99999, 99999, BLACK, &bestmove);
+    Moves ml2 = get_moves(b, BLACK);
+    print_move_list(ml2);
+    ab_prune(&b, 2, -99999, 99999, BLACK, &bestmove);
     print_move(bestmove);
-    ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
-    print_move(bestmove);
-    ab_prune(&b, 4, -99999, 99999, BLACK, &bestmove);
-    print_move(bestmove);
-    //make_move(&b, WHITE, a.movelist[2819]);
-    //Moves c = get_moves(b, BLACK);
-    //print_move_list(c);
-
+    make_move(&b, BLACK, bestmove);
 }
 
 

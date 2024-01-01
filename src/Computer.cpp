@@ -33,8 +33,9 @@ int ply;
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
         if (depth <= 0 || Bitboards::check_win(b) != -1){
+            int eval = evaluate(b);
             //std::cout<<"eval: "<<eval<<std::endl;
-            return evaluate(b);
+            return eval;
         }
         Board b_copy;
         int value;
@@ -44,7 +45,7 @@ int ply;
 
         if (player == WHITE){
             value = -999999;
-            curr_moves = Bitboards::get_moves(b_copy, WHITE);
+            curr_moves = Bitboards::get_moves(*b, WHITE);
             //order_moves(&curr_moves, &ordered_moves);
             for(int i = 0; i < curr_moves.move_count; i++){
                 //memcpy(&b_copy, b, sizeof(Board));
@@ -66,8 +67,9 @@ int ply;
 
         } else{
             value = 999999;
-            curr_moves = Bitboards::get_moves(b_copy, BLACK);
+            curr_moves = Bitboards::get_moves(*b, BLACK);
             //order_moves(&curr_moves, &ordered_moves);
+
             for(int i = 0; i < curr_moves.move_count; i++){
                 //memcpy(&b_copy, b, sizeof(Board));
                 b_copy = *b;
