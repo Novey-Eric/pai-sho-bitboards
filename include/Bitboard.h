@@ -114,6 +114,47 @@ namespace Paisho{
     namespace Bitboards{
 
 
+        static std::map<int, Bitboard> col_map{
+                                {0, FileABB},
+                                {1, FileBBB},
+                                {2, FileCBB},
+                                {3, FileDBB},
+                                {4, FileEBB},
+                                {5, FileFBB},
+                                {6, FileGBB},
+                                {7, FileHBB},
+                                {8, FileIBB},
+                                {9, FileJBB},
+                                {10, FileKBB},
+                                {11, FileLBB},
+                                {12, FileMBB},
+                                {13, FileNBB},
+                                {14, FileOBB},
+                                {15, FilePBB},
+                                {16, FileQBB}
+                                };
+
+
+        static std::map<int, Bitboard> row_map{
+                                {0, Rank1BB},
+                                {1, Rank2BB},
+                                {2, Rank3BB},
+                                {3, Rank4BB},
+                                {4, Rank5BB},
+                                {5, Rank6BB},
+                                {6, Rank7BB},
+                                {7, Rank8BB},
+                                {8, Rank9BB},
+                                {9, Rank10BB},
+                                {10, Rank11BB},
+                                {11, Rank12BB},
+                                {12, Rank13BB},
+                                {13, Rank14BB},
+                                {14, Rank15BB},
+                                {15, Rank16BB},
+                                {16, Rank17BB}
+                                };
+
 
         static std::map<int, int> clash_map{
                                 {w3, clashw3},

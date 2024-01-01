@@ -1,10 +1,13 @@
 #include"Computer.h"
 #include <cstring>
+#include <chrono>
 #include <iostream>
 
 
 namespace Paisho{
 
+using namespace std;
+using namespace std::chrono;
 using namespace Bitboards;
 
 int ply;
@@ -33,7 +36,11 @@ int ply;
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
         if (depth <= 0 || Bitboards::check_win(b) != -1){
+            auto start_eval = high_resolution_clock::now();
             int eval = evaluate(b);
+            auto end_eval = high_resolution_clock::now();
+            auto dur_eval = duration_cast<microseconds>(end_eval-start_eval);
+            //cout << "eval dur: " << dur_eval.count() << endl;
             //std::cout<<"eval: "<<eval<<std::endl;
             return eval;
         }
@@ -45,14 +52,26 @@ int ply;
 
         if (player == WHITE){
             value = -999999;
+
+            auto start_get_moves = high_resolution_clock::now();
             curr_moves = Bitboards::get_moves(*b, WHITE);
+            auto end_get_moves = high_resolution_clock::now();
+            auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
+            cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
+
             //order_moves(&curr_moves, &ordered_moves);
             for(int i = 0; i < curr_moves.move_count; i++){
                 //memcpy(&b_copy, b, sizeof(Board));
                 b_copy = *b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
+
+                auto start_make_move = high_resolution_clock::now();
                 Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
+                auto end_make_move = high_resolution_clock::now();
+                auto dur_make_move = duration_cast<microseconds>(end_make_move-start_make_move);
+                //cout << "make_move dur: " << dur_make_move.count() << endl;
+
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 int t_val = ab_prune(&b_copy, depth-1, alpha, beta, BLACK, &out_move);
                 ply--;

@@ -173,6 +173,49 @@ namespace Paisho{
                                 };
 
 
+        Bitboard get_harm_pieces(Board *b, int team, int flower){
+            Bitboard harm_board;
+            Bitboard *t_board;
+            if (team == WHITE)
+                t_board = &b->whiteBoards[0];
+            if (team == BLACK)
+                t_board = &b->blackBoards[0];
+            
+            switch(flower){
+                case w3:
+                    harm_board = t_board[w4] | t_board[r5] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                case w4:
+                    harm_board = t_board[w3] | t_board[w5] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                case w5:
+                    harm_board = t_board[w4] | t_board[r3] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                case r3:
+                    harm_board = t_board[r4] | t_board[w5] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                case r4:
+                    harm_board = t_board[r5] | t_board[r3] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                case r5:
+                    harm_board = t_board[r4] | t_board[w5] | b->whiteBoards[lotus] | b->blackBoards[lotus];
+                    break;
+                //Lotus only harmonizes with own team.
+                case orchid:
+                    harm_board = Illegal & Legal;
+                    break;
+                case lotus:
+                    harm_board = t_board[harmw3] | t_board[harmw4] | t_board[harmw5] | t_board[harmr3] | t_board[harmr4] | t_board[harmr5];
+                    break;
+              default:
+                    std::cout << "bad piece in get harm board" << std::endl;
+            }
+            
+            return harm_board;
+
+        }
+
+
         Bitboard get_harm_board(Board b, int team, int flower){
             Bitboard harm_board;
             Bitboard *t_board;
@@ -205,11 +248,12 @@ namespace Paisho{
                     harm_board = Illegal & Legal;
                     break;
                 case lotus:
-                    harm_board = Illegal; //TODO: THis needs to change
+                    harm_board = t_board[harmw3] | t_board[harmw4] | t_board[harmw5] | t_board[harmr3] | t_board[harmr4] | t_board[harmr5];
                     break;
               default:
                     std::cout << "bad piece in get harm board" << std::endl;
             }
+            
             return harm_board;
         }
 
@@ -279,6 +323,31 @@ namespace Paisho{
             return cap_board;
         }
 
+
+
+        //Harm pieces is a bitboard of only the actual pieces that the square in question harmonizes with.
+        //harm_board is harm_pieces with tendrils extending from the piece.
+        Bitboard remove_duplicate_harm(Bitboard harm_pieces, Bitboard harm_board, int square){ //Takes board and square, it will remove harmonizing squares that it is currently connected to.
+            int row = square/17;
+            int col = square%17;
+            Bitboard sq_board(1);
+            sq_board <<= square;
+            if ((sq_board & harm_board).count()){ //if it is already harmonizing with a piece, do the calculation. Else just return harm_board
+                int t_harm_p = get_lsb(harm_pieces);
+                while(t_harm_p != -1){
+                    int t_row = t_harm_p / 17;
+                    int t_col = t_harm_p % 17;
+                    if (t_row == row || t_col == col){ //if piece is already lined up with the harmonizing piece. Remove that from the board
+                        harm_board &= ~col_map[t_col] & ~row_map[t_row];
+                    }
+                harm_pieces.reset(t_harm_p);
+                t_harm_p = get_lsb(harm_pieces);
+                }
+            } 
+            return harm_board;
+        }
+
+
         void get_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
             Bitboard *team_board;
             if(team == WHITE){
@@ -316,6 +385,8 @@ namespace Paisho{
             }
         }
 
+
+
         //This function does NOT include boat moves that move a flower piece from tile to tile.
         void get_harmony_accent_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
             Bitboard *team_board;
@@ -327,6 +398,7 @@ namespace Paisho{
 
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
+            
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
             //Note have to add lotus to harm board cases
@@ -360,10 +432,13 @@ namespace Paisho{
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
+            Bitboard harm_pieces = get_harm_pieces(&b, team, bbflowerpiece);
             while (t_src != -1){ //square piece is being moved from
+                Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
+
                 t_dests = mask_move_ptr(t_src) & \
                           ~b.otherBoards[Accents] & \
-                          harm_board & \
+                          updated_harm & \
                           correct_color[bbflowerpiece] & \
                           (~teamboard[allflowers] | cap_board);
 
@@ -534,9 +609,11 @@ namespace Paisho{
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
             Bitboard t_open_gates;
+            Bitboard harm_pieces = get_harm_pieces(&b, team, bbflowerpiece);
             while (t_src != -1){ //First look at quiet moves only
+                Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & \
+                          updated_harm & \
                           correct_color[bbflowerpiece] & \
                           ~b.otherBoards[Accents] & \
                           (~teamboard[allflowers] | cap_board);
@@ -610,7 +687,6 @@ namespace Paisho{
                 for (int i = 0; i < num_pieces; i++){
                     int piece_bits = pieces_in_hand[i];
                     Move t_move = (PLACE << MOVE_TYPE_OFFSET) |\
-                                    (0 << MOVE_CAPTURE_OFFSET) |\
                                     (t_open_gate << MOVE_S1_OFFSET) |\
                                     (piece_bits << MOVE_PIECE_OFFSET);
                     move_list->movelist[(move_list->move_count)++] = t_move;
@@ -1013,6 +1089,12 @@ namespace Paisho{
             int tmp_square;
             int current_row;
             while(w3_piece != -1){ //for each r3 piece on the board:
+                if ((Bitboard(1)<<w3_piece & Gates).count()){
+                    w3_pieces.reset(w3_piece);
+                    w3_piece = get_lsb(w3_pieces);
+                    continue;
+                }
+                    
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
                 while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first

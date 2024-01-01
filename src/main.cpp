@@ -600,21 +600,42 @@ void test_fail1(){
     b.bw5=3;
 
     update_harms_clash(&b);
-    Moves a = get_moves(b, WHITE);
+    //Moves a = get_moves(b, WHITE);
     //print_move_list(a);
 
     Move bestmove;
+    auto start = high_resolution_clock::now();
     int eval = ab_prune(&b, 2, -99999, 99999, WHITE, &bestmove);
+    auto after_mm = high_resolution_clock::now();
+    auto duration_mm = duration_cast<microseconds>(after_mm-start);
+    cout << "prune duration: " << duration_mm.count() << endl;
+
+    cout<<"eval for white: "<< eval<<endl;
     print_move(bestmove);
+    cout<<"before making move allpieces"<<endl;
+    pretty(b.otherBoards[AllPieces]);
+    //pretty(b.whiteBoards[w3]);
+    //pretty(b.whiteBoards[w4]);
     make_move(&b, WHITE, bestmove);
     bestmove = 0;
     pretty(b.otherBoards[AllPieces]);
-
-    Moves ml2 = get_moves(b, BLACK);
-    print_move_list(ml2);
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    
+    //pretty(b.whiteBoards[w3]);
+    //pretty(b.whiteBoards[w4]);
+    /*
+    auto start2 = high_resolution_clock::now();
     ab_prune(&b, 2, -99999, 99999, BLACK, &bestmove);
+    auto after_mm2 = high_resolution_clock::now();
+    auto duration_mm2 = duration_cast<microseconds>(after_mm2-start2);
+    cout << "prune2 duration: " << duration_mm2.count() << endl;
     print_move(bestmove);
     make_move(&b, BLACK, bestmove);
+    pretty(b.otherBoards[AllPieces]);
+    Moves ml2 = get_moves(b, WHITE);
+    print_move_list(ml2);
+    */
 }
 
 
