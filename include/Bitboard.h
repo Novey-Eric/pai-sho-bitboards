@@ -184,7 +184,6 @@ namespace Paisho{
         Bitboard mask_5_move(int square);
         Bitboard mask_6_move(int square);
 
-        Moves get_moves(Board b, int team);
         void make_move(Board *b, int team, Move m);
         void update_harms_clash(Board *b);
         void update_team_harms(Board *b);
@@ -194,7 +193,7 @@ namespace Paisho{
         std::string pretty(Bitboard b);
         void init();
         int get_lsb(Bitboard b);
-        Moves get_moves(Board b, int color);
+        Moves get_moves(Board *b, int color);
 
     } //namespace bitboards
 

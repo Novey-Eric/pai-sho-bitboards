@@ -54,7 +54,7 @@ int ply;
             value = -999999;
 
             auto start_get_moves = high_resolution_clock::now();
-            curr_moves = Bitboards::get_moves(*b, WHITE);
+            curr_moves = Bitboards::get_moves(b, WHITE);
             auto end_get_moves = high_resolution_clock::now();
             auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
             cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
@@ -86,7 +86,7 @@ int ply;
 
         } else{
             value = 999999;
-            curr_moves = Bitboards::get_moves(*b, BLACK);
+            curr_moves = Bitboards::get_moves(b, BLACK);
             //order_moves(&curr_moves, &ordered_moves);
 
             for(int i = 0; i < curr_moves.move_count; i++){
@@ -126,7 +126,7 @@ int ply;
         Moves curr_moves;
         Move out_move;
         value = -999999;
-        curr_moves = Bitboards::get_moves(b_copy, WHITE);
+        curr_moves = Bitboards::get_moves(&b_copy, WHITE);
         for(int i = 0; i < curr_moves.move_count; i++){
             //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
             ply++;
@@ -163,7 +163,7 @@ int ply;
         Moves curr_moves;
         Move out_move;
         value = -999999;
-        curr_moves = Bitboards::get_moves(b_copy, WHITE);
+        curr_moves = Bitboards::get_moves(&b_copy, WHITE);
         for(int i = 0; i < curr_moves.move_count; i++){
             ply++;
             Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
