@@ -553,7 +553,8 @@ namespace Paisho{
                                             (cap_bit << MOVE_CAPTURE_OFFSET) |\
                                             (t_src << MOVE_S1_OFFSET) |\
                                             (t_dest << MOVE_S2_OFFSET) |\
-                                            (piece_bits << MOVE_PIECE_OFFSET) |\
+                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                            (piece_bits << MOVE_AUXPIECE_OFFSET) |\
                                             ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
                             move_list->movelist[move_list->move_count++] = t_move;
                         }
