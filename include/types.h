@@ -2,18 +2,7 @@
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
 
-#include <map>
-
-#define copy_board()                                                      \
-    U64 bitboards_copy[33] \
-    int side_copy, enpassant_copy, castle_copy;                           \
-    memcpy(bitboards_copy, bitboards, sizeof(bitboards));                                \
-    side_copy = side, enpassant_copy = enpassant, castle_copy = castle;   \
-
-// restore board state
-#define take_back()                                                       \
-    memcpy(bitboards, bitboards_copy, 96);                                \
-    side = side_copy, enpassant = enpassant_copy, castle = castle_copy;   \
+#include <unordered_map>
 
 #define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
@@ -44,8 +33,8 @@ namespace Paisho{
         bool wwild;
         char whiteAccents;
     
-        std::map<int,int> white_harm_pairs;
-        std::map<int,int> black_harm_pairs;
+        std::unordered_map<int,int> white_harm_pairs;
+        std::unordered_map<int,int> black_harm_pairs;
 
         Bitboard whiteBoards[NUM_BOARDS];
         Bitboard blackBoards[NUM_BOARDS];
@@ -170,15 +159,15 @@ namespace Paisho{
     #define MOVE_S4_OFFSET (37)
     #define MOVE_BOATMOVE_OFFSET (46)
 
-    #define MOVE_TYPE_MASK (((uint64_t) 0b111))
-    #define MOVE_CAPTURE_MASK (((uint64_t) 0b1) << MOVE_CAPTURE_OFFSET)
-    #define MOVE_S1_MASK (((uint64_t) 0b111111111) << MOVE_S1_OFFSET)
-    #define MOVE_S2_MASK (((uint64_t) 0b111111111) << MOVE_S2_OFFSET)
-    #define MOVE_PIECE_MASK (((uint64_t) 0b111) << MOVE_PIECE_OFFSET)
-    #define MOVE_AUXPIECE_MASK (((uint64_t) 0b111) << MOVE_AUXPIECE_OFFSET)
-    #define MOVE_S3_MASK (((uint64_t) 0b111111111) << MOVE_S3_OFFSET)
-    #define MOVE_S4_MASK (((uint64_t) 0b111111111) << MOVE_S4_OFFSET)
-    #define MOVE_BOATMOVE_MASK (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET)
+    constexpr uint64_t MOVE_TYPE_MASK = (((uint64_t) 0b111));
+    constexpr uint64_t MOVE_CAPTURE_MASK = (((uint64_t) 0b1) << MOVE_CAPTURE_OFFSET);
+    constexpr uint64_t MOVE_S1_MASK = (((uint64_t) 0b111111111) << MOVE_S1_OFFSET);
+    constexpr uint64_t MOVE_S2_MASK = (((uint64_t) 0b111111111) << MOVE_S2_OFFSET);
+    constexpr uint64_t MOVE_PIECE_MASK = (((uint64_t) 0b111) << MOVE_PIECE_OFFSET);
+    constexpr uint64_t MOVE_AUXPIECE_MASK = (((uint64_t) 0b111) << MOVE_AUXPIECE_OFFSET);
+    constexpr uint64_t MOVE_S3_MASK = (((uint64_t) 0b111111111) << MOVE_S3_OFFSET);
+    constexpr uint64_t MOVE_S4_MASK = (((uint64_t) 0b111111111) << MOVE_S4_OFFSET);
+    constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
     typedef uint64_t Move;
 
     #define MOVELIST_LEN (8000)
