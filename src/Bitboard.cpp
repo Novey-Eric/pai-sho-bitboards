@@ -795,6 +795,16 @@ namespace Paisho{
             return move_list;
         }
 
+
+        int get_lsb(Bitboard b){
+            for (int i = 0; i < NUM_SQUARES; i++){
+                if (b[i])
+                    return i;
+            }
+            return -1; //There is no 1
+        }
+
+/*
         int get_lsb(Bitboard b){
             Bitboard mask(1);
             for (int i = 0; i < NUM_SQUARES; i++){
@@ -806,10 +816,7 @@ namespace Paisho{
             }
             return -1; //There is no 1
         }
-
-        void init(){
-            return;
-        }
+*/
 
         void make_place_move(Board *b, int team, int piece, int square){
             Bitboard *team_board;

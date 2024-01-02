@@ -170,7 +170,7 @@ namespace Paisho{
     constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
     typedef uint64_t Move;
 
-    #define MOVELIST_LEN (8000)
+    #define MOVELIST_LEN (4000)
     typedef struct {
         Move movelist[MOVELIST_LEN];
         int move_count;
