@@ -55,6 +55,7 @@ int ply;
 
             auto start_get_moves = high_resolution_clock::now();
             curr_moves = Bitboards::get_moves(b, WHITE);
+            curr_moves.move_count=std::min(curr_moves.move_count, 300);
             auto end_get_moves = high_resolution_clock::now();
             auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
@@ -91,6 +92,7 @@ int ply;
         } else{
             value = 999999;
             curr_moves = Bitboards::get_moves(b, BLACK);
+            curr_moves.move_count=std::min(curr_moves.move_count, 300);
             //order_moves(&curr_moves, &ordered_moves);
 
             for(int i = 0; i < curr_moves.move_count; i++){
@@ -257,7 +259,7 @@ int ply;
     }
 
 
-    std::map<int, int> piece_onboard_score{
+    std::unordered_map<int, int> piece_onboard_score{
                             {w3, 30},
                             {w4, 35},
                             {w5, 40},

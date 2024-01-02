@@ -164,7 +164,7 @@ namespace Paisho{
 
 
 
-        std::map<int, mask_ptr> mask_move_map{
+        std::unordered_map<int, mask_ptr> mask_move_map{
                                 {w3, &mask_3_move},
                                 {w4, &mask_4_move},
                                 {w5, &mask_5_move},
@@ -260,7 +260,7 @@ namespace Paisho{
             return harm_board;
         }
 
-        std::map<int, Bitboard> correct_color{
+        std::unordered_map<int, Bitboard> correct_color{
                                 {w3, White | Neutral},
                                 {w4, White | Neutral},
                                 {w5, White | Neutral},
@@ -271,7 +271,7 @@ namespace Paisho{
                                 {lotus, Legal},
                                 };
 
-        std::map<int, int> clash_piece{
+        std::unordered_map<int, int> clash_piece{
                                         {w3, r3},
                                         {w4, r4},
                                         {w5, r5},
@@ -797,26 +797,12 @@ namespace Paisho{
 
 
         int get_lsb(Bitboard b){
-            for (int i = 0; i < NUM_SQUARES; i++){
+            for (int i = 0; i < NUM_SQUARES-3; i++){//-3 since some are out of bounds we dont care about
                 if (b[i])
                     return i;
             }
             return -1; //There is no 1
         }
-
-/*
-        int get_lsb(Bitboard b){
-            Bitboard mask(1);
-            for (int i = 0; i < NUM_SQUARES; i++){
-                if ((mask & b).any()){
-                    return i;
-                }else{
-                    mask <<= 1;
-                }
-            }
-            return -1; //There is no 1
-        }
-*/
 
         void make_place_move(Board *b, int team, int piece, int square){
             Bitboard *team_board;
