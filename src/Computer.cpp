@@ -57,8 +57,9 @@ int ply;
             curr_moves = Bitboards::get_moves(b, WHITE);
             auto end_get_moves = high_resolution_clock::now();
             auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
-            cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
+            //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
+            auto start_loop = high_resolution_clock::now();
             //order_moves(&curr_moves, &ordered_moves);
             for(int i = 0; i < curr_moves.move_count; i++){
                 //memcpy(&b_copy, b, sizeof(Board));
@@ -83,6 +84,9 @@ int ply;
                     break;
                 alpha = std::max(alpha, value);
             }
+            auto end_loop = high_resolution_clock::now();
+            auto dur_loop = duration_cast<microseconds>(end_loop-start_loop);
+            //cout << "loop dur: " << dur_loop.count() << " movecnt: " << curr_moves.move_count<< endl;
 
         } else{
             value = 999999;
@@ -272,9 +276,9 @@ int ply;
         //If there is no connection from that corner to somewhere else, continue, but remove the corner from the bitboard
         //the map should be (square, corners_shared) pairs
   
-        std::map<int, int> square_cnt;
+        std::unordered_map<int, int> square_cnt;
         int harm_cnt = 0;
-        std::map<int, int> *team_pairs;
+        std::unordered_map<int, int> *team_pairs;
         if (team == WHITE){
             team_pairs = &b->white_harm_pairs;
         } else{
@@ -332,7 +336,7 @@ int ply;
         //check for harmonizing pieces on the board
         int harm_pieces_w = 30;
         for(int i = 0; i <= 5; i++){
-            int harm_index = Bitboards::harm_map[i];
+            int harm_index = Bitboards::harm_map(i);
 
             int n_piece = b->whiteBoards[i].count();
             int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index, WHITE).count();

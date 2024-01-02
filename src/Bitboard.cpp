@@ -4,7 +4,10 @@
 #include <iostream>
 #include <ostream>
 #include <cstring>
+#include <chrono>
 
+using namespace std;
+using namespace std::chrono;
 
 std::string GetBinaryStringFromHexString (std::string sHex)
 		{
@@ -332,7 +335,7 @@ namespace Paisho{
             int col = square%17;
             Bitboard sq_board(1);
             sq_board <<= square;
-            if ((sq_board & harm_board).count()){ //if it is already harmonizing with a piece, do the calculation. Else just return harm_board
+            if ((sq_board & harm_board).any()){ //if it is already harmonizing with a piece, do the calculation. Else just return harm_board
                 int t_harm_p = get_lsb(harm_pieces);
                 while(t_harm_p != -1){
                     int t_row = t_harm_p / 17;
@@ -358,7 +361,7 @@ namespace Paisho{
 
             mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
-            Bitboard clash_board = team_board[clash_map[bbflowerpiece]];
+            Bitboard clash_board = team_board[clash_map(bbflowerpiece)];
             Bitboard w3_copy = team_board[bbflowerpiece];
 
             //Go through each piece and generate moves for it
@@ -997,6 +1000,8 @@ namespace Paisho{
             uint64_t s4 = (m & MOVE_S4_MASK) >> MOVE_S4_OFFSET;
             uint64_t boatmove = (m & MOVE_BOATMOVE_MASK) >> MOVE_BOATMOVE_OFFSET;
             
+            
+
             if (type == MOVE){
                 //std::cout<<"in move"<< std::endl;
                 make_move_move(b, team, piece, s1, s2, cap);
@@ -1013,14 +1018,26 @@ namespace Paisho{
                 //std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
+            auto startu = high_resolution_clock::now();
+            //fast_update_harms_clash(b, )
             update_harms_clash(b);
+            auto endu = high_resolution_clock::now();
+            auto duru = duration_cast<microseconds>(endu-startu);
+            //cout << "clash_harms dur: " << duru.count() << " ";
+
+            auto starth = high_resolution_clock::now();
             update_team_harms(b);
+            auto endh = high_resolution_clock::now();
+            auto durh = duration_cast<microseconds>(endh-starth);
+            //cout << "team harms dur: " << durh.count() << endl;
+
+
         }
 
 
         void find_clashes(Board *b, int t_piece){
 
-            b->otherBoards[clash_map[t_piece]] = Bitboard(0);
+            b->otherBoards[clash_map(t_piece)] = Bitboard(0);
             
             Bitboard cw3_pieces = b->whiteBoards[clash_piece[t_piece]] | b->blackBoards[clash_piece[t_piece]];
             int cw3_piece = get_lsb(cw3_pieces);
@@ -1028,38 +1045,43 @@ namespace Paisho{
             int current_row;
             
             while(cw3_piece != -1){ //for each r3 piece on the board:
+                if ((Bitboard(1)<<cw3_piece & Gates).any()){
+                    cw3_pieces.reset(cw3_piece);
+                    cw3_piece = get_lsb(cw3_pieces);
+                    continue;
+                }
                 tmp_square = cw3_piece + EAST;
                 current_row = cw3_piece / 17;
                 while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
                     tmp_square += EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
 
                 tmp_square = cw3_piece - EAST;
                 while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
                     tmp_square -= EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square >= 0)
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
 
                 tmp_square = cw3_piece + NORTH;
                 while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
                     tmp_square += NORTH;
                 }
                 if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
 
                 tmp_square = cw3_piece - NORTH;
                 while(tmp_square >= 0 && tmp_square && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
                     tmp_square -= NORTH;
                 }
                 if (tmp_square >= 0 && tmp_square >= 0)
-                    b->otherBoards[clash_map[t_piece]].set(tmp_square);
+                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
 
 
                 //go up and down, left and right from the piece.
@@ -1084,12 +1106,12 @@ namespace Paisho{
             }else{
                 teamboard = &(b->blackBoards)[0];
             }
-            teamboard[harm_map[t_piece]] = Bitboard(0);
+            teamboard[harm_map(t_piece)] = Bitboard(0);
 
             int tmp_square;
             int current_row;
             while(w3_piece != -1){ //for each r3 piece on the board:
-                if ((Bitboard(1)<<w3_piece & Gates).count()){
+                if ((Bitboard(1)<<w3_piece & Gates).any()){
                     w3_pieces.reset(w3_piece);
                     w3_piece = get_lsb(w3_pieces);
                     continue;
@@ -1098,35 +1120,35 @@ namespace Paisho{
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
                 while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
                     tmp_square += EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1)
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
 
                 tmp_square = w3_piece - EAST;
                 while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
                     tmp_square -= EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square >= 0)
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
 
                 tmp_square = w3_piece + NORTH;
                 while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
                     tmp_square += NORTH;
                 }
                 if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
 
                 tmp_square = w3_piece - NORTH;
                 while(tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
                     tmp_square -= NORTH;
                 }
                 if (tmp_square >= 0)
-                    teamboard[harm_map[t_piece]].set(tmp_square);
+                    teamboard[harm_map(t_piece)].set(tmp_square);
 
                 //go up and down, left and right from the piece.
                 //until hitting another piece. All those squares should be set to 1
@@ -1140,11 +1162,23 @@ namespace Paisho{
 
 
         void update_harms_clash(Board *b){
+            duration<double> durh;
+            duration<double> durc;
             for (int t_piece = 0; t_piece <= 6; t_piece++){
+
+                auto starth = high_resolution_clock::now();
                 find_clashes(b, t_piece);
+                auto endh = high_resolution_clock::now();
+                durh += duration_cast<microseconds>(endh-starth);
+
+                auto startc = high_resolution_clock::now();
                 find_harms(b, t_piece, WHITE);
                 find_harms(b, t_piece, BLACK);
+                auto endc = high_resolution_clock::now();
+                durc += duration_cast<microseconds>(endc-startc);
             }
+            //cout << "find clash dur: " << durh.count() << endl;// " ";
+            //cout << "find harms dur: " << durc.count() << endl;
         }
 
 
@@ -1193,7 +1227,7 @@ namespace Paisho{
             for(int i = 0; i<=7; i++){
                 Bitboard t_pieces = b->whiteBoards[i];
                 Bitboard t_harm(0);
-                Bitboard harm_pieces = reverse_harm_lookup(b, harm_map[i], WHITE);
+                Bitboard harm_pieces = reverse_harm_lookup(b, harm_map(i), WHITE);
                 int t_piece = get_lsb(t_pieces);
                 while(t_piece != -1){
                     int row = t_piece/17;
@@ -1282,7 +1316,6 @@ namespace Paisho{
             return moves;
         } 
 
-
         Bitboard mask_3_move(int square){
             Bitboard bb(0);
             Bitboard moves(0);
@@ -1313,7 +1346,6 @@ namespace Paisho{
                     ) & ~Gates & Legal;
             return moves;
         } 
-
 
 
         Bitboard mask_4_move(int square){
