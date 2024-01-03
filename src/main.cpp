@@ -347,8 +347,6 @@ void test_total_harms(){
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoards[allflowers]);
-    cout<<"PRINTING WHITE HARMONIES"<<endl;
-    pretty(b.otherBoards[WhiteHarms]);
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<evaluate(&b)<<endl;
@@ -611,7 +609,7 @@ void test_fail1(){
     //print_move_list(a);
 
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(&b, 3, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
