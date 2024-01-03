@@ -290,8 +290,8 @@ void test_harm_clashes(){
     cout<<"printing harmw3"<<endl;
     pretty(b.whiteBoards[harmw3]);
     cout<<"printing clashr3"<<endl;
-    pretty(b.otherBoards[clashr3]);
-    cout<<evaluate(&b)<<endl;
+    //pretty(b.otherBoards[clashr3]);
+    //cout<<evaluate(&b)<<endl;
 
 }
 

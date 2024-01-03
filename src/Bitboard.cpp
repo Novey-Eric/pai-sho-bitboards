@@ -164,16 +164,6 @@ namespace Paisho{
 
 
 
-        std::unordered_map<int, mask_ptr> mask_move_map{
-                                {w3, &mask_3_move},
-                                {w4, &mask_4_move},
-                                {w5, &mask_5_move},
-                                {r3, &mask_3_move},
-                                {r4, &mask_4_move},
-                                {r5, &mask_5_move},
-                                {orchid, &mask_6_move},
-                                {lotus, &mask_2_move},
-                                };
 
 
         Bitboard get_harm_pieces(Board *b, int team, int flower){
@@ -260,16 +250,6 @@ namespace Paisho{
             return harm_board;
         }
 
-        std::unordered_map<int, Bitboard> correct_color{
-                                {w3, White | Neutral},
-                                {w4, White | Neutral},
-                                {w5, White | Neutral},
-                                {r3, Red | Neutral},
-                                {r4, Red | Neutral},
-                                {r5, Red | Neutral},
-                                {orchid, Legal},
-                                {lotus, Legal},
-                                };
 
         std::unordered_map<int, int> clash_piece{
                                         {w3, r3},
@@ -351,6 +331,18 @@ namespace Paisho{
         }
 
 
+        Bitboard get_clash_board(Board *b, int piece){
+            switch(piece){
+                case w3: return b->whiteBoards[harmr3] | b->blackBoards[harmr3];
+                case w4: return b->whiteBoards[harmr4] | b->blackBoards[harmr4];
+                case w5: return b->whiteBoards[harmr5] | b->blackBoards[harmr5];
+                case r3: return b->whiteBoards[harmw3] | b->blackBoards[harmw3];
+                case r4: return b->whiteBoards[harmw4] | b->blackBoards[harmw4];
+                case r5: return b->whiteBoards[harmw5] | b->blackBoards[harmw5];
+                default: return Bitboard(0);
+            }
+        }
+
         void get_flower_moves(Board *b, int team, int bbflowerpiece, Moves *move_list){
             Bitboard *team_board;
             if(team == WHITE){
@@ -359,9 +351,9 @@ namespace Paisho{
                 team_board = &b->blackBoards[0];
             }
 
-            mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
+            mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
-            Bitboard clash_board = team_board[clash_map(bbflowerpiece)];
+            Bitboard clash_board = get_clash_board(b, bbflowerpiece);
             Bitboard w3_copy = team_board[bbflowerpiece];
 
             //Go through each piece and generate moves for it
@@ -370,7 +362,7 @@ namespace Paisho{
             while (t_src != -1){ 
                 t_dests = mask_move_ptr(t_src) & \
                           ~(b->otherBoards[AllPieces] ^ cap_board) & \
-                          ~clash_board & correct_color[bbflowerpiece];
+                          ~clash_board & correct_color(bbflowerpiece);
                 int t_dest = get_lsb(t_dests);
                 while (t_dest != -1){
                     int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
@@ -399,7 +391,7 @@ namespace Paisho{
                 team_board = &b->blackBoards[0];
             }
 
-            mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
+            mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
             
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
@@ -433,115 +425,117 @@ namespace Paisho{
 
             Bitboard w3_copy = team_board[bbflowerpiece];
             //Go through each piece and generate moves for it
-            int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
             Bitboard harm_pieces = get_harm_pieces(b, team, bbflowerpiece);
-            while (t_src != -1){ //square piece is being moved from
-                Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
+            for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
+                if(w3_copy[t_src]){
+            //while (t_src != -1){ //square piece is being moved from
+                    Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
 
-                t_dests = mask_move_ptr(t_src) & \
-                          ~b->otherBoards[Accents] & \
-                          updated_harm & \
-                          correct_color[bbflowerpiece] & \
-                          (~teamboard[allflowers] | cap_board);
+                    t_dests = mask_move_ptr(t_src) & \
+                              ~b->otherBoards[Accents] & \
+                              updated_harm & \
+                              correct_color(bbflowerpiece) & \
+                              (~teamboard[allflowers] | cap_board);
 
-                int t_dest = get_lsb(t_dests);
-                while (t_dest != -1){//square piece is being moved to
-                    int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    
-                    for(int i = 0; i < num_pieces; i++){//For each aux piece in the player's hand
-                        int auxpiece = pieces_in_hand[i];
-                        if (auxpiece == Rock || auxpiece == Knotweed){
-                            Bitboard post_move_bb = b->otherBoards[AllPieces];
-                            post_move_bb.reset(t_src);
-                            post_move_bb.set(t_dest);
-                            Bitboard rock_squares = ((post_move_bb >> EAST) |\
-                                                    (post_move_bb << EAST) |\
-                                                    (post_move_bb << NORTH) |\
-                                                    (post_move_bb >> NORTH) |\
-                                                    (post_move_bb >> (NORTH + EAST)) |\
-                                                    (post_move_bb >> (NORTH - EAST)) |\
-                                                    (post_move_bb << (NORTH + EAST)) |\
-                                                    (post_move_bb << (NORTH - EAST))) &\
-                                                    Legal & ~post_move_bb & ~Gates;
-                            int auxpiece_square = get_lsb(rock_squares);
-                            while(auxpiece_square != -1){ //Add a move for each square around every tile on the board
-                                Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
-                                                (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                                (bbflowerpiece << MOVE_PIECE_OFFSET) |\
-                                                (t_src << MOVE_S1_OFFSET) |\
-                                                (t_dest << MOVE_S2_OFFSET) |\
-                                                (auxpiece << MOVE_AUXPIECE_OFFSET) |\
-                                                ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
-                                move_list->movelist[move_list->move_count++] = t_move;
+                    //int t_dest = get_lsb(t_dests);
+                    for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
+                        if(t_dests[t_dest]){
+                        //while (t_dest != -1){//square piece is being moved to
+                            int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
+                            
+                            for(int i = 0; i < num_pieces; i++){//For each aux piece in the player's hand
+                                int auxpiece = pieces_in_hand[i];
+                                if (auxpiece == Rock || auxpiece == Knotweed){
+                                    Bitboard post_move_bb = b->otherBoards[AllPieces];
+                                    post_move_bb.reset(t_src);
+                                    post_move_bb.set(t_dest);
+                                    Bitboard rock_squares = ((post_move_bb >> EAST) |\
+                                                            (post_move_bb << EAST) |\
+                                                            (post_move_bb << NORTH) |\
+                                                            (post_move_bb >> NORTH) |\
+                                                            (post_move_bb >> (NORTH + EAST)) |\
+                                                            (post_move_bb >> (NORTH - EAST)) |\
+                                                            (post_move_bb << (NORTH + EAST)) |\
+                                                            (post_move_bb << (NORTH - EAST))) &\
+                                                            Legal & ~post_move_bb & ~Gates;
+                                    //int auxpiece_square = get_lsb(rock_squares);
+                                    for(int auxpiece_square = 0; auxpiece_square<NUM_SQUARES; auxpiece_square++){
+                                        if(rock_squares[auxpiece_square]){
+                                            Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                                            (t_src << MOVE_S1_OFFSET) |\
+                                                            (t_dest << MOVE_S2_OFFSET) |\
+                                                            (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                            ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                            move_list->movelist[move_list->move_count++] = t_move;
+                                        }
+                                    }
+                                }else if (auxpiece == Wheel){
+                                    Bitboard post_move_bb = b->otherBoards[AllPieces];
+                                    post_move_bb.reset(t_src);
+                                    post_move_bb.set(t_dest);
+                                    Bitboard wheel_squares = ((post_move_bb >> EAST) |\
+                                                            (post_move_bb << EAST) |\
+                                                            (post_move_bb << NORTH) |\
+                                                            (post_move_bb >> NORTH) |\
+                                                            (post_move_bb >> (NORTH + EAST)) |\
+                                                            (post_move_bb >> (NORTH - EAST)) |\
+                                                            (post_move_bb << (NORTH + EAST)) |\
+                                                            (post_move_bb << (NORTH - EAST))) &\
+                                                            Legal & ~post_move_bb & ~Gates;
+                                    //int auxpiece_square = get_lsb(wheel_squares);
+                                    //while(auxpiece_square != -1){
+                                    for(int auxpiece_square=0; auxpiece_square < NUM_SQUARES; auxpiece_square++){
+                                        if(wheel_squares[auxpiece_square]){
+                                            Bitboard legal_bb(1);
+                                            legal_bb <<= auxpiece_square; //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
+                                            legal_bb = ((legal_bb >> EAST) |\
+                                                        (legal_bb << EAST) |\
+                                                        (legal_bb << NORTH) |\
+                                                        (legal_bb >> NORTH) |\
+                                                        (legal_bb >> (NORTH + EAST)) |\
+                                                        (legal_bb >> (NORTH - EAST)) |\
+                                                        (legal_bb << (NORTH + EAST)) |\
+                                                        (legal_bb << (NORTH - EAST))) &\
+                                                        Legal & ~Gates;
+                                            if (legal_bb.count() == 8){
+                                                Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                                (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                                (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                                                (t_src << MOVE_S1_OFFSET) |\
+                                                                (t_dest << MOVE_S2_OFFSET) |\
+                                                                (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                                ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
+                                                //std::cout << move_list->move_count << " ";
+                                                //print_move(t_move);
+                                                move_list->movelist[move_list->move_count++] = t_move;
+                                            }
+                                        }
+                                    }
 
-                                rock_squares.reset(auxpiece_square);
-                                auxpiece_square = get_lsb(rock_squares);
-                            }
-                        }else if (auxpiece == Wheel){
-                            Bitboard post_move_bb = b->otherBoards[AllPieces];
-                            post_move_bb.reset(t_src);
-                            post_move_bb.set(t_dest);
-                            Bitboard wheel_squares = ((post_move_bb >> EAST) |\
-                                                    (post_move_bb << EAST) |\
-                                                    (post_move_bb << NORTH) |\
-                                                    (post_move_bb >> NORTH) |\
-                                                    (post_move_bb >> (NORTH + EAST)) |\
-                                                    (post_move_bb >> (NORTH - EAST)) |\
-                                                    (post_move_bb << (NORTH + EAST)) |\
-                                                    (post_move_bb << (NORTH - EAST))) &\
-                                                    Legal & ~post_move_bb & ~Gates;
-                            int auxpiece_square = get_lsb(wheel_squares);
-                            while(auxpiece_square != -1){
-                                Bitboard legal_bb(1);
-                                legal_bb <<= auxpiece_square; //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
-                                legal_bb = ((legal_bb >> EAST) |\
-                                            (legal_bb << EAST) |\
-                                            (legal_bb << NORTH) |\
-                                            (legal_bb >> NORTH) |\
-                                            (legal_bb >> (NORTH + EAST)) |\
-                                            (legal_bb >> (NORTH - EAST)) |\
-                                            (legal_bb << (NORTH + EAST)) |\
-                                            (legal_bb << (NORTH - EAST))) &\
-                                            Legal & ~Gates;
-                                if (legal_bb.count() == 8){
-                                    Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
-                                                    (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                                    (bbflowerpiece << MOVE_PIECE_OFFSET) |\
-                                                    (t_src << MOVE_S1_OFFSET) |\
-                                                    (t_dest << MOVE_S2_OFFSET) |\
-                                                    (auxpiece << MOVE_AUXPIECE_OFFSET) |\
-                                                    ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
-                                    //std::cout << move_list->move_count << " ";
-                                    //print_move(t_move);
-                                    move_list->movelist[move_list->move_count++] = t_move;
+                                }else if (auxpiece == Boat){
+                                    Bitboard all_accents = b->otherBoards[Accents];
+                                    //int t_accent = get_lsb(all_accents);
+                                    //while (t_accent != -1){
+                                    for(int t_accent = 0; t_accent < NUM_SQUARES; t_accent++){
+                                        if(all_accents[t_accent]){
+                                            Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
+                                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                                            (t_src << MOVE_S1_OFFSET) |\
+                                                            (t_dest << MOVE_S2_OFFSET) |\
+                                                            (auxpiece << MOVE_AUXPIECE_OFFSET) |\
+                                                            ((uint64_t) t_accent << MOVE_S3_OFFSET);
+                                            move_list->movelist[move_list->move_count++] = t_move;
+                                        }
+                                    }
                                 }
-                                wheel_squares.reset(auxpiece_square);
-                                auxpiece_square = get_lsb(wheel_squares);
-                            }
-
-                        }else if (auxpiece == Boat){
-                            Bitboard all_accents = b->otherBoards[Accents];
-                            int t_accent = get_lsb(all_accents);
-                            while (t_accent != -1){
-                                Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
-                                                (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                                (bbflowerpiece << MOVE_PIECE_OFFSET) |\
-                                                (t_src << MOVE_S1_OFFSET) |\
-                                                (t_dest << MOVE_S2_OFFSET) |\
-                                                (auxpiece << MOVE_AUXPIECE_OFFSET) |\
-                                                ((uint64_t) t_accent << MOVE_S3_OFFSET);
-                                move_list->movelist[move_list->move_count++] = t_move;
-                                all_accents.reset(t_accent);
-                                t_accent = get_lsb(all_accents);
                             }
                         }
                     }
-                    t_dests.reset(t_dest);
-                    t_dest = get_lsb(t_dests);
                 }
-                w3_copy.reset(t_src);
-                t_src = get_lsb(w3_copy);
             }
         }
 
@@ -558,7 +552,7 @@ namespace Paisho{
                 return;
             }
 
-            mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
+            mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
@@ -617,7 +611,7 @@ namespace Paisho{
                 Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
                 t_dests = mask_move_ptr(t_src) & \
                           updated_harm & \
-                          correct_color[bbflowerpiece] & \
+                          correct_color(bbflowerpiece) & \
                           ~b->otherBoards[Accents] & \
                           (~teamboard[allflowers] | cap_board);
 
@@ -714,7 +708,7 @@ namespace Paisho{
                 team_board = &b->blackBoards[0];
             }
 
-            mask_ptr mask_move_ptr = mask_move_map[bbflowerpiece];
+            mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
             Bitboard harm_board = get_harm_board(b, team, bbflowerpiece); //harm1 & harm2
             Bitboard cap_board = get_cap_board(b, team, bbflowerpiece);
 
@@ -727,7 +721,7 @@ namespace Paisho{
             while (t_src != -1){ //square piece is being moved from
                 t_dests = mask_move_ptr(t_src) & \
                           harm_board & \
-                          correct_color[bbflowerpiece] & \
+                          correct_color(bbflowerpiece) & \
                           ~b->otherBoards[Accents] & \
                           (~team_board[allflowers] | cap_board);
 
@@ -1027,66 +1021,7 @@ namespace Paisho{
             return ret;
         }
 
-        void find_clashes(Board *b, int t_piece){
 
-            b->otherBoards[clash_map(t_piece)] = Bitboard(0);
-            
-            Bitboard cw3_pieces = b->whiteBoards[clash_piece[t_piece]] | b->blackBoards[clash_piece[t_piece]];
-            int cw3_piece = get_lsb(cw3_pieces);
-            int tmp_square;
-            int current_row;
-            
-            //std::cout<< "clash map " << t_piece << " " << clash_map(t_piece) << std::endl;
-            while(cw3_piece != -1){ //for each r3 piece on the board:
-                if ((Bitboard(1)<<cw3_piece & Gates).any()){
-                    cw3_pieces.reset(cw3_piece);
-                    cw3_piece = get_lsb(cw3_pieces);
-                    continue;
-                }
-                tmp_square = cw3_piece + EAST;
-                current_row = cw3_piece / 17;
-                while(tmp_square/17 == current_row && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-                    tmp_square += EAST;
-                }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES)
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-
-                tmp_square = cw3_piece - EAST;
-                while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-                    tmp_square -= EAST;
-                }
-                if (tmp_square/17 == current_row && tmp_square >= 0)
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-
-                tmp_square = cw3_piece + NORTH;
-                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-                    tmp_square += NORTH;
-                }
-                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-
-                tmp_square = cw3_piece - NORTH;
-                while(tmp_square >= 0 && tmp_square && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-                    tmp_square -= NORTH;
-                }
-                if (tmp_square >= 0 && tmp_square >= 0)
-                    b->otherBoards[clash_map(t_piece)].set(tmp_square);
-
-
-                //go up and down, left and right from the piece.
-                //until hitting another piece. All those squares should be set to 1
-                //for clashes, it should be un-inclusive of the flowers
-                
-                //For harmonies, it should be inclusive of the tile on the board.
-                cw3_pieces.reset(cw3_piece);
-                cw3_piece = get_lsb(cw3_pieces);
-            }
-            
-        }
 
         void find_harms(Board *b, int team){
             //HARM CASE
@@ -1109,12 +1044,13 @@ namespace Paisho{
             int piece_count = 0;
             Bitboard flowers_copy = teamboard[allflowers] & ~Gates & ~teamboard[orchid];
             //pretty(flowers_copy);
-            int t_teampiece = get_lsb(flowers_copy);
-            while(t_teampiece != -1){
-                piece_ind[piece_count++]=t_teampiece;
-                //std::cout << "piece count " << piece_count << std::endl;
-                flowers_copy.reset(t_teampiece);
-                t_teampiece = get_lsb(flowers_copy);
+            //int t_teampiece = get_lsb(flowers_copy);
+            for(int t_teampiece = 0; t_teampiece < NUM_SQUARES; t_teampiece++){
+                if (flowers_copy[t_teampiece]){
+                    piece_ind[piece_count++]=t_teampiece;
+                    //std::cout << "piece count " << piece_count << std::endl;
+                    flowers_copy.reset(t_teampiece);
+                }
             }
 
             //go through all pieces once. Find all white or black pieces. Then just check those squares instead of getlsb every time
@@ -1184,81 +1120,11 @@ namespace Paisho{
 
 
 
-/*
-        void find_harms(Board *b, int t_piece, int team){
-            //HARM CASE
-            //int t_piece = w3;
-            Bitboard *teamboard;
-            if (team == WHITE){
-                teamboard = &(b->whiteBoards)[0];
-            }else{
-                teamboard = &(b->blackBoards)[0];
-            }
-            teamboard[harm_map(t_piece)] = Bitboard(0);
-
-            //go through all pieces once. Find all white and black pieces. Then just check those squares instead of getlsb every time
-
-
-            int tmp_square;
-            int current_row;
-            Bitboard w3_pieces = teamboard[t_piece];
-            int w3_piece = get_lsb(w3_pieces);
-            while(w3_piece != -1){ //for each r3 piece on the board:
-                if ((Bitboard(1)<<w3_piece & Gates).any()){
-                    w3_pieces.reset(w3_piece);
-                    w3_piece = get_lsb(w3_pieces);
-                    continue;
-                }
-                    
-                tmp_square = w3_piece + EAST;
-                current_row = w3_piece / 17;
-                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-                    tmp_square += EAST;
-                }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1)
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-
-                tmp_square = w3_piece - EAST;
-                while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-                    tmp_square -= EAST;
-                }
-                if (tmp_square/17 == current_row && tmp_square >= 0)
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-
-                tmp_square = w3_piece + NORTH;
-                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-                    tmp_square += NORTH;
-                }
-                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-
-                tmp_square = w3_piece - NORTH;
-                while(tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-                    tmp_square -= NORTH;
-                }
-                if (tmp_square >= 0)
-                    teamboard[harm_map(t_piece)].set(tmp_square);
-
-                //go up and down, left and right from the piece.
-                //until hitting another piece. All those squares should be set to 1
-                //for clashes, it should be un-inclusive of the flowers
-                
-                //For harmonies, it should be inclusive of the tile on the board.
-                w3_pieces.reset(w3_piece);
-                w3_piece = get_lsb(w3_pieces);
-            }
-        }
-*/
-
         void update_harms_clash(Board *b){
-
-            for (int t_piece = 0; t_piece <= 5; t_piece++){
-                find_clashes(b, t_piece);
-            }
+            
+            //for (int t_piece = 0; t_piece <= 5; t_piece++){
+            //    find_clashes(b, t_piece);
+            //}
             //std::cout << " after clash" << std::endl;
             //pretty(b->blackBoards[allflowers]);
 
@@ -1309,65 +1175,65 @@ namespace Paisho{
             b->white_harm_pairs.clear();
             
 
-            for(int i = 0; i<=7; i++){
+            for(int i = 0; i<=6; i++){
                 Bitboard t_pieces = b->whiteBoards[i];
                 Bitboard t_harm(0);
                 Bitboard harm_pieces = reverse_harm_lookup(b, harm_map(i), WHITE);
-                int t_piece = get_lsb(t_pieces);
-                while(t_piece != -1){
-                    int row = t_piece/17;
-                    int col = t_piece%17;
-                    //extend from t_piece east west north south. As you extend, set the bit in t_harm. If you hit a harm_piece, set that bit, and then "OR" whiteharms with t_harm.
-                    //if you never hit something. Don't do anything.
-                    int check_square = t_piece + EAST;
-                    t_harm = Bitboard(0);
-                    while (check_square / 17 == row && check_square < NUM_SQUARES){
-                        t_harm.set(check_square);
-                        if (harm_pieces[check_square]){
-                            b->otherBoards[WhiteHarms] |= t_harm;
-                            b->white_harm_pairs[t_piece]= check_square;
-                            break;
+                for(int t_piece = 0; t_piece < NUM_SQUARES; t_piece++){
+                    if(t_pieces[t_piece]){
+                        int row = t_piece/17;
+                        int col = t_piece%17;
+                        //extend from t_piece east west north south. As you extend, set the bit in t_harm. If you hit a harm_piece, set that bit, and then "OR" whiteharms with t_harm.
+                        //if you never hit something. Don't do anything.
+                        int check_square = t_piece + EAST;
+                        t_harm = Bitboard(0);
+                        while (check_square / 17 == row && check_square < NUM_SQUARES){
+                            t_harm.set(check_square);
+                            if (harm_pieces[check_square]){
+                                b->otherBoards[WhiteHarms] |= t_harm;
+                                b->white_harm_pairs[t_piece]= check_square;
+                                break;
+                            }
+                            check_square += EAST;
                         }
-                        check_square += EAST;
-                    }
 
-                    t_harm = Bitboard(0);
-                    check_square = t_piece - EAST;
-                    while (check_square / 17 == row && check_square >= 0){
-                        t_harm.set(check_square);
-                        if (harm_pieces[check_square]){
-                            b->otherBoards[WhiteHarms] |= t_harm;
-                            b->white_harm_pairs[t_piece]= check_square;
-                            break;
+                        t_harm = Bitboard(0);
+                        check_square = t_piece - EAST;
+                        while (check_square / 17 == row && check_square >= 0){
+                            t_harm.set(check_square);
+                            if (harm_pieces[check_square]){
+                                b->otherBoards[WhiteHarms] |= t_harm;
+                                b->white_harm_pairs[t_piece]= check_square;
+                                break;
+                            }
+                            check_square -= EAST;
                         }
-                        check_square -= EAST;
-                    }
 
-                    t_harm = Bitboard(0);
-                    check_square = t_piece + NORTH;
-                    while (check_square % 17 == col && check_square < NUM_SQUARES){
-                        t_harm.set(check_square);
-                        if (harm_pieces[check_square]){
-                            b->otherBoards[WhiteHarms] |= t_harm;
-                            b->white_harm_pairs[t_piece]= check_square;
-                            break;
+                        t_harm = Bitboard(0);
+                        check_square = t_piece + NORTH;
+                        while (check_square % 17 == col && check_square < NUM_SQUARES){
+                            t_harm.set(check_square);
+                            if (harm_pieces[check_square]){
+                                b->otherBoards[WhiteHarms] |= t_harm;
+                                b->white_harm_pairs[t_piece]= check_square;
+                                break;
+                            }
+                            check_square += NORTH;
                         }
-                        check_square += NORTH;
-                    }
-                    
-                    t_harm = Bitboard(0);
-                    check_square = t_piece - NORTH;
-                    while (check_square % 17 == col && check_square >= 0){
-                        t_harm.set(check_square);
-                        if (harm_pieces[check_square]){
-                            b->otherBoards[WhiteHarms] |= t_harm;
-                            b->white_harm_pairs[t_piece]= check_square;
-                            break;
+                        
+                        t_harm = Bitboard(0);
+                        check_square = t_piece - NORTH;
+                        while (check_square % 17 == col && check_square >= 0){
+                            t_harm.set(check_square);
+                            if (harm_pieces[check_square]){
+                                b->otherBoards[WhiteHarms] |= t_harm;
+                                b->white_harm_pairs[t_piece]= check_square;
+                                break;
+                            }
+                            check_square -= NORTH;
                         }
-                        check_square -= NORTH;
                     }
-                    t_pieces.reset(t_piece);
-                    t_piece = get_lsb(t_pieces);
+                    t_piece++;
                 }
             }
         }
