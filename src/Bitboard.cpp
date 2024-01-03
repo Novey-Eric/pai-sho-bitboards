@@ -354,26 +354,26 @@ namespace Paisho{
             Bitboard w3_copy = team_board[bbflowerpiece];
 
             //Go through each piece and generate moves for it
-            int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
-            while (t_src != -1){ 
-                t_dests = mask_move_ptr(t_src) & \
-                          ~(b->otherBoards[AllPieces] ^ cap_board) & \
-                          ~clash_board & correct_color(bbflowerpiece);
-                int t_dest = get_lsb(t_dests);
-                while (t_dest != -1){
-                    int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
-                                    (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                    (bbflowerpiece << MOVE_PIECE_OFFSET) |\
-                                    (t_src << MOVE_S1_OFFSET) |\
-                                    (t_dest << MOVE_S2_OFFSET);
-                    move_list->movelist[move_list->move_count++] = t_move;
-                    t_dests.reset(t_dest);
-                    t_dest = get_lsb(t_dests);
+            for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
+                if (w3_copy[t_src]){
+                    t_dests = mask_move_ptr(t_src) & \
+                              ~(b->otherBoards[AllPieces] ^ cap_board) & \
+                              ~clash_board & correct_color(bbflowerpiece);
+                    
+                    for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
+                        if(t_dests[t_dest]){
+                        //while (t_dest != -1){
+                            int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
+                            Move t_move = (MOVE << MOVE_TYPE_OFFSET) |\
+                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                            (t_src << MOVE_S1_OFFSET) |\
+                                            (t_dest << MOVE_S2_OFFSET);
+                            move_list->movelist[move_list->move_count++] = t_move;
+                        }
+                    }
                 }
-                w3_copy.reset(t_src);
-                t_src = get_lsb(w3_copy);
             }
         }
 
@@ -600,43 +600,45 @@ namespace Paisho{
 
             Bitboard w3_copy = team_board[bbflowerpiece];
             //Go through each piece and generate moves for it
-            int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
             Bitboard t_open_gates;
             Bitboard harm_pieces = get_harm_pieces(b, team, bbflowerpiece);
-            while (t_src != -1){ //First look at quiet moves only
-                Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
-                t_dests = mask_move_ptr(t_src) & \
-                          updated_harm & \
-                          correct_color(bbflowerpiece) & \
-                          ~b->otherBoards[Accents] & \
-                          (~teamboard[allflowers] | cap_board);
+            for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
+                if (w3_copy[t_src]){
+                //while (t_src != -1){ //First look at quiet moves only
+                    Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
+                    t_dests = mask_move_ptr(t_src) & \
+                              updated_harm & \
+                              correct_color(bbflowerpiece) & \
+                              ~b->otherBoards[Accents] & \
+                              (~teamboard[allflowers] | cap_board);
 
-                int t_dest = get_lsb(t_dests);
-                while (t_dest != -1){
-                    int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                    t_open_gates = Gates & ~b->otherBoards[AllPieces];
-                    int t_open_gate = get_lsb(t_open_gates);
-                    while (t_open_gate != -1){
-                        for (int i = 0; i < num_pieces; i++){
-                            int piece_bits = pieces_in_hand[i];
-                            Move t_move = (HARMPLACE << MOVE_TYPE_OFFSET) |\
-                                            (cap_bit << MOVE_CAPTURE_OFFSET) |\
-                                            (t_src << MOVE_S1_OFFSET) |\
-                                            (t_dest << MOVE_S2_OFFSET) |\
-                                            (bbflowerpiece << MOVE_PIECE_OFFSET) |\
-                                            (piece_bits << MOVE_AUXPIECE_OFFSET) |\
-                                            ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
-                            move_list->movelist[move_list->move_count++] = t_move;
+                    //int t_dest = get_lsb(t_dests);
+                    for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
+                        if(t_dests[t_dest]){
+                            int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
+                            t_open_gates = Gates & ~b->otherBoards[AllPieces];
+
+                            
+                            //int t_open_gate = get_lsb(t_open_gates);
+                            for(int t_open_gate = 0; t_open_gate < NUM_SQUARES; t_open_gate++){
+                                if(t_open_gates[t_open_gate]){
+                                    for (int i = 0; i < num_pieces; i++){
+                                        int piece_bits = pieces_in_hand[i];
+                                        Move t_move = (HARMPLACE << MOVE_TYPE_OFFSET) |\
+                                                        (cap_bit << MOVE_CAPTURE_OFFSET) |\
+                                                        (t_src << MOVE_S1_OFFSET) |\
+                                                        (t_dest << MOVE_S2_OFFSET) |\
+                                                        (bbflowerpiece << MOVE_PIECE_OFFSET) |\
+                                                        (piece_bits << MOVE_AUXPIECE_OFFSET) |\
+                                                        ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
+                                        move_list->movelist[move_list->move_count++] = t_move;
+                                    }
+                                }
+                            }
                         }
-                        t_open_gates.reset(t_open_gate);
-                        t_open_gate = get_lsb(t_open_gates);
                     }
-                    t_dests.reset(t_dest);
-                    t_dest = get_lsb(t_dests);
                 }
-                w3_copy.reset(t_src);
-                t_src = get_lsb(w3_copy);
             }
         }
 
@@ -1076,6 +1078,7 @@ namespace Paisho{
                 //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
+
                 while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square += EAST;
