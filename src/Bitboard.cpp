@@ -162,10 +162,7 @@ namespace Paisho{
 
     namespace Bitboards{
 
-
-
-
-
+        //takes flower as input and returns bitboard of every space it can harmonize with.
         Bitboard get_harm_pieces(Board *b, int team, int flower){
             Bitboard harm_board;
             Bitboard *t_board;
@@ -1006,10 +1003,6 @@ namespace Paisho{
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
             update_harms_clash(b);
-
-            update_team_harms(b);
-
-
         }
 
         //returns a bitboard with vertical and horizontal lines extending from square.
@@ -1022,15 +1015,17 @@ namespace Paisho{
         }
 
 
-
         void find_harms(Board *b, int team){
             //HARM CASE
             //int t_piece = w3;
             Bitboard *teamboard;
+            std::unordered_map<int, int> *team_harms;
             if (team == WHITE){
                 teamboard = &(b->whiteBoards)[0];
+                team_harms = &b->white_harm_pairs;
             }else{
                 teamboard = &(b->blackBoards)[0];
+                team_harms = &b->black_harm_pairs;
             }
             //teamboard[harm_map(t_piece)] = Bitboard(0);
 
@@ -1072,6 +1067,11 @@ namespace Paisho{
                     }
                 }
                     
+                //Bitboard get_harm_pieces(Board *b, int team, int flower){
+                //Bitboard reverse_harm_lookup(Board *b, int harm_index, int team){
+                //returns bitboard of pieces that can harmonize with t_piece
+                Bitboard harm_board = reverse_harm_lookup(b, harm_map(t_piece), team);
+
                 int harm_ind = harm_map(t_piece);
                 //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
                 tmp_square = w3_piece + EAST;
@@ -1080,33 +1080,51 @@ namespace Paisho{
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square += EAST;
                 }
-                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1)
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1){
                     teamboard[harm_ind].set(tmp_square);
+
+                    //if the final square you check is actually a piece you can harmonize with. Add it to the pairs.
+                    if(harm_board[tmp_square])
+                        (*team_harms)[w3_piece] = tmp_square;
+                    //if [tmp_square], then add {w3_piece, tmp_square} to harmpairs
+                }
 
                 tmp_square = w3_piece - EAST;
                 while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square -= EAST;
                 }
-                if (tmp_square/17 == current_row && tmp_square >= 0)
+                if (tmp_square/17 == current_row && tmp_square >= 0){
                     teamboard[harm_ind].set(tmp_square);
 
+                    if(harm_board[tmp_square])
+                        (*team_harms)[w3_piece] = tmp_square;
+                }
+
                 tmp_square = w3_piece + NORTH;
-                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square += NORTH;
                 }
-                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                if (tmp_square < NUM_SQUARES){
                     teamboard[harm_ind].set(tmp_square);
+
+                    if(harm_board[tmp_square])
+                        (*team_harms)[w3_piece] = tmp_square;
+                }
+
 
                 tmp_square = w3_piece - NORTH;
                 while(tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square -= NORTH;
                 }
-                if (tmp_square >= 0)
+                if (tmp_square >= 0){
                     teamboard[harm_ind].set(tmp_square);
 
+                    if(harm_board[tmp_square])
+                        (*team_harms)[w3_piece] = tmp_square;
+                }
                 //std::cout<<"w3 pieces after loop" <<std::endl;
                 //pretty(teamboard[allflowers]);
                 
@@ -1121,13 +1139,6 @@ namespace Paisho{
 
 
         void update_harms_clash(Board *b){
-            
-            //for (int t_piece = 0; t_piece <= 5; t_piece++){
-            //    find_clashes(b, t_piece);
-            //}
-            //std::cout << " after clash" << std::endl;
-            //pretty(b->blackBoards[allflowers]);
-
             find_harms(b, WHITE);
             find_harms(b, BLACK);
         }
@@ -1166,76 +1177,6 @@ namespace Paisho{
                     break;
             }
             return ret;
-        }
-
-        void update_team_harms(Board *b){
-
-            b->otherBoards[WhiteHarms] = Bitboard(0);
-            //b->otherBoards[BlackHarms] = Bitboard(0);
-            b->white_harm_pairs.clear();
-            
-
-            for(int i = 0; i<=6; i++){
-                Bitboard t_pieces = b->whiteBoards[i];
-                Bitboard t_harm(0);
-                Bitboard harm_pieces = reverse_harm_lookup(b, harm_map(i), WHITE);
-                for(int t_piece = 0; t_piece < NUM_SQUARES; t_piece++){
-                    if(t_pieces[t_piece]){
-                        int row = t_piece/17;
-                        int col = t_piece%17;
-                        //extend from t_piece east west north south. As you extend, set the bit in t_harm. If you hit a harm_piece, set that bit, and then "OR" whiteharms with t_harm.
-                        //if you never hit something. Don't do anything.
-                        int check_square = t_piece + EAST;
-                        t_harm = Bitboard(0);
-                        while (check_square / 17 == row && check_square < NUM_SQUARES){
-                            t_harm.set(check_square);
-                            if (harm_pieces[check_square]){
-                                b->otherBoards[WhiteHarms] |= t_harm;
-                                b->white_harm_pairs[t_piece]= check_square;
-                                break;
-                            }
-                            check_square += EAST;
-                        }
-
-                        t_harm = Bitboard(0);
-                        check_square = t_piece - EAST;
-                        while (check_square / 17 == row && check_square >= 0){
-                            t_harm.set(check_square);
-                            if (harm_pieces[check_square]){
-                                b->otherBoards[WhiteHarms] |= t_harm;
-                                b->white_harm_pairs[t_piece]= check_square;
-                                break;
-                            }
-                            check_square -= EAST;
-                        }
-
-                        t_harm = Bitboard(0);
-                        check_square = t_piece + NORTH;
-                        while (check_square % 17 == col && check_square < NUM_SQUARES){
-                            t_harm.set(check_square);
-                            if (harm_pieces[check_square]){
-                                b->otherBoards[WhiteHarms] |= t_harm;
-                                b->white_harm_pairs[t_piece]= check_square;
-                                break;
-                            }
-                            check_square += NORTH;
-                        }
-                        
-                        t_harm = Bitboard(0);
-                        check_square = t_piece - NORTH;
-                        while (check_square % 17 == col && check_square >= 0){
-                            t_harm.set(check_square);
-                            if (harm_pieces[check_square]){
-                                b->otherBoards[WhiteHarms] |= t_harm;
-                                b->white_harm_pairs[t_piece]= check_square;
-                                break;
-                            }
-                            check_square -= NORTH;
-                        }
-                    }
-                    t_piece++;
-                }
-            }
         }
 
         int check_win(Board *b){

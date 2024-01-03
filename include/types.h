@@ -46,9 +46,8 @@ namespace Paisho{
     } Board;
 
     enum OtherBoards: int{
-        //clashw3,clashw4,clashw5,clashr3,clashr4,clashr5,
         Accents,Rocks,Knotweeds,
-        AllPieces,WhiteHarms,BlackHarms,Nothing
+        AllPieces,Nothing
     };
 
     enum MoveType: int{

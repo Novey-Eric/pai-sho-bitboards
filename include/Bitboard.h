@@ -113,6 +113,7 @@ namespace Paisho{
                 case r5: return Red | Neutral;
                 case orchid: return Legal;
                 case lotus: return Legal;
+                default: return Bitboard(0);
             }
         }
 
@@ -132,6 +133,7 @@ namespace Paisho{
                 case r5: return &mask_5_move;
                 case orchid: return &mask_6_move;
                 case lotus: return &mask_2_move;
+                default: return nullptr;
             }
         }
 
@@ -176,19 +178,6 @@ namespace Paisho{
                             Rank17BB
                             };
 
-/*
-        constexpr int clash_map(int piece){
-            switch(piece){
-                case w4: return clashw3;
-                case w4: return clashw4;
-                case w5: return clashw5;
-                case r3: return clashr3;
-                case r4: return clashr4;
-                case r5: return clashr5;
-                default: return -1;
-            }
-        }
-*/
         constexpr int harm_map(int piece){
             switch(piece){
                 case w3: return harmw3;
@@ -205,7 +194,6 @@ namespace Paisho{
 
         void make_move(Board *b, int team, Move m);
         void update_harms_clash(Board *b);
-        void update_team_harms(Board *b);
         int check_win(Board *b); //returns WHITE, BLACK or -1
         Bitboard reverse_harm_lookup(Board *b, int harm_index, int team);
 
