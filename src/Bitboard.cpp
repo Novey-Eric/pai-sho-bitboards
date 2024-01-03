@@ -1011,22 +1011,21 @@ namespace Paisho{
                 //std::cout<<"harmacc boatmove"<< std::endl;
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
-            auto startu = high_resolution_clock::now();
-            //fast_update_harms_clash(b, )
             update_harms_clash(b);
-            auto endu = high_resolution_clock::now();
-            auto duru = duration_cast<microseconds>(endu-startu);
-            //cout << "clash_harms dur: " << duru.count() << " ";
 
-            auto starth = high_resolution_clock::now();
             update_team_harms(b);
-            auto endh = high_resolution_clock::now();
-            auto durh = duration_cast<microseconds>(endh-starth);
-            //cout << "team harms dur: " << durh.count() << endl;
 
 
         }
 
+        //returns a bitboard with vertical and horizontal lines extending from square.
+        //not inclusive of square
+        Bitboard get_tendrils(int square){
+            int row = square/17;
+            int col = square%17;
+            Bitboard ret = col_map[col] ^ row_map[row];
+            return ret;
+        }
 
         void find_clashes(Board *b, int t_piece){
 
@@ -1037,6 +1036,7 @@ namespace Paisho{
             int tmp_square;
             int current_row;
             
+            //std::cout<< "clash map " << t_piece << " " << clash_map(t_piece) << std::endl;
             while(cw3_piece != -1){ //for each r3 piece on the board:
                 if ((Bitboard(1)<<cw3_piece & Gates).any()){
                     cw3_pieces.reset(cw3_piece);
@@ -1088,11 +1088,106 @@ namespace Paisho{
             
         }
 
+        void find_harms(Board *b, int team){
+            //HARM CASE
+            //int t_piece = w3;
+            Bitboard *teamboard;
+            if (team == WHITE){
+                teamboard = &(b->whiteBoards)[0];
+            }else{
+                teamboard = &(b->blackBoards)[0];
+            }
+            //teamboard[harm_map(t_piece)] = Bitboard(0);
+
+            teamboard[harmw3] = Bitboard(0);
+            teamboard[harmw4] = Bitboard(0);
+            teamboard[harmw5] = Bitboard(0);
+            teamboard[harmr3] = Bitboard(0);
+            teamboard[harmr4] = Bitboard(0);
+            teamboard[harmr5] = Bitboard(0);
+            int piece_ind[18];
+            int piece_count = 0;
+            Bitboard flowers_copy = teamboard[allflowers] & ~Gates & ~teamboard[orchid];
+            //pretty(flowers_copy);
+            int t_teampiece = get_lsb(flowers_copy);
+            while(t_teampiece != -1){
+                piece_ind[piece_count++]=t_teampiece;
+                //std::cout << "piece count " << piece_count << std::endl;
+                flowers_copy.reset(t_teampiece);
+                t_teampiece = get_lsb(flowers_copy);
+            }
+
+            //go through all pieces once. Find all white or black pieces. Then just check those squares instead of getlsb every time
+
+
+            int tmp_square;
+            int current_row;
+            //int w3_piece = get_lsb(w3_pieces);
+            int w3_piece;
+            for(int i = 0; i < piece_count; i++){
+            //while(w3_piece != -1){ //for each r3 piece on the board:
+                w3_piece = piece_ind[i];
+                Bitboard w3_pieces;
+                int t_piece = 0;
+                for(t_piece = 0; t_piece <= 6; t_piece++){
+                    if (teamboard[t_piece][w3_piece]){
+                        w3_pieces = teamboard[t_piece];
+                        break;
+                    }
+                }
+                    
+                int harm_ind = harm_map(t_piece);
+                //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
+                tmp_square = w3_piece + EAST;
+                current_row = w3_piece / 17;
+                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_ind].set(tmp_square);
+                    tmp_square += EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1)
+                    teamboard[harm_ind].set(tmp_square);
+
+                tmp_square = w3_piece - EAST;
+                while(tmp_square/17 == current_row && tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_ind].set(tmp_square);
+                    tmp_square -= EAST;
+                }
+                if (tmp_square/17 == current_row && tmp_square >= 0)
+                    teamboard[harm_ind].set(tmp_square);
+
+                tmp_square = w3_piece + NORTH;
+                while(tmp_square >= 0 && tmp_square < NUM_SQUARES && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_ind].set(tmp_square);
+                    tmp_square += NORTH;
+                }
+                if (tmp_square >= 0 && tmp_square < NUM_SQUARES)
+                    teamboard[harm_ind].set(tmp_square);
+
+                tmp_square = w3_piece - NORTH;
+                while(tmp_square >= 0 && b->otherBoards[AllPieces][tmp_square] == 0){ //left first
+                    teamboard[harm_ind].set(tmp_square);
+                    tmp_square -= NORTH;
+                }
+                if (tmp_square >= 0)
+                    teamboard[harm_ind].set(tmp_square);
+
+                //std::cout<<"w3 pieces after loop" <<std::endl;
+                //pretty(teamboard[allflowers]);
+                
+                //go up and down, left and right from the piece.
+                //until hitting another piece. All those squares should be set to 1
+                //for clashes, it should be un-inclusive of the flowers
+                
+                //For harmonies, it should be inclusive of the tile on the board.
+            }
+        }
+
+
+
+/*
         void find_harms(Board *b, int t_piece, int team){
             //HARM CASE
             //int t_piece = w3;
-            Bitboard w3_pieces = b->whiteBoards[t_piece];
-            int w3_piece = get_lsb(w3_pieces);
             Bitboard *teamboard;
             if (team == WHITE){
                 teamboard = &(b->whiteBoards)[0];
@@ -1101,8 +1196,13 @@ namespace Paisho{
             }
             teamboard[harm_map(t_piece)] = Bitboard(0);
 
+            //go through all pieces once. Find all white and black pieces. Then just check those squares instead of getlsb every time
+
+
             int tmp_square;
             int current_row;
+            Bitboard w3_pieces = teamboard[t_piece];
+            int w3_piece = get_lsb(w3_pieces);
             while(w3_piece != -1){ //for each r3 piece on the board:
                 if ((Bitboard(1)<<w3_piece & Gates).any()){
                     w3_pieces.reset(w3_piece);
@@ -1152,26 +1252,18 @@ namespace Paisho{
                 w3_piece = get_lsb(w3_pieces);
             }
         }
-
+*/
 
         void update_harms_clash(Board *b){
-            duration<double> durh;
-            duration<double> durc;
-            for (int t_piece = 0; t_piece <= 6; t_piece++){
 
-                auto starth = high_resolution_clock::now();
+            for (int t_piece = 0; t_piece <= 5; t_piece++){
                 find_clashes(b, t_piece);
-                auto endh = high_resolution_clock::now();
-                durh += duration_cast<microseconds>(endh-starth);
-
-                auto startc = high_resolution_clock::now();
-                find_harms(b, t_piece, WHITE);
-                find_harms(b, t_piece, BLACK);
-                auto endc = high_resolution_clock::now();
-                durc += duration_cast<microseconds>(endc-startc);
             }
-            //cout << "find clash dur: " << durh.count() << endl;// " ";
-            //cout << "find harms dur: " << durc.count() << endl;
+            //std::cout << " after clash" << std::endl;
+            //pretty(b->blackBoards[allflowers]);
+
+            find_harms(b, WHITE);
+            find_harms(b, BLACK);
         }
 
 

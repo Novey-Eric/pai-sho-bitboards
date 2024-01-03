@@ -577,7 +577,7 @@ void test_fail1(){
     b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) ;//| (1<<Boat);
 
     Bitboard w3h(1);
-    w3h <<= i10;
+    w3h <<= i9;
     b.whiteBoards[harmw4] = w3h;
 
     b.whiteBoards[w3]=w3b;
@@ -599,15 +599,19 @@ void test_fail1(){
     b.bw4=1;
     b.bw5=3;
 
-    update_harms_clash(&b);
-    //Moves a = get_moves(&b, WHITE);
+    //update_harms_clash(&b);
+    Moves a = get_moves(&b, WHITE);
     //print_move_list(a);
-
+    print_move(a.movelist[57]);
+    make_move(&b, WHITE, a.movelist[57]);
+    pretty(b.whiteBoards[allflowers]);
+    
     Move bestmove;
     //Moves a = get_moves(&b, WHITE);
     //print_move_list(a);
+
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(&b, 2, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(&b, 3, -99999, 99999, WHITE, &bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
@@ -621,21 +625,7 @@ void test_fail1(){
     make_move(&b, WHITE, bestmove);
     bestmove = 0;
     pretty(b.otherBoards[AllPieces]);
-    
-    //pretty(b.whiteBoards[w3]);
-    //pretty(b.whiteBoards[w4]);
-    /*
-    auto start2 = high_resolution_clock::now();
-    ab_prune(&b, 2, -99999, 99999, BLACK, &bestmove);
-    auto after_mm2 = high_resolution_clock::now();
-    auto duration_mm2 = duration_cast<microseconds>(after_mm2-start2);
-    cout << "prune2 duration: " << duration_mm2.count() << endl;
-    print_move(bestmove);
-    make_move(&b, BLACK, bestmove);
-    pretty(b.otherBoards[AllPieces]);
-    Moves ml2 = get_moves(&b, WHITE);
-    print_move_list(ml2);
-    */
+
 }
 
 
