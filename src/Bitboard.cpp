@@ -79,9 +79,11 @@ namespace Paisho{
     }
     
     void print_move_list(const Moves& mlist){
-        for (int i = 0; i < mlist.move_count; i++){
-            std::cout<<i<<": ";
-            print_move(mlist.movelist[i]);
+        int i = 0;
+        for(auto move : mlist){
+        //for (int i = 0; i < mlist.size(); i++){
+            std::cout<<i++<<": ";
+            print_move(move);
         }
     }
 
@@ -360,7 +362,7 @@ namespace Paisho{
                                             (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                             (t_src << MOVE_S1_OFFSET) |\
                                             (t_dest << MOVE_S2_OFFSET);
-                            move_list.movelist[move_list.move_count++] = t_move;
+                            move_list.push_back(t_move);
                         }
                     }
                 }
@@ -456,7 +458,8 @@ namespace Paisho{
                                                             (t_dest << MOVE_S2_OFFSET) |\
                                                             (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                             ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
-                                            move_list.movelist[move_list.move_count++] = t_move;
+                                            move_list.push_back(t_move);
+                                            //move_list[move_list.move_count++] = t_move;
                                         }
                                     }
                                 }else if (auxpiece == Wheel){
@@ -497,7 +500,7 @@ namespace Paisho{
                                                                 ((uint64_t) auxpiece_square << MOVE_S3_OFFSET);
                                                 //std::cout << move_list.move_count << " ";
                                                 //print_move(t_move);
-                                                move_list.movelist[move_list.move_count++] = t_move;
+                                                move_list.push_back(t_move);
                                             }
                                         }
                                     }
@@ -515,7 +518,7 @@ namespace Paisho{
                                                             (t_dest << MOVE_S2_OFFSET) |\
                                                             (auxpiece << MOVE_AUXPIECE_OFFSET) |\
                                                             ((uint64_t) t_accent << MOVE_S3_OFFSET);
-                                            move_list.movelist[move_list.move_count++] = t_move;
+                                                move_list.push_back(t_move);
                                         }
                                     }
                                 }
@@ -622,7 +625,7 @@ namespace Paisho{
                                                         (bbflowerpiece << MOVE_PIECE_OFFSET) |\
                                                         (piece_bits << MOVE_AUXPIECE_OFFSET) |\
                                                         ((uint64_t) t_open_gate << MOVE_S3_OFFSET);
-                                        move_list.movelist[move_list.move_count++] = t_move;
+                                        move_list.push_back(t_move);
                                     }
                                 }
                             }
@@ -675,7 +678,7 @@ namespace Paisho{
                     Move t_move = (PLACE << MOVE_TYPE_OFFSET) |\
                                     (t_open_gate << MOVE_S1_OFFSET) |\
                                     (piece_bits << MOVE_PIECE_OFFSET);
-                    move_list.movelist[(move_list.move_count)++] = t_move;
+                    move_list.push_back(t_move);
                 }
                 t_open_gates.reset(t_open_gate);
                 t_open_gate = get_lsb(t_open_gates);
@@ -742,7 +745,7 @@ namespace Paisho{
                                             ((uint64_t) boat_square << MOVE_S3_OFFSET) |\
                                             ((uint64_t) s4_square << MOVE_S4_OFFSET) |\
                                             ((uint64_t) 1 << MOVE_BOATMOVE_OFFSET);
-                            move_list.movelist[move_list.move_count++] = t_move;
+                            move_list.push_back(t_move);
                             
                             s4_squares.reset(s4_square);
                             s4_square = get_lsb(s4_squares);
@@ -764,7 +767,6 @@ namespace Paisho{
         //get_flower_moves(Board b, int team, int bbflowerpiece, Moves *move_list){
         Moves get_moves(const Board& b, int team){
             Moves move_list;
-            move_list.move_count = 0;
             int piece_list[] = {w3,w4,w5,r3,r4,r5,lotus,orchid};
 
             for (int i = 0; i < 8; i++){

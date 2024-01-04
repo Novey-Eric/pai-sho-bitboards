@@ -127,9 +127,9 @@ void test_gen_moves(){
     b.ww5=3;
     
     Moves a = get_moves(b, WHITE);
-    cout<<"move count "<< a.move_count<<endl;
-    cout<<"first move in hex: " << std::hex << a.movelist[0] << endl;
-    print_move(a.movelist[0]);
+    cout<<"move count "<< a.size()<<endl;
+    cout<<"first move in hex: " << std::hex << a[0] << endl;
+    print_move(a[0]);
     cout << std::dec<<endl;
     print_move_list(a);
         
@@ -168,10 +168,10 @@ void test_wheel(){
 
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -204,10 +204,10 @@ void test_wheel2(){
 
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -241,10 +241,10 @@ void test_boat(){
 
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[159]);
+    make_move(b, WHITE, a[159]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -279,11 +279,11 @@ void test_harm_clashes(){
 
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
     pretty(b.whiteBoards[harmw3]);
-    make_move(b, WHITE, a.movelist[159]);
+    make_move(b, WHITE, a[159]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoards[allflowers]);
@@ -330,12 +330,12 @@ void test_total_harms(){
     update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[2298]);
-    Move tm = a.movelist[2298];
+    make_move(b, WHITE, a[2298]);
+    Move tm = a[2298];
     cout<< ((tm & MOVE_PIECE_MASK)>>MOVE_PIECE_OFFSET) << endl;
     cout<< w3<< endl;
     cout<<"printing w3 "<< endl;
@@ -390,11 +390,11 @@ void test_abprune(){
 
     update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[1353]);
+    make_move(b, WHITE, a[1353]);
     cout<<"done making move"<<endl;
     Move bestmove;
     auto start = high_resolution_clock::now();
@@ -444,11 +444,11 @@ void test_minimax(){
     update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
     //print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a.movelist[1353]);
+    make_move(b, WHITE, a[1353]);
     Move bestmove;
     auto start = high_resolution_clock::now();
     Move t = minimax(b, 2, WHITE, bestmove);
@@ -501,7 +501,7 @@ void test_move_types(){
     cout<<"harm w3 before"<<endl;
     pretty(b.whiteBoards[harmw3]);
     cout<<"making move K9-I10+B I10-H10"<<endl;
-    make_move(b, WHITE, a.movelist[2902]);
+    make_move(b, WHITE, a[2902]);
     //2806: K9-I10+B I10-H10
     
     cout<<"all tiles"<<endl;
@@ -509,7 +509,7 @@ void test_move_types(){
 
     Moves c = get_moves(b, WHITE);
     //print_move_list(c);
-    make_move(b, WHITE, c.movelist[10]);
+    make_move(b, WHITE, c[10]);
     pretty(b.otherBoards[AllPieces]);
     
     
@@ -602,8 +602,8 @@ void test_fail1(){
     //update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
     //print_move_list(a);
-    print_move(a.movelist[57]);
-    make_move(b, WHITE, a.movelist[57]);
+    print_move(a[57]);
+    make_move(b, WHITE, a[57]);
     pretty(b.whiteBoards[allflowers]);
     
     Move bestmove;

@@ -93,7 +93,6 @@ const Bitboard Neutral = (Legal^Red^White^Gates);
 
 namespace Paisho{
     //Used to initialize all the bitboards
-    Board init_board();
     //use one char (8 bits) to pick from {rock1, r2, knot1, knot2, w1, w2, b1, b2}
     typedef Bitboard (*mask_ptr)(int);
 

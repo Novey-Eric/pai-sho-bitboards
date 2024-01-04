@@ -3,10 +3,15 @@
 #define TYPES_INCLUDED
 
 #include <unordered_map>
+#include <array>
+#include <vector>
+#include <deque>
+#include <list>
 
 #define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
 typedef std::bitset<290> Bitboard;
+using std::array;
 namespace Paisho{
 
     typedef struct {
@@ -36,11 +41,14 @@ namespace Paisho{
         std::unordered_map<int,int> white_harm_pairs;
         std::unordered_map<int,int> black_harm_pairs;
 
-        Bitboard whiteBoards[NUM_BOARDS];
-        Bitboard blackBoards[NUM_BOARDS];
+        array<Bitboard, NUM_BOARDS> whiteBoards;
+        array<Bitboard, NUM_BOARDS> blackBoards;
+        //Bitboard whiteBoards[NUM_BOARDS];
+        //Bitboard blackBoards[NUM_BOARDS];
         //Bitboard bitboards[41];
 
-        Bitboard otherBoards[NUM_OTHER_BOARDS];
+        array<Bitboard, NUM_OTHER_BOARDS> otherBoards;
+        //Bitboard otherBoards[NUM_OTHER_BOARDS];
         //Bitboard HarmLotus;
 
     } Board;
@@ -169,12 +177,14 @@ namespace Paisho{
     constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
     typedef uint64_t Move;
 
-    #define MOVELIST_LEN (4000)
+    typedef std::deque<Move> Moves;
+  //  #define MOVELIST_LEN (8000)
+/*
     typedef struct {
         Move movelist[MOVELIST_LEN];
         int move_count;
     } Moves;
-
+*/
 }//Paisho
 
 

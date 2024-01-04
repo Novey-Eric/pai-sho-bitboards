@@ -12,11 +12,35 @@ using namespace Bitboards;
 
 int ply;
     
-    void order_moves(const Moves& in, Moves& out){
-        int good_move = 0;
-        int bad_move = MOVELIST_LEN-1;
-        for (int i = 0; i < in.move_count; i++){
-            const Move *t_move = &in.movelist[i];
+    bool compare_moves(const Move& first, const Move& second){
+        bool spec1 = (((first & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
+            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
+            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
+            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
+            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
+            ((first & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
+            );
+/*
+        bool spec2 = (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
+            ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
+            ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
+            ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
+            ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
+            ((*t_move & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
+            );
+*/
+        return (spec1);
+        
+
+    }
+
+
+/*
+    void order_moves(Moves& in){ //, Moves& out){
+        //int good_move = 0;
+        //int bad_move = MOVELIST_LEN-1;
+        for (int i = 0; i < in.size(); i++){
+            const Move *t_move = &in[i];
             if (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
                 ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
                 ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
@@ -24,14 +48,13 @@ int ply;
                 ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
                 ((*t_move & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
                 ){
-                out.movelist[good_move++] = *t_move;
-            } else{
-                out.movelist[bad_move--] = *t_move;
-            }
-            out.move_count++;
+                in.insert(in.begin(), in[i]);
+                in.erase(in[i+1]);
+            }  
         }
     }
 
+*/
     int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
@@ -53,60 +76,49 @@ int ply;
         if (player == WHITE){
             value = -999999;
 
-            auto start_get_moves = high_resolution_clock::now();
             curr_moves = Bitboards::get_moves(b, WHITE);
             //curr_moves.move_count=std::min(curr_moves.move_count, 600);
-            auto end_get_moves = high_resolution_clock::now();
-            auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
-            auto start_loop = high_resolution_clock::now();
+            //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
-            for(int i = 0; i < curr_moves.move_count; i++){
-                //memcpy(&b_copy, b, sizeof(Board));
+            for(auto t_move : curr_moves){
+            //for(int i = 0; i < curr_moves.size(); i++){
                 b_copy = b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
 
-                auto start_make_move = high_resolution_clock::now();
-                Bitboards::make_move(b_copy, player, curr_moves.movelist[i]);
-                auto end_make_move = high_resolution_clock::now();
-                auto dur_make_move = duration_cast<microseconds>(end_make_move-start_make_move);
-                //cout << "make_move dur: " << dur_make_move.count() << endl;
+                Bitboards::make_move(b_copy, player, t_move);
 
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
                 ply--;
                 if (t_val > value){
                     value = t_val;
-                    best_move = curr_moves.movelist[i];
+                    best_move = t_move;
                 }
                 if (value > beta)
                     break;
                 alpha = std::max(alpha, value);
             }
-            auto end_loop = high_resolution_clock::now();
-            auto dur_loop = duration_cast<microseconds>(end_loop-start_loop);
-            //cout << "loop dur: " << dur_loop.count() << " movecnt: " << curr_moves.move_count<< endl;
 
         } else{
             value = 999999;
             curr_moves = Bitboards::get_moves(b, BLACK);
             //curr_moves.move_count=std::min(curr_moves.move_count, 600);
+            //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
 
-            for(int i = 0; i < curr_moves.move_count; i++){
-                //memcpy(&b_copy, b, sizeof(Board));
+            for(auto t_move : curr_moves){
+            //for(int i = 0; i < curr_moves.size(); i++){
                 b_copy = b;
-                //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
-                Bitboards::make_move(b_copy, player, curr_moves.movelist[i]);
-                //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
+                Bitboards::make_move(b_copy, player, t_move);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
                 ply--;
                 if (t_val < value){
                     value = t_val;
-                    best_move = curr_moves.movelist[i];
+                    best_move = t_move;
                 }
                 if (value < alpha)
                     break;
