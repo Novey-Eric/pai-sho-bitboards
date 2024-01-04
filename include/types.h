@@ -4,9 +4,7 @@
 
 #include <unordered_map>
 #include <array>
-#include <vector>
 #include <deque>
-#include <list>
 
 #define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
