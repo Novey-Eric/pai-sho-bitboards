@@ -188,8 +188,6 @@ namespace Paisho{
             }
         }
 
-
-
         void update_harms_clash(Board& b);
         int check_win(const Board& b); //returns WHITE, BLACK or -1
         Bitboard reverse_harm_lookup(const Board& b, int harm_index, int team);
@@ -213,7 +211,6 @@ namespace Paisho{
         void make_move(Board& b, int team, Move m);
 
         void find_harms(Board& b, int team);
-        void update_harms_clash(Board& b);
 
 
     } //namespace bitboards

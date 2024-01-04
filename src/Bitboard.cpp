@@ -1019,6 +1019,7 @@ namespace Paisho{
                 teamboard = &(b.blackBoards)[0];
                 team_harms = &b.black_harm_pairs;
             }
+            team_harms->clear();
             //teamboard[harm_map(t_piece)] = Bitboard(0);
 
             teamboard[harmw3] = Bitboard(0);
@@ -1036,7 +1037,6 @@ namespace Paisho{
                 if (flowers_copy[t_teampiece]){
                     piece_ind[piece_count++]=t_teampiece;
                     //std::cout << "piece count " << piece_count << std::endl;
-                    flowers_copy.reset(t_teampiece);
                 }
             }
 
@@ -1062,8 +1062,7 @@ namespace Paisho{
                 //Bitboard get_harm_pieces(Board *b, int team, int flower){
                 //Bitboard reverse_harm_lookup(Board *b, int harm_index, int team){
                 //returns bitboard of pieces that can harmonize with t_piece
-                Bitboard harm_board = reverse_harm_lookup(b, harm_map(t_piece), team);
-
+                Bitboard harm_board = reverse_harm_lookup(b, harm_map(t_piece), team) & ~Gates;
                 int harm_ind = harm_map(t_piece);
                 //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
                 tmp_square = w3_piece + EAST;
@@ -1131,7 +1130,7 @@ namespace Paisho{
 
 
 
-        void update_harms_clash(Board& b){
+        inline void update_harms_clash(Board& b){
             find_harms(b, WHITE);
             find_harms(b, BLACK);
         }

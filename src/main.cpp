@@ -552,14 +552,15 @@ void comp_v_comp(){
     for(;;){
         Move bestmove;
         pretty(b.otherBoards[AllPieces]);
-        auto start = high_resolution_clock::now();
-        int eval = ab_prune(b, 5, -99999, 99999, WHITE, bestmove);
-        auto after_mm = high_resolution_clock::now();
-        auto duration_mm = duration_cast<microseconds>(after_mm-start);
-        cout << "minimax duration: " << duration_mm.count() << endl;
+        int eval = ab_prune(b, 2, -99999, 99999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         print_move(bestmove);
         make_move(b, player, bestmove);
+        cout<< "white harms: ";
+        for (auto it : b.white_harm_pairs){
+            cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
+        }
+        cout<<"\n";
         player = WHITE ? BLACK : WHITE;
         
     }
@@ -642,7 +643,7 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    //comp_v_comp();
-    test_fail1();
+    comp_v_comp();
+    //test_fail1();
     return 1;
 }

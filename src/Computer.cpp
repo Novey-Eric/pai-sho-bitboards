@@ -34,27 +34,6 @@ int ply;
 
     }
 
-
-/*
-    void order_moves(Moves& in){ //, Moves& out){
-        //int good_move = 0;
-        //int bad_move = MOVELIST_LEN-1;
-        for (int i = 0; i < in.size(); i++){
-            const Move *t_move = &in[i];
-            if (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
-                ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
-                ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
-                ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
-                ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
-                ((*t_move & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
-                ){
-                in.insert(in.begin(), in[i]);
-                in.erase(in[i+1]);
-            }  
-        }
-    }
-
-*/
     int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
@@ -128,77 +107,6 @@ int ply;
         return value;
     }
 
-/*
-    int ab_prune_neg(Board *b, int depth, int alpha, int beta, int player, Move *best_move){
-        int p_mult = player ? -1 : 1; //WHITEs enum value is 0
-
-        if (depth <= 0 || Bitboards::check_win(b) != -1){
-            int eval = evaluate(b);
-            //std::cout<<"eval: "<<eval<<std::endl;
-            return p_mult*eval;
-        }
-        int next_player = player ? WHITE : BLACK;
-        Board b_copy;
-        //memcpy(&b_copy, b, sizeof(Board));
-        b_copy = *b;
-        int value;
-        Moves curr_moves;
-        Move out_move;
-        value = -999999;
-        curr_moves = Bitboards::get_moves(&b_copy, WHITE);
-        for(int i = 0; i < curr_moves.move_count; i++){
-            //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
-            ply++;
-            Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
-            int t_val = -ab_prune_neg(&b_copy, depth-1, -beta, -alpha, next_player, &out_move);
-            ply--;
-            if (t_val > value){
-                value = t_val;
-                *best_move = curr_moves.movelist[i];
-            }
-            //memcpy(&b_copy, b, sizeof(Board));
-            b_copy = *b;
-            alpha = std::max(alpha, value);
-            if (alpha >= beta){
-                break;
-            }
-        }
-        return value;
-    }
-*/
-/*
-    int negamax(Board *b, int depth, int player, Move *best_move){
-        int p_mult = player ? -1 : 1; //WHITEs enum value is 0
-
-        if (depth == 0 || Bitboards::check_win(b) != -1){
-            return p_mult*evaluate(b);
-        }
-        int next_player = player ? WHITE : BLACK;
-
-        Board b_copy;
-        //memcpy(&b_copy, b, sizeof(Board));
-        b_copy = *b;
-        int value;
-        Moves curr_moves;
-        Move out_move;
-        value = -999999;
-        curr_moves = Bitboards::get_moves(&b_copy, WHITE);
-        for(int i = 0; i < curr_moves.move_count; i++){
-            ply++;
-            Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
-            int t_val = -negamax(&b_copy, depth-1, next_player, &out_move);
-            ply--;
-            if (t_val > value){
-                value = t_val;
-                *best_move = curr_moves.movelist[i];
-            }
-            //memcpy(&b_copy, b, sizeof(Board));
-            b_copy = *b;
-            
-        }
-        return value;
-    }
-*/
     
 /*
     int minimax(Board *b, int depth, int player, Move *best_move){
@@ -301,9 +209,10 @@ int ply;
         }
 
         int doub_cnt = 0;
-        for (auto i = team_pairs->begin(); i != team_pairs->end(); i++){
-            int q1 = get_quadrant(i->first);
-            int q2 = get_quadrant(i->second);
+        for (auto i : *team_pairs){
+        //for (auto i = team_pairs->begin(); i != team_pairs->end(); i++){
+            int q1 = get_quadrant(i.first);
+            int q2 = get_quadrant(i.second);
             if (q1 != q2 && q1 != -1 && q2 != -1){
                 harm_cnt++;
                 if(square_cnt.count(q1)){
