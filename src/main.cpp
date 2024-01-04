@@ -4,10 +4,12 @@
 #include <ostream>
 #include <strings.h>
 #include"Computer.h"
+#include"types.h"
 #include <chrono>
 
 using namespace std::chrono;
-using namespace std;
+using std::cout;
+using std::endl;
 using namespace Paisho::Bitboards;
 using namespace Paisho;
 
@@ -124,10 +126,10 @@ void test_gen_moves(){
     b.ww4=1;
     b.ww5=3;
     
-    Moves a = get_moves(&b, WHITE);
-    cout<<"move count "<< a.move_count<<endl;
-    cout<<"first move in hex: " << std::hex << a.movelist[0] << endl;
-    print_move(a.movelist[0]);
+    Moves a = get_moves(b, WHITE);
+    cout<<"move count "<< a.size()<<endl;
+    cout<<"first move in hex: " << std::hex << a[0] << endl;
+    print_move(a[0]);
     cout << std::dec<<endl;
     print_move_list(a);
         
@@ -164,12 +166,12 @@ void test_wheel(){
     b.ww4=1;
     b.ww5=3;
 
-    Moves a = get_moves(&b, WHITE);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -200,12 +202,12 @@ void test_wheel2(){
     b.ww4=1;
     b.ww5=3;
 
-    Moves a = get_moves(&b, WHITE);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -237,12 +239,12 @@ void test_boat(){
     b.ww4=1;
     b.ww5=3;
 
-    Moves a = get_moves(&b, WHITE);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[159]);
+    make_move(b, WHITE, a[159]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -275,13 +277,13 @@ void test_harm_clashes(){
     b.ww4=1;
     b.ww5=3;
 
-    Moves a = get_moves(&b, WHITE);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
     pretty(b.whiteBoards[harmw3]);
-    make_move(&b, WHITE, a.movelist[159]);
+    make_move(b, WHITE, a[159]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoards[allflowers]);
@@ -290,8 +292,8 @@ void test_harm_clashes(){
     cout<<"printing harmw3"<<endl;
     pretty(b.whiteBoards[harmw3]);
     cout<<"printing clashr3"<<endl;
-    pretty(b.otherBoards[clashr3]);
-    cout<<evaluate(&b)<<endl;
+    //pretty(b.otherBoards[clashr3]);
+    //cout<<evaluate(b)<<endl;
 
 }
 
@@ -325,15 +327,15 @@ void test_total_harms(){
     b.ww4=1;
     b.ww5=3;
 
-    update_harms_clash(&b);
-    Moves a = get_moves(&b, WHITE);
+    update_harms_clash(b);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[2298]);
-    Move tm = a.movelist[2298];
+    make_move(b, WHITE, a[2298]);
+    Move tm = a[2298];
     cout<< ((tm & MOVE_PIECE_MASK)>>MOVE_PIECE_OFFSET) << endl;
     cout<< w3<< endl;
     cout<<"printing w3 "<< endl;
@@ -347,11 +349,9 @@ void test_total_harms(){
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoards[allflowers]);
-    cout<<"PRINTING WHITE HARMONIES"<<endl;
-    pretty(b.otherBoards[WhiteHarms]);
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
-    cout<<evaluate(&b)<<endl;
+    cout<<evaluate(b)<<endl;
     
 }
 
@@ -388,17 +388,17 @@ void test_abprune(){
     b.bw4=1;
     b.bw5=3;
 
-    update_harms_clash(&b);
-    Moves a = get_moves(&b, WHITE);
-    cout<<"move count "<< a.move_count<<endl;
+    update_harms_clash(b);
+    Moves a = get_moves(b, WHITE);
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[1353]);
+    make_move(b, WHITE, a[1353]);
     cout<<"done making move"<<endl;
     Move bestmove;
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(&b, 4, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(b, 4, -99999, 99999, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
@@ -441,22 +441,22 @@ void test_minimax(){
     b.bw4=1;
     b.bw5=3;
 
-    update_harms_clash(&b);
-    Moves a = get_moves(&b, WHITE);
+    update_harms_clash(b);
+    Moves a = get_moves(b, WHITE);
     //print_move_list(a);
-    cout<<"move count "<< a.move_count<<endl;
+    cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(&b, WHITE, a.movelist[1353]);
+    make_move(b, WHITE, a[1353]);
     Move bestmove;
     auto start = high_resolution_clock::now();
-    Move t = minimax(&b, 2, WHITE, &bestmove);
+    Move t = minimax(b, 2, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
 
-    Move t2 = negamax(&b, 2, WHITE, &bestmove);
+    Move t2 = negamax(b, 2, WHITE, bestmove);
     auto after_nm = high_resolution_clock::now();
     auto duration_nm = duration_cast<microseconds>(after_nm-after_mm);
     cout << "negamax duration: " << duration_nm.count() << endl;
@@ -493,23 +493,23 @@ void test_move_types(){
     b.ww5=3;
     b.wo=true;
 
-    update_harms_clash(&b);
-    Moves a = get_moves(&b, WHITE);
+    update_harms_clash(b);
+    Moves a = get_moves(b, WHITE);
     print_move_list(a);
     pretty(b.otherBoards[AllPieces]);
 
     cout<<"harm w3 before"<<endl;
     pretty(b.whiteBoards[harmw3]);
     cout<<"making move K9-I10+B I10-H10"<<endl;
-    make_move(&b, WHITE, a.movelist[2902]);
+    make_move(b, WHITE, a[2902]);
     //2806: K9-I10+B I10-H10
     
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
 
-    Moves c = get_moves(&b, WHITE);
+    Moves c = get_moves(b, WHITE);
     //print_move_list(c);
-    make_move(&b, WHITE, c.movelist[10]);
+    make_move(b, WHITE, c[10]);
     pretty(b.otherBoards[AllPieces]);
     
     
@@ -548,18 +548,18 @@ void comp_v_comp(){
     b.bw5=3;
 
     int player = WHITE;
-    update_harms_clash(&b);
+    update_harms_clash(b);
     for(;;){
         Move bestmove;
         pretty(b.otherBoards[AllPieces]);
         auto start = high_resolution_clock::now();
-        int eval = ab_prune(&b, 5, -99999, 99999, WHITE, &bestmove);
+        int eval = ab_prune(b, 5, -99999, 99999, WHITE, bestmove);
         auto after_mm = high_resolution_clock::now();
         auto duration_mm = duration_cast<microseconds>(after_mm-start);
         cout << "minimax duration: " << duration_mm.count() << endl;
         cout<< "eval: " << eval << " found move: ";
         print_move(bestmove);
-        make_move(&b, player, bestmove);
+        make_move(b, player, bestmove);
         player = WHITE ? BLACK : WHITE;
         
     }
@@ -577,7 +577,7 @@ void test_fail1(){
     b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) ;//| (1<<Boat);
 
     Bitboard w3h(1);
-    w3h <<= i10;
+    w3h <<= i9;
     b.whiteBoards[harmw4] = w3h;
 
     b.whiteBoards[w3]=w3b;
@@ -599,15 +599,19 @@ void test_fail1(){
     b.bw4=1;
     b.bw5=3;
 
-    update_harms_clash(&b);
-    //Moves a = get_moves(&b, WHITE);
+    //update_harms_clash(b);
+    Moves a = get_moves(b, WHITE);
+    //print_move_list(a);
+    print_move(a[57]);
+    make_move(b, WHITE, a[57]);
+    pretty(b.whiteBoards[allflowers]);
+    
+    Move bestmove;
+    //Moves a = get_moves(b, WHITE);
     //print_move_list(a);
 
-    Move bestmove;
-    //Moves a = get_moves(&b, WHITE);
-    //print_move_list(a);
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(&b, 2, -99999, 99999, WHITE, &bestmove);
+    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
@@ -618,24 +622,10 @@ void test_fail1(){
     pretty(b.otherBoards[AllPieces]);
     //pretty(b.whiteBoards[w3]);
     //pretty(b.whiteBoards[w4]);
-    make_move(&b, WHITE, bestmove);
+    make_move(b, WHITE, bestmove);
     bestmove = 0;
     pretty(b.otherBoards[AllPieces]);
-    
-    //pretty(b.whiteBoards[w3]);
-    //pretty(b.whiteBoards[w4]);
-    /*
-    auto start2 = high_resolution_clock::now();
-    ab_prune(&b, 2, -99999, 99999, BLACK, &bestmove);
-    auto after_mm2 = high_resolution_clock::now();
-    auto duration_mm2 = duration_cast<microseconds>(after_mm2-start2);
-    cout << "prune2 duration: " << duration_mm2.count() << endl;
-    print_move(bestmove);
-    make_move(&b, BLACK, bestmove);
-    pretty(b.otherBoards[AllPieces]);
-    Moves ml2 = get_moves(&b, WHITE);
-    print_move_list(ml2);
-    */
+
 }
 
 

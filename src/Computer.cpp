@@ -12,11 +12,35 @@ using namespace Bitboards;
 
 int ply;
     
-    void order_moves(Moves *in, Moves *out){
-        int good_move = 0;
-        int bad_move = MOVELIST_LEN-1;
-        for (int i = 0; i < in->move_count; i++){
-            Move *t_move = &in->movelist[i];
+    bool compare_moves(const Move& first, const Move& second){
+        bool spec1 = (((first & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
+            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
+            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
+            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
+            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
+            ((first & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
+            );
+/*
+        bool spec2 = (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
+            ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
+            ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
+            ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
+            ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
+            ((*t_move & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
+            );
+*/
+        return (spec1);
+        
+
+    }
+
+
+/*
+    void order_moves(Moves& in){ //, Moves& out){
+        //int good_move = 0;
+        //int bad_move = MOVELIST_LEN-1;
+        for (int i = 0; i < in.size(); i++){
+            const Move *t_move = &in[i];
             if (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
                 ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
                 ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
@@ -24,15 +48,14 @@ int ply;
                 ((*t_move & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
                 ((*t_move & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
                 ){
-                out->movelist[good_move++] = *t_move;
-            } else{
-                out->movelist[bad_move--] = *t_move;
-            }
-            out->move_count++;
+                in.insert(in.begin(), in[i]);
+                in.erase(in[i+1]);
+            }  
         }
     }
 
-    int ab_prune(Board *b, int depth, int alpha, int beta, int player, Move *best_move){
+*/
+    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
         if (depth <= 0 || Bitboards::check_win(b) != -1){
@@ -53,31 +76,26 @@ int ply;
         if (player == WHITE){
             value = -999999;
 
-            auto start_get_moves = high_resolution_clock::now();
             curr_moves = Bitboards::get_moves(b, WHITE);
-            auto end_get_moves = high_resolution_clock::now();
-            auto dur_get_moves = duration_cast<microseconds>(end_get_moves-start_get_moves);
-            cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
+            //curr_moves.move_count=std::min(curr_moves.move_count, 600);
+            //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
+            //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
-            for(int i = 0; i < curr_moves.move_count; i++){
-                //memcpy(&b_copy, b, sizeof(Board));
-                b_copy = *b;
+            for(auto t_move : curr_moves){
+            //for(int i = 0; i < curr_moves.size(); i++){
+                b_copy = b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
 
-                auto start_make_move = high_resolution_clock::now();
-                Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
-                auto end_make_move = high_resolution_clock::now();
-                auto dur_make_move = duration_cast<microseconds>(end_make_move-start_make_move);
-                //cout << "make_move dur: " << dur_make_move.count() << endl;
+                Bitboards::make_move(b_copy, player, t_move);
 
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
-                int t_val = ab_prune(&b_copy, depth-1, alpha, beta, BLACK, &out_move);
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
                 ply--;
                 if (t_val > value){
                     value = t_val;
-                    *best_move = curr_moves.movelist[i];
+                    best_move = t_move;
                 }
                 if (value > beta)
                     break;
@@ -87,20 +105,20 @@ int ply;
         } else{
             value = 999999;
             curr_moves = Bitboards::get_moves(b, BLACK);
+            //curr_moves.move_count=std::min(curr_moves.move_count, 600);
+            //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
 
-            for(int i = 0; i < curr_moves.move_count; i++){
-                //memcpy(&b_copy, b, sizeof(Board));
-                b_copy = *b;
-                //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
+            for(auto t_move : curr_moves){
+            //for(int i = 0; i < curr_moves.size(); i++){
+                b_copy = b;
                 ply++;
-                Bitboards::make_move(&b_copy, player, curr_moves.movelist[i]);
-                //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
-                int t_val = ab_prune(&b_copy, depth-1, alpha, beta, WHITE, &out_move);
+                Bitboards::make_move(b_copy, player, t_move);
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
                 ply--;
                 if (t_val < value){
                     value = t_val;
-                    *best_move = curr_moves.movelist[i];
+                    best_move = t_move;
                 }
                 if (value < alpha)
                     break;
@@ -110,6 +128,7 @@ int ply;
         return value;
     }
 
+/*
     int ab_prune_neg(Board *b, int depth, int alpha, int beta, int player, Move *best_move){
         int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
@@ -146,8 +165,8 @@ int ply;
         }
         return value;
     }
-
-
+*/
+/*
     int negamax(Board *b, int depth, int player, Move *best_move){
         int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
@@ -179,7 +198,7 @@ int ply;
         }
         return value;
     }
-
+*/
     
 /*
     int minimax(Board *b, int depth, int player, Move *best_move){
@@ -253,7 +272,7 @@ int ply;
     }
 
 
-    std::map<int, int> piece_onboard_score{
+    std::unordered_map<int, int> piece_onboard_score{
                             {w3, 30},
                             {w4, 35},
                             {w5, 40},
@@ -265,20 +284,20 @@ int ply;
                             };
 
     
-    int eval_helper_harms(Board *b, int team){
+    int eval_helper_harms(const Board& b, int team){
         //keep a map of all the corners registered so far. 
         //Start at one of the corners, remove the connection in the bitboard to another corner.
         //register that new corner
         //If there is no connection from that corner to somewhere else, continue, but remove the corner from the bitboard
         //the map should be (square, corners_shared) pairs
   
-        std::map<int, int> square_cnt;
+        std::unordered_map<int, int> square_cnt;
         int harm_cnt = 0;
-        std::map<int, int> *team_pairs;
+        const std::unordered_map<int, int> *team_pairs;
         if (team == WHITE){
-            team_pairs = &b->white_harm_pairs;
+            team_pairs = &b.white_harm_pairs;
         } else{
-            team_pairs = &b->black_harm_pairs;
+            team_pairs = &b.black_harm_pairs;
         }
 
         int doub_cnt = 0;
@@ -306,40 +325,40 @@ int ply;
     }
 
 
-    int evaluate(Board *b){
+    int evaluate(const Board& b){
         //Do white first
         int white_score = 0;
         int black_score = 0;
 
         for(int i = 0; i <= 5; i++){
-            white_score += b->whiteBoards[i].count()*piece_onboard_score[i];
-            black_score += b->blackBoards[i].count()*piece_onboard_score[i];
+            white_score += b.whiteBoards[i].count()*piece_onboard_score[i];
+            black_score += b.blackBoards[i].count()*piece_onboard_score[i];
         }
-        white_score += b->whiteBoards[orchid].count()*piece_onboard_score[orchid];
-        black_score += b->blackBoards[orchid].count()*piece_onboard_score[orchid];
+        white_score += b.whiteBoards[orchid].count()*piece_onboard_score[orchid];
+        black_score += b.blackBoards[orchid].count()*piece_onboard_score[orchid];
 
-        white_score += b->whiteBoards[lotus].count()*piece_onboard_score[lotus];
-        black_score += b->blackBoards[lotus].count()*piece_onboard_score[lotus];
+        white_score += b.whiteBoards[lotus].count()*piece_onboard_score[lotus];
+        black_score += b.blackBoards[lotus].count()*piece_onboard_score[lotus];
         
-        white_score += (b->wwild)*400;
-        black_score += (b->bwild)*400;
+        white_score += (b.wwild)*400;
+        black_score += (b.bwild)*400;
 
         int accent_hand_weight = 100;
-        white_score += __builtin_popcount(b->whiteAccents)*accent_hand_weight;
-        black_score += __builtin_popcount(b->blackAccents)*accent_hand_weight;
+        white_score += __builtin_popcount(b.whiteAccents)*accent_hand_weight;
+        black_score += __builtin_popcount(b.blackAccents)*accent_hand_weight;
 
         //int center = i9;
         //check for harmonizing pieces on the board
         int harm_pieces_w = 30;
         for(int i = 0; i <= 5; i++){
-            int harm_index = Bitboards::harm_map[i];
+            int harm_index = Bitboards::harm_map(i);
 
-            int n_piece = b->whiteBoards[i].count();
+            int n_piece = b.whiteBoards[i].count();
             int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index, WHITE).count();
             n_harm_pieces = std::min(n_harm_pieces, n_piece);
             white_score += n_harm_pieces*harm_pieces_w;
 
-            int bn_piece = b->blackBoards[i].count();
+            int bn_piece = b.blackBoards[i].count();
             int bn_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index, BLACK).count();
             bn_harm_pieces = std::min(bn_harm_pieces, bn_piece);
             black_score += bn_harm_pieces*harm_pieces_w;

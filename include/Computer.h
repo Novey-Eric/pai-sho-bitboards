@@ -4,12 +4,13 @@
 #include"Bitboard.h"
 
 namespace Paisho{
-    int minimax(Board *b, int depth, int player, Move *eval);
-    int negamax(Board *b, int depth, int player, Move *eval);
-    int ab_prune_neg(Board *b, int depth, int alpha, int beta, int player, Move *eval);
-    int ab_prune(Board *b, int depth, int alpha, int beta, int player, Move *eval);
-    void order_moves(Moves *in, Moves *out);
-    int evaluate(Board *b);
+    int minimax(const Board& b, int depth, int player, Move& eval);
+    int negamax(const Board& b, int depth, int player, Move& eval);
+    int ab_prune_neg(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
+    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
+    //void order_moves(const Moves& in, Moves& out);
+    void order_moves(Moves& in);
+    int evaluate(const Board& b);
 
 }
 
