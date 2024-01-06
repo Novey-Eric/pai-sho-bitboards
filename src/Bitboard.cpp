@@ -769,14 +769,14 @@ namespace Paisho{
                     post_move_bb.set(t_dest);
                     int boat_square = get_lsb(post_move_bb);
                     while (boat_square != -1){
-                        Bitboard s4_squares = ((post_move_bb >> EAST) |\
-                                                (post_move_bb << EAST) |\
+                        Bitboard s4_squares = (((post_move_bb & ~FileABB) >> EAST) |\
+                                                ((post_move_bb & ~FileQBB) << EAST) |\
                                                 (post_move_bb << NORTH) |\
                                                 (post_move_bb >> NORTH) |\
-                                                (post_move_bb >> (NORTH + EAST)) |\
-                                                (post_move_bb >> (NORTH - EAST)) |\
-                                                (post_move_bb << (NORTH + EAST)) |\
-                                                (post_move_bb << (NORTH - EAST))) &\
+                                                ((post_move_bb & ~FileABB) >> (NORTH + EAST)) |\
+                                                ((post_move_bb & ~FileQBB) >> (NORTH - EAST)) |\
+                                                ((post_move_bb & ~FileQBB) << (NORTH + EAST)) |\
+                                                ((post_move_bb & ~FileABB) << (NORTH - EAST))) &\
                                                 Legal & ~post_move_bb & ~Gates;
                         int s4_square = get_lsb(s4_squares);
                         while(s4_square != -1){
