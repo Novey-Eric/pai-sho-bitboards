@@ -96,19 +96,11 @@ namespace Paisho{
         for (int i = 0; i < NUM_SQUARES; i++){
 
             if (Legal[i]){
-                if(i%17 == 16){
-                    sq_strs[i] = " . \n";
-                }else{
-                    sq_strs[i] = " . ";
-                }
+                sq_strs[i] = " . ";
             }else{
-                if(i%17 == 16){
-                    sq_strs[i] = "   \n";
-                }else{
-                    sq_strs[i] = "   ";
+                sq_strs[i] = "   ";
                 }
             }
-        }
 
         //do w3 first
         for (int i = 0; i < 8; i++){
@@ -131,6 +123,8 @@ namespace Paisho{
             std::cout << std::to_string(row+1) + "\t";
             for(int col = 0; col < 17; col++){
                 std::cout<<sq_strs[row*17 + col];
+                if(col == 16)
+                    std::cout<<"\n";
             }
         }
         std::cout << "\t A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q\n";
