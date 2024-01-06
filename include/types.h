@@ -41,13 +41,8 @@ namespace Paisho{
 
         array<Bitboard, NUM_BOARDS> whiteBoards;
         array<Bitboard, NUM_BOARDS> blackBoards;
-        //Bitboard whiteBoards[NUM_BOARDS];
-        //Bitboard blackBoards[NUM_BOARDS];
-        //Bitboard bitboards[41];
 
         array<Bitboard, NUM_OTHER_BOARDS> otherBoards;
-        //Bitboard otherBoards[NUM_OTHER_BOARDS];
-        //Bitboard HarmLotus;
 
     } Board;
 

@@ -128,10 +128,12 @@ namespace Paisho{
         }
 
         for (int row = 16; row >= 0; row--){
+            std::cout << std::to_string(row+1) + "\t";
             for(int col = 0; col < 17; col++){
                 std::cout<<sq_strs[row*17 + col];
             }
         }
+        std::cout << "\t A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q\n";
 
     }
 
