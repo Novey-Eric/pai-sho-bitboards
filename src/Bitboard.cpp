@@ -525,14 +525,14 @@ namespace Paisho{
                                         if(wheel_squares[auxpiece_square]){
                                             Bitboard legal_bb(1);
                                             legal_bb <<= auxpiece_square; //This is a bitboard of all the squares around the wheel square. Check to make sure there are exactly 9 bits
-                                            legal_bb = ((legal_bb >> EAST) |\
-                                                        (legal_bb << EAST) |\
+                                            legal_bb = (((legal_bb & ~FileABB) >> EAST) |\
+                                                        ((legal_bb & ~FileQBB) << EAST) |\
                                                         (legal_bb << NORTH) |\
                                                         (legal_bb >> NORTH) |\
-                                                        (legal_bb >> (NORTH + EAST)) |\
-                                                        (legal_bb >> (NORTH - EAST)) |\
-                                                        (legal_bb << (NORTH + EAST)) |\
-                                                        (legal_bb << (NORTH - EAST))) &\
+                                                        ((legal_bb & ~FileABB) >> (NORTH + EAST)) |\
+                                                        ((legal_bb & ~FileQBB) >> (NORTH - EAST)) |\
+                                                        ((legal_bb & ~FileQBB) << (NORTH + EAST)) |\
+                                                        ((legal_bb & ~FileABB) << (NORTH - EAST))) &\
                                                         Legal & ~Gates;
                                             if (legal_bb.count() == 8){
                                                 Move t_move = (HARMACCENT << MOVE_TYPE_OFFSET) |\
