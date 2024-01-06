@@ -1,9 +1,11 @@
 
+#include <algorithm>
 #include "Bitboard.h"
 #include "types.h"
 #include <iostream>
 #include <ostream>
 #include <cstring>
+#include<string>
 #include <chrono>
 
 using namespace std;
@@ -56,11 +58,11 @@ namespace Paisho{
                 std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
                 break;
             case PLACE:
-                std::cout << PieceStrings[move_piece] << " " << SquareStrings[move_s1];
+                std::cout << WhitePieceStrings[move_piece] << " " << SquareStrings[move_s1];
                 break;
             case HARMPLACE:
                 std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
-                std::cout << "+" << PieceStrings[move_piece] << " " << SquareStrings[move_s3];
+                std::cout << "+" << WhitePieceStrings[move_piece] << " " << SquareStrings[move_s3];
                 break;
             case HARMACCENT:
                 if (move_boatmove){
@@ -88,7 +90,54 @@ namespace Paisho{
     }
 
 
-    std::string Bitboards::pretty(const Bitboard b){
+    void Bitboards::print_board(const Board& b){
+
+        std::array<std::string, NUM_SQUARES> sq_strs;
+        for (int i = 0; i < NUM_SQUARES; i++){
+
+            if (Legal[i]){
+                if(i%17 == 16){
+                    sq_strs[i] = " . \n";
+                }else{
+                    sq_strs[i] = " . ";
+                }
+            }else{
+                if(i%17 == 16){
+                    sq_strs[i] = "   \n";
+                }else{
+                    sq_strs[i] = "   ";
+                }
+            }
+        }
+
+        //do w3 first
+        for (int i = 0; i < 8; i++){
+            for(int sq = 0; sq < NUM_SQUARES; sq++){
+                if(b.whiteBoards[i][sq]){
+                    sq_strs[sq] = WhitePieceStrings[i] + " ";
+                }else if (b.blackBoards[i][sq]){
+                    sq_strs[sq] = BlackPieceStrings[i] + " ";
+                }
+            }
+        }
+
+        for(int i = 0; i < NUM_SQUARES; i++){
+           if(b.otherBoards[Accents][i]){
+                sq_strs[i] = " A ";
+            }
+        }
+
+        for (int row = 16; row >= 0; row--){
+            for(int col = 0; col < 17; col++){
+                std::cout<<sq_strs[row*17 + col];
+            }
+        }
+
+    }
+
+
+
+    void Bitboards::pretty(const Bitboard b){
         std::cout << "17 " << "        ";
         for (int i = 276; i <= 284; i++){
             std::cout << " " << b[i];
@@ -159,7 +208,6 @@ namespace Paisho{
         std::cout << "        " << std::endl;
         std::cout << "    A B C D E F G H I J K L M N O P Q" << std::endl;
 
-        return "hello";
     }
 
     namespace Bitboards{

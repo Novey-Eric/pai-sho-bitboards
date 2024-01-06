@@ -101,6 +101,7 @@ namespace Paisho{
 
     namespace Bitboards{
         
+
         constexpr Bitboard correct_color(int piece){
             switch(piece){
                 case w3: return White | Neutral;
@@ -192,7 +193,8 @@ namespace Paisho{
         int check_win(const Board& b); //returns WHITE, BLACK or -1
         Bitboard reverse_harm_lookup(const Board& b, int harm_index, int team);
 
-        std::string pretty(const Bitboard b);
+        void print_board(const Board& b);
+        void pretty(const Bitboard b);
         int get_lsb(const Bitboard b);
 
         void get_flower_moves(const Board& b, int team, const int bbflowerpiece, Moves& move_list);

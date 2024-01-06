@@ -555,6 +555,7 @@ void comp_v_comp(){
         int eval = ab_prune(b, 2, -99999, 99999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         print_move(bestmove);
+        cout<<bestmove<<endl;
         make_move(b, player, bestmove);
         cout<< "white harms: ";
         for (auto it : b.white_harm_pairs){
@@ -629,7 +630,102 @@ void test_fail1(){
 
 }
 
+void test_fail2(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
 
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+
+    update_harms_clash(b);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 5369873843);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 2152458530);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 36511465602);
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    pretty(b.otherBoards[AllPieces]);
+    pretty(b.whiteBoards[allflowers]);
+    pretty(b.blackBoards[allflowers]);
+    
+}
+
+
+void test_print_board(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+
+    update_harms_clash(b);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 5369873843);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 2152458530);
+    pretty(b.otherBoards[AllPieces]);
+    make_move(b, WHITE, 36511465602);
+    print_board(b);
+/*
+    Moves a = get_moves(b, WHITE);
+    print_move_list(a);
+    pretty(b.otherBoards[AllPieces]);
+    pretty(b.whiteBoards[allflowers]);
+    pretty(b.blackBoards[allflowers]);
+  */  
+}
 
 int main(){
     //test_print_macros();
@@ -643,7 +739,9 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    comp_v_comp();
+    //comp_v_comp();
+    //test_fail2();
     //test_fail1();
+    test_print_board();
     return 1;
 }
