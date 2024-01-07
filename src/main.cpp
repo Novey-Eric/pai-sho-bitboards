@@ -1,10 +1,10 @@
 
-#include"Bitboard.h"
 #include <iostream>
 #include <ostream>
 #include <strings.h>
 #include"Computer.h"
 #include"types.h"
+#include"Bitboard.h"
 #include <chrono>
 
 using namespace std::chrono;
@@ -327,7 +327,7 @@ void test_total_harms(){
     b.ww4=1;
     b.ww5=3;
 
-    update_harms_clash(b);
+    Paisho::Bitboards::update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
@@ -551,8 +551,9 @@ void comp_v_comp(){
     update_harms_clash(b);
     for(;;){
         Move bestmove;
-        pretty(b.otherBoards[AllPieces]);
-        int eval = ab_prune(b, 2, -99999, 99999, player, bestmove);
+        //pretty(b.otherBoards[AllPieces]);
+        print_board(b);
+        int eval = ab_prune(b, 3, -99999, 99999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         print_move(bestmove);
         cout<<bestmove<<endl;
@@ -671,9 +672,7 @@ void test_fail2(){
     make_move(b, WHITE, 36511465602);
     Moves a = get_moves(b, WHITE);
     print_move_list(a);
-    pretty(b.otherBoards[AllPieces]);
-    pretty(b.whiteBoards[allflowers]);
-    pretty(b.blackBoards[allflowers]);
+    print_board(b);
     
 }
 
@@ -712,10 +711,14 @@ void test_print_board(){
 
     update_harms_clash(b);
     pretty(b.otherBoards[AllPieces]);
+    print_board(b);
+    print_move(5369873843);
     make_move(b, WHITE, 5369873843);
-    pretty(b.otherBoards[AllPieces]);
+    print_board(b);
+    print_move(2152458530);
     make_move(b, WHITE, 2152458530);
-    pretty(b.otherBoards[AllPieces]);
+    print_board(b);
+    print_move(36511465602);
     make_move(b, WHITE, 36511465602);
     print_board(b);
 /*
@@ -739,9 +742,9 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    //comp_v_comp();
+    comp_v_comp();
     //test_fail2();
     //test_fail1();
-    test_print_board();
+    //test_print_board();
     return 1;
 }

@@ -1,9 +1,11 @@
 
-FLAGS := -I../include -g -Wall
+FLAGS := -I../include -O1 -g -Wall 
 
-all: Computer.o Bitboard.o
-	g++ main.cpp ./build/Computer.o ./build/Bitboard.o -o ./build/paisho $(FLAGS)
+all: Computer.o Bitboard.o main.o
+	g++ ./build/main.o ./build/Bitboard.o ./build/Computer.o -o ./build/paisho $(FLAGS)
 
+main.o: main.cpp
+	g++ -c main.cpp -o ./build/main.o $(FLAGS)
 Computer.o: Computer.cpp
 	g++ -c Computer.cpp -o ./build/Computer.o $(FLAGS)
 Bitboard.o: Bitboard.cpp

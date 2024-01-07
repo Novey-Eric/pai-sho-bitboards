@@ -214,7 +214,7 @@ namespace Paisho{
             const Bitboard *t_board;
             if (team == WHITE)
                 t_board = &b.whiteBoards[0];
-            if (team == BLACK)
+            else
                 t_board = &b.blackBoards[0];
             
             switch(flower){
@@ -257,7 +257,7 @@ namespace Paisho{
             const Bitboard *t_board;
             if (team == WHITE)
                 t_board = &b.whiteBoards[0];
-            if (team == BLACK)
+            else
                 t_board = &b.blackBoards[0];
             
             switch(flower){
@@ -1174,7 +1174,7 @@ namespace Paisho{
 
 
 
-        inline void update_harms_clash(Board& b){
+        void update_harms_clash(Board& b){
             find_harms(b, WHITE);
             find_harms(b, BLACK);
         }

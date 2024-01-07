@@ -179,18 +179,6 @@ int ply;
 
     }
 
-
-    std::unordered_map<int, int> piece_onboard_score{
-                            {w3, 30},
-                            {w4, 35},
-                            {w5, 40},
-                            {r3, 30},
-                            {r4, 35},
-                            {r5, 40},
-                            {lotus, 150},
-                            {orchid, 100},
-                            };
-
     
     int eval_helper_harms(const Board& b, int team){
         //keep a map of all the corners registered so far. 
@@ -217,20 +205,29 @@ int ply;
                 harm_cnt++;
                 if(square_cnt.count(q1)){
                     square_cnt[q1]++;
-                    doub_cnt++;
                 } else{ 
                     square_cnt[q1] = 1;
                 }
 
                 if(square_cnt.count(q2)){
                     square_cnt[q2]++;
-                    doub_cnt++;
                 } else{ 
                     square_cnt[q2] = 1;
                 }
             }
         }
-        return 100*harm_cnt + 300*doub_cnt;
+        for(auto i : square_cnt){
+            if (i.second > 2){
+                doub_cnt++;
+            }
+        }
+        int win_bonus = 0;
+        if(doub_cnt >= 4)
+            win_bonus = 999999;
+        
+
+
+        return 100*harm_cnt + 300*doub_cnt + win_bonus;
     }
 
 
@@ -240,14 +237,14 @@ int ply;
         int black_score = 0;
 
         for(int i = 0; i <= 5; i++){
-            white_score += b.whiteBoards[i].count()*piece_onboard_score[i];
-            black_score += b.blackBoards[i].count()*piece_onboard_score[i];
+            white_score += b.whiteBoards[i].count()*piece_onboard_score(i);
+            black_score += b.blackBoards[i].count()*piece_onboard_score(i);
         }
-        white_score += b.whiteBoards[orchid].count()*piece_onboard_score[orchid];
-        black_score += b.blackBoards[orchid].count()*piece_onboard_score[orchid];
+        white_score += b.whiteBoards[orchid].count()*piece_onboard_score(orchid);
+        black_score += b.blackBoards[orchid].count()*piece_onboard_score(orchid);
 
-        white_score += b.whiteBoards[lotus].count()*piece_onboard_score[lotus];
-        black_score += b.blackBoards[lotus].count()*piece_onboard_score[lotus];
+        white_score += b.whiteBoards[lotus].count()*piece_onboard_score(lotus);
+        black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
         
         white_score += (b.wwild)*400;
         black_score += (b.bwild)*400;
