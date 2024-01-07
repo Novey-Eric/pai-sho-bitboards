@@ -214,12 +214,10 @@ int ply;
             }
         }
         for(auto i : square_cnt){
-            std::cout<<"("<<SquareStrings[i.first]<<", "<<i.second<<"), ";
             if (i.second > 1){
                 doub_cnt++;
             }
         }
-        //std::cout<<"\n";
 
 
         int win_bonus = 0;
@@ -250,7 +248,6 @@ int ply;
                             c4 = m->first%17;
                             if(r1 == r2 && r3 == r4 && c4 == c2 && c1 == c3){
                                 win_bonus = 999999;
-                                std::cout<<"in win condition"<<std::endl;
                             }
                         }
                     }
