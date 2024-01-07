@@ -36,8 +36,8 @@ namespace Paisho{
         bool wwild;
         char whiteAccents;
     
-        std::unordered_map<int,int> white_harm_pairs;
-        std::unordered_map<int,int> black_harm_pairs;
+        std::deque<std::pair<int, int>> white_harm_pairs;
+        std::deque<std::pair<int, int>> black_harm_pairs;
 
         array<Bitboard, NUM_BOARDS> whiteBoards;
         array<Bitboard, NUM_BOARDS> blackBoards;

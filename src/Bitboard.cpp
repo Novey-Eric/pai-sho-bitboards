@@ -1061,7 +1061,7 @@ namespace Paisho{
             //HARM CASE
             //int t_piece = w3;
             Bitboard *teamboard;
-            std::unordered_map<int, int> *team_harms;
+            std::deque<std::pair<int, int>> *team_harms;
             if (team == WHITE){
                 teamboard = &(b.whiteBoards)[0];
                 team_harms = &b.white_harm_pairs;
@@ -1127,7 +1127,7 @@ namespace Paisho{
 
                     //if the final square you check is actually a piece you can harmonize with. Add it to the pairs.
                     if(harm_board[tmp_square])
-                        (*team_harms)[w3_piece] = tmp_square;
+                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
                     //if [tmp_square], then add {w3_piece, tmp_square} to harmpairs
                 }
 
@@ -1140,7 +1140,7 @@ namespace Paisho{
                     teamboard[harm_ind].set(tmp_square);
 
                     if(harm_board[tmp_square])
-                        (*team_harms)[w3_piece] = tmp_square;
+                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
                 }
 
                 tmp_square = w3_piece + NORTH;
@@ -1152,7 +1152,7 @@ namespace Paisho{
                     teamboard[harm_ind].set(tmp_square);
 
                     if(harm_board[tmp_square])
-                        (*team_harms)[w3_piece] = tmp_square;
+                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
                 }
 
 
@@ -1165,7 +1165,7 @@ namespace Paisho{
                     teamboard[harm_ind].set(tmp_square);
 
                     if(harm_board[tmp_square])
-                        (*team_harms)[w3_piece] = tmp_square;
+                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
                 }
                 //std::cout<<"w3 pieces after loop" <<std::endl;
                 //pretty(teamboard[allflowers]);

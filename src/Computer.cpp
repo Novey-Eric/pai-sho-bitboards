@@ -162,8 +162,8 @@ int ply;
 
 
     int get_quadrant(int square){
-        int row = square/17;
-        int col = square%17;
+        int row = (square/17)+1;
+        int col = (square%17)+1;
         if (row < 9 && col < 9){
             return 4;
         } else if (row > 9 && col < 9){
@@ -188,7 +188,7 @@ int ply;
   
         std::map<int, int> square_cnt;
         int harm_cnt = 0;
-        const std::unordered_map<int, int> *team_pairs;
+        const std::deque<std::pair<int, int>> *team_pairs;
         if (team == WHITE){
             team_pairs = &b.white_harm_pairs;
         } else{
@@ -197,24 +197,29 @@ int ply;
 
         int doub_cnt = 0;
         for (auto i : *team_pairs){
-        //for (auto i = team_pairs->begin(); i != team_pairs->end(); i++){
             int q1 = get_quadrant(i.first);
             int q2 = get_quadrant(i.second);
             if (q1 != q2 && q1 != -1 && q2 != -1){
                 harm_cnt++;
-                if(square_cnt.count(q1)){
-                    square_cnt[q1]++;
+                if(square_cnt.count(i.first)){
+                    square_cnt[i.first]++;
                 } else{ 
-                    square_cnt[q1] = 1;
+                    square_cnt[i.first] = 1;
+                }
+                if(square_cnt.count(i.second)){
+                    square_cnt[i.second]++;
+                } else{ 
+                    square_cnt[i.second] = 1;
                 }
             }
         }
         for(auto i : square_cnt){
+            std::cout<<"("<<SquareStrings[i.first]<<", "<<i.second<<"), ";
             if (i.second > 1){
                 doub_cnt++;
             }
         }
-
+        //std::cout<<"\n";
 
 
         int win_bonus = 0;
@@ -243,8 +248,10 @@ int ply;
                             int r4, c4;
                             r4 = m->first/17;
                             c4 = m->first%17;
-                            if(r1 == r2 && r3 == r4 && c4 == c2 && c1 == c3)
+                            if(r1 == r2 && r3 == r4 && c4 == c2 && c1 == c3){
                                 win_bonus = 999999;
+                                std::cout<<"in win condition"<<std::endl;
+                            }
                         }
                     }
                 }
