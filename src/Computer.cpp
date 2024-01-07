@@ -37,11 +37,9 @@ int ply;
     int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
-        if (depth <= 0 || Bitboards::check_win(b) != -1){
-            auto start_eval = high_resolution_clock::now();
-            int eval = evaluate(b);
-            auto end_eval = high_resolution_clock::now();
-            auto dur_eval = duration_cast<microseconds>(end_eval-start_eval);
+        int eval = evaluate(b);
+        if (depth <= 0 || std::abs(eval) >= 999999){
+            eval += depth;
             //cout << "eval dur: " << dur_eval.count() << endl;
             //std::cout<<"eval: "<<eval<<std::endl;
             return eval;
@@ -53,10 +51,11 @@ int ply;
         //Moves ordered_moves;
 
         if (player == WHITE){
-            value = -999999;
+            value = -9999999;
 
             curr_moves = Bitboards::get_moves(b, WHITE);
-            //curr_moves.move_count=std::min(curr_moves.move_count, 600);
+            if(!curr_moves.size())
+                value = 0;
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
             //curr_moves.sort();
@@ -82,14 +81,14 @@ int ply;
             }
 
         } else{
-            value = 999999;
+            value = 9999999;
             curr_moves = Bitboards::get_moves(b, BLACK);
-            //curr_moves.move_count=std::min(curr_moves.move_count, 600);
+            if(!curr_moves.size())
+                value = 0;
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
 
             for(auto t_move : curr_moves){
-            //for(int i = 0; i < curr_moves.size(); i++){
                 b_copy = b;
                 ply++;
                 Bitboards::make_move(b_copy, player, t_move);
@@ -187,7 +186,7 @@ int ply;
         //If there is no connection from that corner to somewhere else, continue, but remove the corner from the bitboard
         //the map should be (square, corners_shared) pairs
   
-        std::unordered_map<int, int> square_cnt;
+        std::map<int, int> square_cnt;
         int harm_cnt = 0;
         const std::unordered_map<int, int> *team_pairs;
         if (team == WHITE){
@@ -208,24 +207,50 @@ int ply;
                 } else{ 
                     square_cnt[q1] = 1;
                 }
-
-                if(square_cnt.count(q2)){
-                    square_cnt[q2]++;
-                } else{ 
-                    square_cnt[q2] = 1;
-                }
             }
         }
         for(auto i : square_cnt){
-            if (i.second > 2){
+            if (i.second > 1){
                 doub_cnt++;
             }
         }
-        int win_bonus = 0;
-        if(doub_cnt >= 4)
-            win_bonus = 999999;
-        
 
+
+
+        int win_bonus = 0;
+        if(doub_cnt >= 4){
+            for (auto i = square_cnt.begin(); i != square_cnt.end(); i++){//if using ordered map this will be guaranteed bottom right
+                if(i->second <= 1)
+                    continue;
+                int r1, c1;
+                r1 = i->first/17;
+                c1 = i->first%17;
+                for(auto j = std::next(i, 1); j != square_cnt.end(); j++){//bottom left
+                    if(j->second <= 1)
+                        continue;
+                    int r2, c2;
+                    r2 = j->first/17;
+                    c2 = j->first%17;
+                    for(auto k = std::next(j, 1); k != square_cnt.end(); k++){//top right
+                        if(k->second <= 1)
+                            continue;
+                        int r3, c3;
+                        r3 = k->first/17;
+                        c3 = k->first%17;
+                        for(auto m = std::next(k, 1); m != square_cnt.end(); m++){//top left
+                            if(m->second <= 1)
+                                continue;
+                            int r4, c4;
+                            r4 = m->first/17;
+                            c4 = m->first%17;
+                            if(r1 == r2 && r3 == r4 && c4 == c2 && c1 == c3)
+                                win_bonus = 999999;
+                        }
+                    }
+                }
+            }
+        }
+        
 
         return 100*harm_cnt + 300*doub_cnt + win_bonus;
     }
@@ -238,7 +263,9 @@ int ply;
 
         for(int i = 0; i <= 5; i++){
             white_score += b.whiteBoards[i].count()*piece_onboard_score(i);
+            white_score += (b.whiteBoards[i] & ~Gates).count()*20;
             black_score += b.blackBoards[i].count()*piece_onboard_score(i);
+            black_score += (b.blackBoards[i] & ~Gates).count()*20;
         }
         white_score += b.whiteBoards[orchid].count()*piece_onboard_score(orchid);
         black_score += b.blackBoards[orchid].count()*piece_onboard_score(orchid);
@@ -269,6 +296,9 @@ int ply;
             bn_harm_pieces = std::min(bn_harm_pieces, bn_piece);
             black_score += bn_harm_pieces*harm_pieces_w;
         }
+
+        
+        
 
         white_score += eval_helper_harms(b, WHITE);
         black_score += eval_helper_harms(b, BLACK);

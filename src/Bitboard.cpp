@@ -96,7 +96,13 @@ namespace Paisho{
         for (int i = 0; i < NUM_SQUARES; i++){
 
             if (Legal[i]){
-                sq_strs[i] = " . ";
+                if (Red[i])
+                    sq_strs[i] = " r ";
+                else if (White[i])
+                    sq_strs[i] = " w ";
+                else
+                    sq_strs[i] = " . ";
+
             }else{
                 sq_strs[i] = "   ";
                 }
@@ -394,8 +400,8 @@ namespace Paisho{
             for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
                 if (w3_copy[t_src]){
                     t_dests = mask_move_ptr(t_src) & \
-                              ~(b.otherBoards[AllPieces] ^ cap_board) & \
-                              ~clash_board & correct_color(bbflowerpiece);
+                              (~b.otherBoards[AllPieces] ^ cap_board) & 
+                              (~clash_board) & correct_color(bbflowerpiece);
                     
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
                         if(t_dests[t_dest]){
@@ -815,12 +821,12 @@ namespace Paisho{
 
             for (int i = 0; i < 8; i++){
                 get_flower_moves(b, team, piece_list[i], move_list);
-                get_harmony_place_moves(b, team, piece_list[i], move_list);
-                get_harmony_accent_moves(b, team, piece_list[i], move_list);
-                get_boat_flower_moves(b, team, piece_list[i], move_list);
+                //get_harmony_place_moves(b, team, piece_list[i], move_list);
+                //get_harmony_accent_moves(b, team, piece_list[i], move_list);
+                //get_boat_flower_moves(b, team, piece_list[i], move_list);
                 //get harmony boat moves
             }
-            get_place_moves(b, team, move_list);
+            //get_place_moves(b, team, move_list);
             return move_list;
         }
 

@@ -1,5 +1,5 @@
 
-FLAGS := -I../include -O1 -g -Wall 
+FLAGS := -I../include -g -Wall 
 
 all: Computer.o Bitboard.o main.o
 	g++ ./build/main.o ./build/Bitboard.o ./build/Computer.o -o ./build/paisho $(FLAGS)
