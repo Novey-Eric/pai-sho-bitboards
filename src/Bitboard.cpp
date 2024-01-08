@@ -62,7 +62,7 @@ namespace Paisho{
                 break;
             case HARMPLACE:
                 std::cout << SquareStrings[move_s1] << "-" << SquareStrings[move_s2];
-                std::cout << "+" << WhitePieceStrings[move_piece] << " " << SquareStrings[move_s3];
+                std::cout << "+" << WhitePieceStrings[move_auxpiece] << " " << SquareStrings[move_s3];
                 break;
             case HARMACCENT:
                 if (move_boatmove){
@@ -587,9 +587,11 @@ namespace Paisho{
                 team_board = &b.blackBoards[0];
             }
 
-            if ((team_board[allflowers] & team_board[orchid] & team_board[lotus] & Gates).any()){
+            bool only_lotus_orc = false;
+
+            if ((team_board[allflowers] & Gates).any()){
+                only_lotus_orc = true;
                 //Trying to harmony place with a growing tile in gate
-                return;
             }
 
             mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
@@ -604,18 +606,20 @@ namespace Paisho{
             
             if (team == WHITE){
                 teamboard = &b.whiteBoards[0];
-                if (b.ww3)
-                    pieces_in_hand[num_pieces++] = w3;
-                if (b.ww4)
-                    pieces_in_hand[num_pieces++] = w4;
-                if (b.ww5)
-                    pieces_in_hand[num_pieces++] = w5;
-                if (b.wr3)
-                    pieces_in_hand[num_pieces++] = r3;
-                if (b.wr4)
-                    pieces_in_hand[num_pieces++] = r4;
-                if (b.wr5)
-                    pieces_in_hand[num_pieces++] = r5;
+                if(!only_lotus_orc){
+                    if (b.ww3)
+                        pieces_in_hand[num_pieces++] = w3;
+                    if (b.ww4)
+                        pieces_in_hand[num_pieces++] = w4;
+                    if (b.ww5)
+                        pieces_in_hand[num_pieces++] = w5;
+                    if (b.wr3)
+                        pieces_in_hand[num_pieces++] = r3;
+                    if (b.wr4)
+                        pieces_in_hand[num_pieces++] = r4;
+                    if (b.wr5)
+                        pieces_in_hand[num_pieces++] = r5;
+                }
                 if (b.wo)
                     pieces_in_hand[num_pieces++] = orchid;
                 if (b.wl)
@@ -623,18 +627,20 @@ namespace Paisho{
                 
             } else{
                 teamboard = &b.blackBoards[0];
-                if (b.bw3)
-                    pieces_in_hand[num_pieces++] = w3;
-                if (b.bw4)
-                    pieces_in_hand[num_pieces++] = w4;
-                if (b.bw5)
-                    pieces_in_hand[num_pieces++] = w5;
-                if (b.br3)
-                    pieces_in_hand[num_pieces++] = r3;
-                if (b.br4)
-                    pieces_in_hand[num_pieces++] = r4;
-                if (b.br5)
-                    pieces_in_hand[num_pieces++] = r5;
+                if(!only_lotus_orc){
+                    if (b.bw3)
+                        pieces_in_hand[num_pieces++] = w3;
+                    if (b.bw4)
+                        pieces_in_hand[num_pieces++] = w4;
+                    if (b.bw5)
+                        pieces_in_hand[num_pieces++] = w5;
+                    if (b.br3)
+                        pieces_in_hand[num_pieces++] = r3;
+                    if (b.br4)
+                        pieces_in_hand[num_pieces++] = r4;
+                    if (b.br5)
+                        pieces_in_hand[num_pieces++] = r5;
+                }
                 if (b.bo)
                     pieces_in_hand[num_pieces++] = orchid;
                 if (b.bl)
@@ -1126,8 +1132,18 @@ namespace Paisho{
                     teamboard[harm_ind].set(tmp_square);
 
                     //if the final square you check is actually a piece you can harmonize with. Add it to the pairs.
-                    if(harm_board[tmp_square])
-                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    if(harm_board[tmp_square]){
+                        bool found = false;
+                        for(int i = 0; i < (*team_harms).size(); i++){
+                            if(std::pair{tmp_square, w3_piece} == (*team_harms)[i]){
+                                found = true;
+                                break;
+                            } 
+                        }
+                        if (!found)
+                            (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    }
+                        
                     //if [tmp_square], then add {w3_piece, tmp_square} to harmpairs
                 }
 
@@ -1139,8 +1155,17 @@ namespace Paisho{
                 if (tmp_square/17 == current_row && tmp_square >= 0){
                     teamboard[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square])
-                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    if(harm_board[tmp_square]){
+                        bool found = false;
+                        for(int i = 0; i < (*team_harms).size(); i++){
+                            if(std::pair{tmp_square, w3_piece} == (*team_harms)[i]){
+                                found = true;
+                                break;
+                            } 
+                        }
+                        if (!found)
+                            (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    }
                 }
 
                 tmp_square = w3_piece + NORTH;
@@ -1151,8 +1176,17 @@ namespace Paisho{
                 if (tmp_square < NUM_SQUARES){
                     teamboard[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square])
-                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    if(harm_board[tmp_square]){
+                        bool found = false;
+                        for(int i = 0; i < (*team_harms).size(); i++){
+                            if(std::pair{tmp_square, w3_piece} == (*team_harms)[i]){
+                                found = true;
+                                break;
+                            } 
+                        }
+                        if (!found)
+                            (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    }
                 }
 
 
@@ -1164,8 +1198,17 @@ namespace Paisho{
                 if (tmp_square >= 0){
                     teamboard[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square])
-                        (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    if(harm_board[tmp_square]){
+                        bool found = false;
+                        for(int i = 0; i < (*team_harms).size(); i++){
+                            if(std::pair{tmp_square, w3_piece} == (*team_harms)[i]){
+                                found = true;
+                                break;
+                            } 
+                        }
+                        if (!found)
+                            (*team_harms).push_back(std::pair{w3_piece, tmp_square});
+                    }
                 }
                 //std::cout<<"w3 pieces after loop" <<std::endl;
                 //pretty(teamboard[allflowers]);

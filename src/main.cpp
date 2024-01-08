@@ -546,21 +546,23 @@ void comp_v_comp(){
     b.bw3=2;
     b.bw4=1;
     b.bw5=3;
+    b.bl=1;
+    b.bo=1;
 
-    int player = WHITE;
+    int player = BLACK;
     update_harms_clash(b);
     while(evaluate(b) < 999999){
         Move bestmove;
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
-        std::cout<<get_moves(b, WHITE).size() << std::endl;
+        std::cout<<"num moves: "<<get_moves(b, player).size() << std::endl;
         int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         print_move(bestmove);
         cout<<bestmove<<endl;
         make_move(b, player, bestmove);
-        cout<< "white harms: ";
-        for (auto it : b.white_harm_pairs){
+        cout<< "black harms: ";
+        for (auto it : b.black_harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
         cout<<"\n";
@@ -708,6 +710,9 @@ void test_fail3(){
     b.bw3=2;
     b.bw4=1;
     b.bw5=3;
+    b.bo=1;
+    b.wo=1;
+    b.wl=1;
 
     update_harms_clash(b);
     make_move(b, WHITE, 5369873843);
@@ -721,9 +726,10 @@ void test_fail3(){
     make_move(b, WHITE, 5794064);
     make_move(b, WHITE, 6220848);
     make_move(b, WHITE, 2001936);
+    //make_move(b, WHITE, 5326976);
 
     a = get_moves(b, WHITE);
-    //print_move_list(a);
+    print_move_list(a);
     print_board(b);
     cout<<evaluate(b)<<endl;
     for (auto it : b.white_harm_pairs){
@@ -800,9 +806,9 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    comp_v_comp();
+    //comp_v_comp();
     //test_fail2();
-    //test_fail3();
+    test_fail3();
     //test_fail1();
     //test_print_board();
     return 1;

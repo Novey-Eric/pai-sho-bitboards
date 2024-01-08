@@ -256,7 +256,7 @@ int ply;
         }
         
 
-        return 100*harm_cnt + 300*doub_cnt + win_bonus;
+        return 200*harm_cnt + 300*doub_cnt + win_bonus;
     }
 
 

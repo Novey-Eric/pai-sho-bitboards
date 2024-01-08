@@ -14,8 +14,8 @@ namespace Paisho{
             case r3: return 30;
             case r4: return 35;
             case r5: return 40;
-            case lotus: return 150;
-            case orchid: return 100;
+            case lotus: return 250;
+            case orchid: return 200;
             default: return 0;
         }
     }
