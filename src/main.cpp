@@ -726,10 +726,13 @@ void test_fail3(){
     make_move(b, WHITE, 5794064);
     make_move(b, WHITE, 6220848);
     make_move(b, WHITE, 2001936);
-    //make_move(b, WHITE, 5326976);
+    print_board(b);
+    make_move(b, WHITE, 75368211346);
 
     a = get_moves(b, WHITE);
-    print_move_list(a);
+    //print_move_list(a);
+    print_move(75368211346);
+    //cout<<a[1044]<<endl;
     print_board(b);
     cout<<evaluate(b)<<endl;
     for (auto it : b.white_harm_pairs){
@@ -806,9 +809,9 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    //comp_v_comp();
+    comp_v_comp();
     //test_fail2();
-    test_fail3();
+    //test_fail3();
     //test_fail1();
     //test_print_board();
     return 1;

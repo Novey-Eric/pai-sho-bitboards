@@ -1042,7 +1042,7 @@ namespace Paisho{
                 make_place_move(b, team, piece, s1);
             }else if(type == HARMPLACE){
                 //std::cout<<"harmplace"<< std::endl;
-                make_harm_place_move(b, team, piece, s1, s2, piece, s3, cap);
+                make_harm_place_move(b, team, piece, s1, s2, auxpiece, s3, cap);
             }else if(type == HARMACCENT && !boatmove){
                 //std::cout<<"harmacc"<< std::endl;
                 make_harm_accent_move(b, team, piece, s1, s2, auxpiece, s3, cap);
@@ -1258,7 +1258,7 @@ namespace Paisho{
                     ret = teamboard[w5] | teamboard[r3];
                     break;
                 case harmlotus:
-                    ret = teamboard[w5] | teamboard[r3];
+                    ret = teamboard[allflowers];
                     break;
             }
             return ret;

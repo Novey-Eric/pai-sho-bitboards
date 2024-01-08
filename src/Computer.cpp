@@ -265,17 +265,14 @@ int ply;
         int white_score = 0;
         int black_score = 0;
 
-        for(int i = 0; i <= 5; i++){
+        for(int i = 0; i <= 7; i++){
             white_score += b.whiteBoards[i].count()*piece_onboard_score(i);
-            white_score += (b.whiteBoards[i] & ~Gates).count()*20;
+            white_score += (b.whiteBoards[i] & ~Gates).count()*40; //has it moved out of the gate
             black_score += b.blackBoards[i].count()*piece_onboard_score(i);
-            black_score += (b.blackBoards[i] & ~Gates).count()*20;
+            black_score += (b.blackBoards[i] & ~Gates).count()*40;
         }
-        white_score += b.whiteBoards[orchid].count()*piece_onboard_score(orchid);
-        black_score += b.blackBoards[orchid].count()*piece_onboard_score(orchid);
 
-        white_score += b.whiteBoards[lotus].count()*piece_onboard_score(lotus);
-        black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
+        //black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
         
         white_score += (b.wwild)*400;
         black_score += (b.bwild)*400;

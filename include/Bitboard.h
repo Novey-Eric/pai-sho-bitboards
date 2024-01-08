@@ -185,6 +185,7 @@ namespace Paisho{
                 case r3: return harmr3;
                 case r4: return harmr4;
                 case r5: return harmr5;
+                case lotus: return harmlotus;
                 default: return -1;
             }
         }

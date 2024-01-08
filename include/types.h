@@ -143,8 +143,8 @@ namespace Paisho{
         "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
     };    
 
-    const std::string BlackPieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", "l", "o"};
-    const std::string WhitePieceStrings[] = {"W3", "W4", "W5", "R3", "R4", "R5", "L", "O"};
+    const std::string BlackPieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
+    const std::string WhitePieceStrings[] = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
 
     // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
     // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
