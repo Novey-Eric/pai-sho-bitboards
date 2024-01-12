@@ -2,6 +2,7 @@
 #include <cstring>
 #include <chrono>
 #include <iostream>
+#include <cmath>
 
 
 namespace Paisho{
@@ -178,6 +179,14 @@ int ply;
 
     }
 
+    float get_radius(int square){
+        int row = (square/17) - 8;
+        int col = (square%17) - 8;
+        float rad = std::sqrt(row*row + col*col);
+        return rad;
+
+    }
+
     
     int eval_helper_harms(const Board& b, int team){
         //keep a map of all the corners registered so far. 
@@ -298,7 +307,25 @@ int ply;
             black_score += bn_harm_pieces*harm_pieces_w;
         }
 
-        
+        for (int i = 0; i < NUM_SQUARES; i++){
+            if(b.whiteBoards[allflowers][i]){
+                float r = get_radius(i);
+                if(r <= 3){
+                    white_score += 50;
+                } else if (r <= 5){
+                    white_score += 20;
+                }
+            }
+            if(b.blackBoards[allflowers][i]){
+                float r = get_radius(i);
+                if(r <= 3){
+                    black_score += 50;
+                } else if (r <= 5){
+                    black_score += 20;
+                }
+            }
+    
+        }
         
 
         white_score += eval_helper_harms(b, WHITE);

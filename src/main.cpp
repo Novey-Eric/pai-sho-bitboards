@@ -6,6 +6,7 @@
 #include"types.h"
 #include"Bitboard.h"
 #include <chrono>
+#include <vector>
 
 using namespace std::chrono;
 using std::cout;
@@ -543,11 +544,13 @@ void comp_v_comp(){
     b.ww3=2;
     b.ww4=1;
     b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
+    b.bw3=3;
+    b.bw4=3;
     b.bw5=3;
     b.bl=1;
     b.bo=1;
+
+    std::vector<Move> moves;
 
     int player = BLACK;
     update_harms_clash(b);
@@ -558,14 +561,19 @@ void comp_v_comp(){
         std::cout<<"num moves: "<<get_moves(b, player).size() << std::endl;
         int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
+        moves.push_back(bestmove);
         print_move(bestmove);
-        cout<<bestmove<<endl;
         make_move(b, player, bestmove);
+        cout<< "moves list: ";
+        for (Move move: moves){
+            cout<<move<<", ";
+        }
+        cout << endl;
         cout<< "black harms: ";
         for (auto it : b.black_harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
-        cout<<"\n";
+        cout<<endl;
         //player = player==WHITE ? BLACK : WHITE;
     }
     print_board(b);
@@ -744,6 +752,53 @@ void test_fail3(){
 }
 
 
+void test_fail4(){
+    
+    Bitboard w3b(1);
+    w3b <<= i6;
+    w3b |= Bitboard(1)<<i8;
+    w3b |= Bitboard(1)<<g6;
+    Board b={0};
+    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+
+    Bitboard w3h(1);
+    w3h <<= i10;
+    b.whiteBoards[harmw4] = w3h;
+
+    b.whiteBoards[w3]=w3b;
+    Bitboard w4b = Bitboard(1)<<k9;
+    b.whiteBoards[w4]=w4b;
+    b.whiteBoards[allflowers] = w3b | w4b;
+
+    Bitboard waccent(1);
+    waccent <<= e3;
+    b.otherBoards[Accents]=waccent;
+
+    b.otherBoards[AllPieces]= waccent | w3b | w4b;
+    //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
+    
+    b.ww3=2;
+    b.ww4=1;
+    b.ww5=3;
+    b.bw3=2;
+    b.bw4=1;
+    b.bw5=3;
+    b.bo=1;
+    b.wo=1;
+    b.wl=1;
+
+    update_harms_clash(b);
+    std::array<Move,12> moves = {8388737, 8390785, 9545856, 8390785, 4196737, 4198785, 5409152, 41008892226, 26265984, 41043399042, 30558600, 30124328};
+    for(Move m : moves){
+        print_move(m);
+        make_move(b, BLACK, m);
+        print_board(b);
+    }
+    
+}
+
+
+
 void test_print_board(){
     
     Bitboard w3b(1);
@@ -809,9 +864,10 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    comp_v_comp();
+    //comp_v_comp();
     //test_fail2();
     //test_fail3();
+    test_fail4();
     //test_fail1();
     //test_print_board();
     return 1;
