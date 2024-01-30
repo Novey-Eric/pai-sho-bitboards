@@ -14,27 +14,28 @@ namespace Paisho{
 
     typedef struct {
         //save how many are in each hand
-        int bw3;
-        int bw4;
-        int bw5;
-        int br3;
-        int br4;
-        int br5;
-        bool bo;
-        bool bl;
-        bool bwild;
-        char blackAccents;
+        int bw3=3;
+        int bw4=3;
+        int bw5=3;
+        int br3=3;
+        int br4=3;
+        int br5=3;
+        bool bo=true;
+        bool bl=true;
+        bool bwild=false;
+        char blackAccents=0;
 
-        int ww3;
-        int ww4;
-        int ww5;
-        int wr3;
-        int wr4;
-        int wr5;
-        bool wo;
-        bool wl;
-        bool wwild;
-        char whiteAccents;
+        int ww3=3;
+        int ww4=3;
+        int ww5=3;
+        int wr3=3;
+        int wr4=3;
+        int wr5=3;
+        bool wo=true;
+        bool wl=true;
+        bool wwild=false;
+        char whiteAccents=0;
+        bool whiteToMove=true;
     
         std::deque<std::pair<int, int>> white_harm_pairs;
         std::deque<std::pair<int, int>> black_harm_pairs;
@@ -171,6 +172,8 @@ namespace Paisho{
     constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
     typedef uint64_t Move;
 
+    
+    //typedef cuda::std::vector<Move> Moves;
     typedef std::deque<Move> Moves;
   //  #define MOVELIST_LEN (8000)
 /*

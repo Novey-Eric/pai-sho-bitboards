@@ -24,7 +24,7 @@ namespace Paisho{
     int minimax(const Board& b, int depth, int player, Move& eval);
     int negamax(const Board& b, int depth, int player, Move& eval);
     int ab_prune_neg(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
-    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
+    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& eval, std::unordered_map<size_t, int> shared_hash = {});
     //void order_moves(const Moves& in, Moves& out);
     void order_moves(Moves& in);
     int evaluate(const Board& b);

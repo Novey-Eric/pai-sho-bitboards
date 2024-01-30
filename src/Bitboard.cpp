@@ -7,6 +7,7 @@
 #include <cstring>
 #include<string>
 #include <chrono>
+#include <boost/functional/hash.hpp>
 
 using namespace std;
 using namespace std::chrono;
@@ -1051,6 +1052,7 @@ namespace Paisho{
                 make_harm_accent_boatmove(b, team, piece, s1, s2, s3, s4, cap);
             }
             update_harms_clash(b);
+            b.whiteToMove = !b.whiteToMove;
         }
 
         //returns a bitboard with vertical and horizontal lines extending from square.
@@ -1268,6 +1270,26 @@ namespace Paisho{
             return -1;
         }
 
+        size_t get_hash(const Board& b){
+            size_t ret = 0;
+            boost::hash_combine(ret, b.bw3);
+            boost::hash_combine(ret, b.bw4);
+            boost::hash_combine(ret, b.bw5);
+            boost::hash_combine(ret, b.ww3);
+            boost::hash_combine(ret, b.ww4);
+            boost::hash_combine(ret, b.ww5);
+            boost::hash_combine(ret, b.bo);
+            boost::hash_combine(ret, b.bl);
+            boost::hash_combine(ret, b.wo);
+            boost::hash_combine(ret, b.wl);
+            boost::hash_combine(ret, b.wwild);
+            boost::hash_combine(ret, b.bwild);
+            boost::hash_combine(ret, b.blackAccents);
+            boost::hash_combine(ret, b.whiteAccents);
+            boost::hash_combine(ret, b.whiteToMove);
+            return ret;
+        }
+        
 
         Bitboard mask_2_move(int square){
             Bitboard bb(0);

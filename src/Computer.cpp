@@ -35,7 +35,8 @@ int ply;
 
     }
 
-    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
+    //shared hash is used for checking duplicate positions.
+    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move, std::unordered_map<size_t, int> shared_hash){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
 
         int eval = evaluate(b);
@@ -67,10 +68,14 @@ int ply;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
 
-                Bitboards::make_move(b_copy, player, t_move);
-
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
+                Bitboards::make_move(b_copy, player, t_move);
+                size_t curr_hash = get_hash(b_copy);
+                if (shared_hash.count(curr_hash)){
+                    return shared_hash[curr_hash];
+                } 
+
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move, shared_hash);
                 ply--;
                 if (t_val > value){
                     value = t_val;
@@ -93,7 +98,13 @@ int ply;
                 b_copy = b;
                 ply++;
                 Bitboards::make_move(b_copy, player, t_move);
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
+
+                size_t curr_hash = get_hash(b_copy);
+                if (shared_hash.count(curr_hash)){
+                    return shared_hash[curr_hash];
+                } 
+
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move, shared_hash);
                 ply--;
                 if (t_val < value){
                     value = t_val;

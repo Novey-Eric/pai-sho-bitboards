@@ -100,7 +100,6 @@ namespace Paisho{
     void print_move_list(const Moves& mlist);
 
     namespace Bitboards{
-        
 
         constexpr Bitboard correct_color(int piece){
             switch(piece){
@@ -212,9 +211,8 @@ namespace Paisho{
         void make_harm_accent_boatmove(Board& b, int team, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap);
 
         void make_move(Board& b, int team, Move m);
-
         void find_harms(Board& b, int team);
-
+        size_t get_hash(const Board& b);
 
     } //namespace bitboards
 } //namespace Paisho

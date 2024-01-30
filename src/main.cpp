@@ -7,7 +7,6 @@
 #include"Bitboard.h"
 #include <chrono>
 #include <vector>
-
 using namespace std::chrono;
 using std::cout;
 using std::endl;
@@ -398,11 +397,12 @@ void test_abprune(){
     make_move(b, WHITE, a[1353]);
     cout<<"done making move"<<endl;
     Move bestmove;
-    auto start = high_resolution_clock::now();
-    int eval = ab_prune(b, 4, -99999, 99999, WHITE, bestmove);
-    auto after_mm = high_resolution_clock::now();
-    auto duration_mm = duration_cast<microseconds>(after_mm-start);
-    cout << "minimax duration: " << duration_mm.count() << endl;
+    print_board(b);
+    //auto start = high_resolution_clock::now();
+    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
+    //auto after_mm = high_resolution_clock::now();
+    //auto duration_mm = duration_cast<microseconds>(after_mm-start);
+    //cout << "minimax duration: " << duration_mm.count() << endl;
     cout<< "eval: " << eval << " found move: ";
     print_move(bestmove);
 
@@ -862,12 +862,12 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    //test_abprune();
+    test_abprune();
     //test_move_types();
     //comp_v_comp();
     //test_fail2();
     //test_fail3();
-    test_fail4();
+    //test_fail4();
     //test_fail1();
     //test_print_board();
     return 1;
