@@ -11,7 +11,6 @@ using namespace std;
 using namespace std::chrono;
 using namespace Bitboards;
 
-int ply;
     
     bool compare_moves(const Move& first, const Move& second){
         bool spec1 = (((first & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
@@ -34,16 +33,45 @@ int ply;
         
 
     }
+    int read_hash_entry(const HashTable& ht, size_t key, int alpha, int beta, int depth){
+        if(!ht.count(key))
+            return hf_nohash;
+
+        const HashEntry* he = &ht.at(key);
+        if (he->depth >= depth){
+            if(he->flag == hf_exact)
+                return he->val;
+            if(he->flag == hf_alpha && he->val <= alpha)
+                return alpha;
+            if(he->flag == hf_beta && he->val >= beta)
+                return beta;
+        }
+        return hf_nohash;
+    }
+
+    void write_hash_entry(HashTable& ht, size_t key, int score, int depth, int flag){
+        HashEntry he = {depth, flag, score};
+        ht[key] = he;
+
+    }
+
+
+int ply;
+HashTable shared_hash;
 
     //shared hash is used for checking duplicate positions.
-    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move, std::unordered_map<size_t, int> shared_hash){
+    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
+    //int read_hash_entry(const HashTable& ht, size_t key, int alpha, int beta, int depth){
+        int score;
+        size_t curr_hash = get_hash(b);
+        if ((score = read_hash_entry(shared_hash, curr_hash, alpha, beta, depth)) != hf_nohash){
+            return score;
+        }
 
         int eval = evaluate(b);
         if (depth <= 0 || std::abs(eval) >= 999999){
             eval += depth;
-            //cout << "eval dur: " << dur_eval.count() << endl;
-            //std::cout<<"eval: "<<eval<<std::endl;
             return eval;
         }
         Board b_copy;
@@ -67,22 +95,20 @@ int ply;
                 b_copy = b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
-
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 Bitboards::make_move(b_copy, player, t_move);
-                size_t curr_hash = get_hash(b_copy);
-                if (shared_hash.count(curr_hash)){
-                    return shared_hash[curr_hash];
-                } 
 
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move, shared_hash);
+
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
                 ply--;
                 if (t_val > value){
                     value = t_val;
                     best_move = t_move;
                 }
-                if (value > beta)
-                    break;
+                if (value > beta){
+                    write_hash_entry(shared_hash, curr_hash, value, depth, hf_beta);
+                    return beta;
+                }
                 alpha = std::max(alpha, value);
             }
 
@@ -98,20 +124,16 @@ int ply;
                 b_copy = b;
                 ply++;
                 Bitboards::make_move(b_copy, player, t_move);
-
-                size_t curr_hash = get_hash(b_copy);
-                if (shared_hash.count(curr_hash)){
-                    return shared_hash[curr_hash];
-                } 
-
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move, shared_hash);
+                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
                 ply--;
                 if (t_val < value){
                     value = t_val;
                     best_move = t_move;
                 }
-                if (value < alpha)
-                    break;
+                if (value < alpha){
+                    write_hash_entry(shared_hash, curr_hash, value, depth, hf_alpha);
+                    return alpha;
+                }
                 beta = std::min(beta, value);
             }
         }
