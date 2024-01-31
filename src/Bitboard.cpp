@@ -363,8 +363,8 @@ namespace Paisho{
                     if (t_row == row || t_col == col){ //if piece is already lined up with the harmonizing piece. Remove that from the board
                         harm_board &= ~col_map[t_col] & ~row_map[t_row];
                     }
-                harm_pieces.reset(t_harm_p);
-                t_harm_p = get_lsb(harm_pieces);
+                    harm_pieces.reset(t_harm_p);
+                    t_harm_p = get_lsb(harm_pieces);
                 }
             } 
             return harm_board;
@@ -655,7 +655,6 @@ namespace Paisho{
             Bitboard harm_pieces = get_harm_pieces(b, team, bbflowerpiece);
             for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
                 if (w3_copy[t_src]){
-                //while (t_src != -1){ //First look at quiet moves only
                     Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
                     t_dests = mask_move_ptr(t_src) & \
                               updated_harm & \
@@ -767,9 +766,11 @@ namespace Paisho{
             //Go through each piece and generate moves for it
             int t_src = get_lsb(w3_copy);
             Bitboard t_dests;
+            Bitboard harm_pieces = get_harm_pieces(b, team, bbflowerpiece);
             while (t_src != -1){ //square piece is being moved from
+                Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
                 t_dests = mask_move_ptr(t_src) & \
-                          harm_board & \
+                          updated_harm & \
                           correct_color(bbflowerpiece) & \
                           ~b.otherBoards[Accents] & \
                           (~team_board[allflowers] | cap_board);
@@ -1278,15 +1279,27 @@ namespace Paisho{
             boost::hash_combine(ret, b.ww3);
             boost::hash_combine(ret, b.ww4);
             boost::hash_combine(ret, b.ww5);
+            boost::hash_combine(ret, b.br3);
+            boost::hash_combine(ret, b.br4);
+            boost::hash_combine(ret, b.br5);
+            boost::hash_combine(ret, b.wr3);
+            boost::hash_combine(ret, b.wr4);
+            boost::hash_combine(ret, b.wr5);
+            boost::hash_combine(ret, b.whiteAccents);
+            boost::hash_combine(ret, b.blackAccents);
+            
             boost::hash_combine(ret, b.bo);
             boost::hash_combine(ret, b.bl);
             boost::hash_combine(ret, b.wo);
             boost::hash_combine(ret, b.wl);
             boost::hash_combine(ret, b.wwild);
             boost::hash_combine(ret, b.bwild);
-            boost::hash_combine(ret, b.blackAccents);
-            boost::hash_combine(ret, b.whiteAccents);
             boost::hash_combine(ret, b.whiteToMove);
+            std::hash<Bitboard> hf;
+            for (int i = 0; i < NUM_BOARDS; i++){
+                boost::hash_combine(ret, hf(b.whiteBoards[i]));
+                boost::hash_combine(ret, hf(b.blackBoards[i]));
+            }
             return ret;
         }
         
