@@ -3,7 +3,9 @@
 #include <chrono>
 #include <iostream>
 #include <cmath>
-
+#include <mutex>
+#include <thread>
+#include <functional>
 
 namespace Paisho{
 
@@ -30,9 +32,8 @@ using namespace Bitboards;
             );
 */
         return (spec1);
-        
-
     }
+
     int read_hash_entry(const HashTable& ht, size_t key, int alpha, int beta, int depth){
         if(!ht.count(key))
             return hf_nohash;
@@ -52,27 +53,35 @@ using namespace Bitboards;
     void write_hash_entry(HashTable& ht, size_t key, int score, int depth, int flag){
         HashEntry he = {depth, flag, score};
         ht[key] = he;
-
     }
 
 
 int ply;
-HashTable shared_hash;
+std::mutex hash_mtx;
+std::mutex move_mtx;
+
+
 
     //shared hash is used for checking duplicate positions.
-    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& best_move){
+    void ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move* best_move, HashTable * shared_hash, int& eval_ret){
         //int p_mult = player ? -1 : 1; //WHITEs enum value is 0
     //int read_hash_entry(const HashTable& ht, size_t key, int alpha, int beta, int depth){
         int score;
         size_t curr_hash = get_hash(b);
-        if ((score = read_hash_entry(shared_hash, curr_hash, alpha, beta, depth)) != hf_nohash){
-            return score;
+        hash_mtx.lock();
+        score = read_hash_entry(*shared_hash, curr_hash, alpha, beta, depth);
+        hash_mtx.unlock();
+        if (score != hf_nohash){
+            //return score;
+            eval_ret = score;
+            return;
         }
 
         int eval = evaluate(b);
         if (depth <= 0 || std::abs(eval) >= 999999){
             eval += depth;
-            return eval;
+            eval_ret = eval;
+            return;
         }
         Board b_copy;
         int value;
@@ -84,6 +93,7 @@ HashTable shared_hash;
             value = -9999999;
 
             curr_moves = Bitboards::get_moves(b, WHITE);
+            std::random_shuffle(curr_moves.begin(), curr_moves.end());
             if(!curr_moves.size())
                 value = 0;
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
@@ -98,16 +108,21 @@ HashTable shared_hash;
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 Bitboards::make_move(b_copy, player, t_move);
 
-
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
+                int t_val;
+                ab_prune(b_copy, depth-1, alpha, beta, BLACK, &out_move, shared_hash, t_val);
                 ply--;
                 if (t_val > value){
                     value = t_val;
-                    best_move = t_move;
+                    move_mtx.lock();
+                    *best_move = t_move;
+                    move_mtx.unlock();
                 }
                 if (value > beta){
-                    write_hash_entry(shared_hash, curr_hash, value, depth, hf_beta);
-                    return beta;
+                    hash_mtx.lock();
+                    write_hash_entry(*shared_hash, curr_hash, value, depth, hf_beta);
+                    hash_mtx.unlock();
+                    eval_ret = beta;
+                    return;
                 }
                 alpha = std::max(alpha, value);
             }
@@ -115,6 +130,7 @@ HashTable shared_hash;
         } else{
             value = 9999999;
             curr_moves = Bitboards::get_moves(b, BLACK);
+            std::random_shuffle(curr_moves.begin(), curr_moves.end());
             if(!curr_moves.size())
                 value = 0;
             //curr_moves.sort();
@@ -124,22 +140,52 @@ HashTable shared_hash;
                 b_copy = b;
                 ply++;
                 Bitboards::make_move(b_copy, player, t_move);
-                int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
+                int t_val;
+                ab_prune(b_copy, depth-1, alpha, beta, WHITE, &out_move, shared_hash, t_val);
                 ply--;
                 if (t_val < value){
                     value = t_val;
-                    best_move = t_move;
+                    move_mtx.lock();
+                    *best_move = t_move;
+                    move_mtx.unlock();
                 }
                 if (value < alpha){
-                    write_hash_entry(shared_hash, curr_hash, value, depth, hf_alpha);
-                    return alpha;
+                    hash_mtx.lock();
+                    write_hash_entry(*shared_hash, curr_hash, value, depth, hf_alpha);
+                    hash_mtx.unlock();
+                    eval_ret = alpha;
+                    return;
                 }
                 beta = std::min(beta, value);
             }
         }
-        return value;
+        eval_ret = value;
+        return;
+        //return value;
     }
 
+
+    int prune_helper(const Board& b, int depth, int player, Move& best_move){
+        HashTable shared_hash;
+        int num_threads = 8;
+        std::thread t_arr[num_threads];
+        int eval_arr[num_threads];
+        Move move_arr[num_threads];
+        for(int i = 0; i < num_threads; i++){
+            t_arr[i] = std::thread(std::cref(ab_prune), b, depth, -99999, 99999, player, &move_arr[i], &shared_hash, std::ref(eval_arr[i]));
+        }
+        for (int i = 0; i < num_threads; i++){
+            t_arr[i].join();
+        }
+        int t_score = -99999;
+        for(int i = 0; i < num_threads; i++){
+            if(eval_arr[i] > t_score){
+                t_score = eval_arr[i];
+                best_move = move_arr[i];
+            }
+        }
+        return t_score;
+    }
     
 /*
     int minimax(Board *b, int depth, int player, Move *best_move){

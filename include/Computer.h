@@ -41,8 +41,9 @@ namespace Paisho{
     int minimax(const Board& b, int depth, int player, Move& eval);
     int negamax(const Board& b, int depth, int player, Move& eval);
     int ab_prune_neg(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
-    int ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move& eval);
+    void ab_prune(const Board& b, int depth, int alpha, int beta, int player, Move* eval, HashTable * shared_hash, int& eval_score);
     //void order_moves(const Moves& in, Moves& out);
+    int prune_helper(const Board& b, int depth, int player, Move& best_move);
     void order_moves(Moves& in);
     int evaluate(const Board& b);
 

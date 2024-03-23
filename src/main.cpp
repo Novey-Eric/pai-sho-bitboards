@@ -381,28 +381,12 @@ void test_abprune(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
-
     update_harms_clash(b);
     Moves a = get_moves(b, WHITE);
-    cout<<"move count "<< a.size()<<endl;
-    //pretty(b.otherBoards[AllPieces]);
-
-    cout<<"making move"<<endl;
     make_move(b, WHITE, a[1353]);
-    cout<<"done making move"<<endl;
     Move bestmove;
     print_board(b);
-    //auto start = high_resolution_clock::now();
-    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
-    //auto after_mm = high_resolution_clock::now();
-    //auto duration_mm = duration_cast<microseconds>(after_mm-start);
-    //cout << "minimax duration: " << duration_mm.count() << endl;
+    int eval = prune_helper(b, 3, WHITE, bestmove);
     cout<< "eval: " << eval << " found move: ";
     print_move(bestmove);
 
@@ -559,7 +543,8 @@ void comp_v_comp(){
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
         std::cout<<"num moves: "<<get_moves(b, player).size() << std::endl;
-        int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
+        //int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
+        int eval = prune_helper(b, 2, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
         print_move(bestmove);
@@ -625,7 +610,8 @@ void test_fail1(){
     //print_move_list(a);
 
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
+    //int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
+    int eval = prune_helper(b, 3, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
