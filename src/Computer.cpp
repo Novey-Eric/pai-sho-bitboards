@@ -67,7 +67,7 @@ int ply;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
 
-                Bitboards::make_move(b_copy.whiteBoard, t_move);
+                Bitboards::make_move(b_copy, WHITE, t_move);
 
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
@@ -92,7 +92,7 @@ int ply;
             for(auto t_move : curr_moves){
                 b_copy = b;
                 ply++;
-                Bitboards::make_move(b_copy.blackBoard, t_move);
+                Bitboards::make_move(b_copy, BLACK, t_move);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
                 ply--;
                 if (t_val < value){

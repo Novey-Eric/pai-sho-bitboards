@@ -211,7 +211,7 @@ namespace Paisho{
         void make_harm_accent_move(TeamBoard& b, int piece, int src, int dst, int auxpiece, int auxsq, bool cap);
         void make_harm_accent_boatmove(TeamBoard& b, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap);
 
-        void make_move(TeamBoard& b, Move m);
+        void make_move(Board& b, int team, Move m);
 
         void find_harms(TeamBoard& b);
 

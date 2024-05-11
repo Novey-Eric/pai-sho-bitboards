@@ -172,7 +172,7 @@ void test_wheel(){
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 }
 void test_wheel2(){
@@ -207,7 +207,7 @@ void test_wheel2(){
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[125]);
+    make_move(b, WHITE, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -244,7 +244,7 @@ void test_boat(){
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[159]);
+    make_move(b, WHITE, a[159]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -283,7 +283,7 @@ void test_harm_clashes(){
     //pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
     pretty(b.whiteBoard.boards[harmw3]);
-    make_move(b.whiteBoard, a[159]);
+    make_move(b, WHITE, a[159]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
     pretty(b.whiteBoard.boards[allflowers]);
@@ -334,7 +334,7 @@ void test_total_harms(){
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[2298]);
+    make_move(b, WHITE, a[2298]);
     Move tm = a[2298];
     cout<< tm.fields.piece << endl;
     cout<< w3<< endl;
@@ -394,7 +394,7 @@ void test_abprune(){
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[1353]);
+    make_move(b, WHITE, a[1353]);
     cout<<"done making move"<<endl;
     Move bestmove;
     auto start = high_resolution_clock::now();
@@ -448,7 +448,7 @@ void test_minimax(){
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b.whiteBoard, a[1353]);
+    make_move(b, WHITE, a[1353]);
     Move bestmove;
     auto start = high_resolution_clock::now();
     Move t = minimax(b, 2.whiteBoard, bestmove);
@@ -501,7 +501,7 @@ void test_move_types(){
     cout<<"harm w3 before"<<endl;
     pretty(b.whiteBoard.boards[harmw3]);
     cout<<"making move K9-I10+B I10-H10"<<endl;
-    make_move(b.whiteBoard, a[2902]);
+    make_move(b, WHITE, a[2902]);
     //2806: K9-I10+B I10-H10
     
     cout<<"all tiles"<<endl;
@@ -509,7 +509,7 @@ void test_move_types(){
 
     Moves c = get_moves(b.whiteBoard);
     //print_move_list(c);
-    make_move(b.whiteBoard, c[10]);
+    make_move(b, WHITE, c[10]);
     pretty(b.otherBoards[AllPieces]);
     
     
@@ -557,7 +557,7 @@ void comp_v_comp(){
         Move bestmove;
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
-        std::cout<<"num moves: "<<get_moves(b, player).size() << std::endl;
+        std::cout<<"num moves: "<< get_moves(b.blackBoard).size() << std::endl;
         int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
@@ -616,7 +616,7 @@ void test_fail1(){
     Moves a = get_moves(b.whiteBoard);
     //print_move_list(a);
     print_move(a[57]);
-    make_move(b.whiteBoard, a[57]);
+    make_move(b, WHITE, a[57]);
     pretty(b.whiteBoard.boards[allflowers]);
     
     Move bestmove;
@@ -624,7 +624,7 @@ void test_fail1(){
     //print_move_list(a);
 
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(b, 3, -99999, 99999.whiteBoard, bestmove);
+    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
@@ -635,7 +635,7 @@ void test_fail1(){
     pretty(b.otherBoards[AllPieces]);
     //pretty(b.whiteBoard.boards[w3]);
     //pretty(b.whiteBoard.boards[w4]);
-    make_move(b.whiteBoard, bestmove);
+    make_move(b, WHITE, bestmove);
     //bestmove.bits = 0;
     pretty(b.otherBoards[AllPieces]);
 
@@ -675,11 +675,11 @@ void test_fail2(){
 
     update_harms_clash(b);
     pretty(b.otherBoards[AllPieces]);
-    make_move(b.whiteBoard, Move{.bits = 5369873843});
+    make_move(b, WHITE, Move{.bits = 5369873843});
     pretty(b.otherBoards[AllPieces]);
-    make_move(b.whiteBoard, Move{.bits = 2152458530});
+    make_move(b, WHITE, Move{.bits = 2152458530});
     pretty(b.otherBoards[AllPieces]);
-    make_move(b.whiteBoard, Move{.bits = 36511465602});
+    make_move(b, WHITE, Move{.bits = 36511465602});
     Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     print_board(b);
@@ -722,19 +722,19 @@ void test_fail3(){
     b.whiteBoard.l=1;
 
     update_harms_clash(b);
-    make_move(b.whiteBoard, Move{.bits = 5369873843});
-    make_move(b.whiteBoard, Move{.bits = 2152458530});
-    make_move(b.whiteBoard, Move{.bits = 36511465602});
+    make_move(b, WHITE, Move{.bits = 5369873843});
+    make_move(b, WHITE, Move{.bits = 2152458530});
+    make_move(b, WHITE, Move{.bits = 36511465602});
     Moves a = get_moves(b.whiteBoard);
-    make_move(b.whiteBoard, Move{.bits = 4661344});
-    make_move(b.whiteBoard, Move{.bits = 1583328});
-    make_move(b.whiteBoard, Move{.bits = 493008});
-    make_move(b.whiteBoard, Move{.bits = 5383664});
-    make_move(b.whiteBoard, Move{.bits = 5794064});
-    make_move(b.whiteBoard, Move{.bits = 6220848});
-    make_move(b.whiteBoard, Move{.bits = 2001936});
+    make_move(b, WHITE, Move{.bits = 4661344});
+    make_move(b, WHITE, Move{.bits = 1583328});
+    make_move(b, WHITE, Move{.bits = 493008});
+    make_move(b, WHITE, Move{.bits = 5383664});
+    make_move(b, WHITE, Move{.bits = 5794064});
+    make_move(b, WHITE, Move{.bits = 6220848});
+    make_move(b, WHITE, Move{.bits = 2001936});
     print_board(b);
-    make_move(b.whiteBoard, Move{.bits = 75368211346});
+    make_move(b, WHITE, Move{.bits = 75368211346});
 
     a = get_moves(b.whiteBoard);
     //print_move_list(a);
@@ -801,7 +801,7 @@ void test_fail4(){
                                 Move {.bits = 30124328}};
     for(Move m : moves){
         print_move(m);
-        make_move(b.blackBoard, m);
+        make_move(b, BLACK, m);
         print_board(b);
     }
     
@@ -847,16 +847,16 @@ void test_print_board(){
     //cout << "sizeof move" << sizeof(Move) << endl;
     Move m1 = {.bits = 5369873843};
     print_move(m1);
-    make_move(b.whiteBoard, m1);
+    make_move(b, WHITE, m1);
     print_board(b);
 
     Move m2 = {.bits = 2152458530};
     print_move(m2);
-    make_move(b.whiteBoard, m2);
+    make_move(b, WHITE, m2);
     print_board(b);
     Move m3 = {.bits = 36511465602};
     print_move(m3);
-    make_move(b.whiteBoard, m3);
+    make_move(b, WHITE, m3);
     print_board(b);
 /*
     Moves a = get_moves(b.whiteBoard);
