@@ -7,6 +7,7 @@
 #include"Bitboard.h"
 #include <chrono>
 #include <vector>
+
 using namespace std::chrono;
 using std::cout;
 using std::endl;
@@ -105,16 +106,16 @@ void test_gen_moves(){
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
     pretty(w3b);
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
     pretty(w3h);
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
-    b.whiteBoards[allflowers] = w3b;
+    b.whiteBoard.boards[w3]=w3b;
+    b.whiteBoard.boards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -122,13 +123,13 @@ void test_gen_moves(){
 
     b.otherBoards[AllPieces]= waccent | w3b | w3h;
 
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
     
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     cout<<"move count "<< a.size()<<endl;
-    cout<<"first move in hex: " << std::hex << a[0] << endl;
+    cout<<"first move in hex: " << std::hex << a[0].bits << endl;
     print_move(a[0]);
     cout << std::dec<<endl;
     print_move_list(a);
@@ -145,15 +146,15 @@ void test_wheel(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
-    b.whiteBoards[allflowers] = w3b;
+    b.whiteBoard.boards[w3]=w3b;
+    b.whiteBoard.boards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -162,18 +163,17 @@ void test_wheel(){
     b.otherBoards[AllPieces]= waccent | w3b;
     b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
 
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
 
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a[125]);
+    make_move(b.whiteBoard, a[125]);
     pretty(b.otherBoards[AllPieces]);
-
 }
 void test_wheel2(){
     
@@ -181,15 +181,15 @@ void test_wheel2(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
-    b.whiteBoards[allflowers] = w3b;
+    b.whiteBoard.boards[w3]=w3b;
+    b.whiteBoard.boards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -198,16 +198,16 @@ void test_wheel2(){
     b.otherBoards[AllPieces]= waccent | w3b;
     b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
 
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
 
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a[125]);
+    make_move(b.whiteBoard, a[125]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -218,15 +218,15 @@ void test_boat(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
-    b.whiteBoards[allflowers] = w3b;
+    b.whiteBoard.boards[w3]=w3b;
+    b.whiteBoard.boards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -235,16 +235,16 @@ void test_boat(){
     b.otherBoards[AllPieces]= waccent | w3b;
     b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
 
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
 
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a[159]);
+    make_move(b.whiteBoard, a[159]);
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -256,15 +256,15 @@ void test_harm_clashes(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
-    b.whiteBoards[allflowers] = w3b;
+    b.whiteBoard.boards[w3]=w3b;
+    b.whiteBoard.boards[allflowers] = w3b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -273,24 +273,24 @@ void test_harm_clashes(){
     b.otherBoards[AllPieces]= waccent | w3b;
     b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
 
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
 
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
     cout<<"making move"<<endl;
-    pretty(b.whiteBoards[harmw3]);
-    make_move(b, WHITE, a[159]);
+    pretty(b.whiteBoard.boards[harmw3]);
+    make_move(b.whiteBoard, a[159]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
-    pretty(b.whiteBoards[allflowers]);
+    pretty(b.whiteBoard.boards[allflowers]);
     cout<<"printing all pieces"<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<"printing harmw3"<<endl;
-    pretty(b.whiteBoards[harmw3]);
+    pretty(b.whiteBoard.boards[harmw3]);
     cout<<"printing clashr3"<<endl;
     //pretty(b.otherBoards[clashr3]);
     //cout<<evaluate(b)<<endl;
@@ -304,17 +304,17 @@ void test_total_harms(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -323,32 +323,32 @@ void test_total_harms(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
 
     Paisho::Bitboards::update_harms_clash(b);
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a[2298]);
+    make_move(b.whiteBoard, a[2298]);
     Move tm = a[2298];
-    cout<< ((tm & MOVE_PIECE_MASK)>>MOVE_PIECE_OFFSET) << endl;
+    cout<< tm.fields.piece << endl;
     cout<< w3<< endl;
     cout<<"printing w3 "<< endl;
-    pretty(b.whiteBoards[w3]);
+    pretty(b.whiteBoard.boards[w3]);
     cout<<"printing harmw3 "<< endl;
-    pretty(b.whiteBoards[harmw3]);
+    pretty(b.whiteBoard.boards[harmw3]);
     cout<<"printing w4 "<< endl;
-    pretty(b.whiteBoards[w4]);
+    pretty(b.whiteBoard.boards[w4]);
     cout<<"printing harmw4 "<< endl;
-    pretty(b.whiteBoards[harmw4]);
+    pretty(b.whiteBoard.boards[harmw4]);
     //pretty(b.otherBoards[AllPieces]);
     cout<<"PRINTING ALL white FLOWERS"<<endl;
-    pretty(b.whiteBoards[allflowers]);
+    pretty(b.whiteBoard.boards[allflowers]);
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
     cout<<evaluate(b)<<endl;
@@ -362,17 +362,17 @@ void test_abprune(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -381,12 +381,27 @@ void test_abprune(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
+
     update_harms_clash(b);
-    Moves a = get_moves(b, WHITE);
-    make_move(b, WHITE, a[1353]);
+    Moves a = get_moves(b.whiteBoard);
+    cout<<"move count "<< a.size()<<endl;
+    //pretty(b.otherBoards[AllPieces]);
+
+    cout<<"making move"<<endl;
+    make_move(b.whiteBoard, a[1353]);
+    cout<<"done making move"<<endl;
     Move bestmove;
-    print_board(b);
-    int eval = prune_helper(b, 3, WHITE, bestmove);
+    auto start = high_resolution_clock::now();
+    int eval = ab_prune(b, 4, -99999, 99999, WHITE, bestmove);
+    auto after_mm = high_resolution_clock::now();
+    auto duration_mm = duration_cast<microseconds>(after_mm-start);
+    cout << "minimax duration: " << duration_mm.count() << endl;
     cout<< "eval: " << eval << " found move: ";
     print_move(bestmove);
 
@@ -400,17 +415,17 @@ void test_minimax(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -419,29 +434,29 @@ void test_minimax(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
 
     update_harms_clash(b);
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     //print_move_list(a);
     cout<<"move count "<< a.size()<<endl;
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    make_move(b, WHITE, a[1353]);
+    make_move(b.whiteBoard, a[1353]);
     Move bestmove;
     auto start = high_resolution_clock::now();
-    Move t = minimax(b, 2, WHITE, bestmove);
+    Move t = minimax(b, 2.whiteBoard, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
 
-    Move t2 = negamax(b, 2, WHITE, bestmove);
+    Move t2 = negamax(b, 2.whiteBoard, bestmove);
     auto after_nm = high_resolution_clock::now();
     auto duration_nm = duration_cast<microseconds>(after_nm-after_mm);
     cout << "negamax duration: " << duration_nm.count() << endl;
@@ -454,17 +469,17 @@ void test_move_types(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -473,28 +488,28 @@ void test_move_types(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.wo=true;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.whiteBoard.o=true;
 
     update_harms_clash(b);
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     pretty(b.otherBoards[AllPieces]);
 
     cout<<"harm w3 before"<<endl;
-    pretty(b.whiteBoards[harmw3]);
+    pretty(b.whiteBoard.boards[harmw3]);
     cout<<"making move K9-I10+B I10-H10"<<endl;
-    make_move(b, WHITE, a[2902]);
+    make_move(b.whiteBoard, a[2902]);
     //2806: K9-I10+B I10-H10
     
     cout<<"all tiles"<<endl;
     pretty(b.otherBoards[AllPieces]);
 
-    Moves c = get_moves(b, WHITE);
+    Moves c = get_moves(b.whiteBoard);
     //print_move_list(c);
-    make_move(b, WHITE, c[10]);
+    make_move(b.whiteBoard, c[10]);
     pretty(b.otherBoards[AllPieces]);
     
     
@@ -506,17 +521,17 @@ void comp_v_comp(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -525,14 +540,14 @@ void comp_v_comp(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=3;
-    b.bw4=3;
-    b.bw5=3;
-    b.bl=1;
-    b.bo=1;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=3;
+    b.blackBoard.w4=3;
+    b.blackBoard.w5=3;
+    b.blackBoard.l=1;
+    b.blackBoard.o=1;
 
     std::vector<Move> moves;
 
@@ -543,19 +558,18 @@ void comp_v_comp(){
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
         std::cout<<"num moves: "<<get_moves(b, player).size() << std::endl;
-        //int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
-        int eval = prune_helper(b, 2, player, bestmove);
+        int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
         print_move(bestmove);
         make_move(b, player, bestmove);
         cout<< "moves list: ";
         for (Move move: moves){
-            cout<<move<<", ";
+            cout<<move.bits<<", ";
         }
         cout << endl;
         cout<< "black harms: ";
-        for (auto it : b.black_harm_pairs){
+        for (auto it : b.blackBoard.harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
         cout<<endl;
@@ -572,17 +586,17 @@ void test_fail1(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) ;//| (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 0};
 
     Bitboard w3h(1);
     w3h <<= i9;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -591,27 +605,26 @@ void test_fail1(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
 
     //update_harms_clash(b);
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     //print_move_list(a);
     print_move(a[57]);
-    make_move(b, WHITE, a[57]);
-    pretty(b.whiteBoards[allflowers]);
+    make_move(b.whiteBoard, a[57]);
+    pretty(b.whiteBoard.boards[allflowers]);
     
     Move bestmove;
-    //Moves a = get_moves(b, WHITE);
+    //Moves a = get_moves(b.whiteBoard);
     //print_move_list(a);
 
     auto start = high_resolution_clock::now();
-    //int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
-    int eval = prune_helper(b, 3, WHITE, bestmove);
+    int eval = ab_prune(b, 3, -99999, 99999.whiteBoard, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "prune duration: " << duration_mm.count() << endl;
@@ -620,10 +633,10 @@ void test_fail1(){
     print_move(bestmove);
     cout<<"before making move allpieces"<<endl;
     pretty(b.otherBoards[AllPieces]);
-    //pretty(b.whiteBoards[w3]);
-    //pretty(b.whiteBoards[w4]);
-    make_move(b, WHITE, bestmove);
-    bestmove = 0;
+    //pretty(b.whiteBoard.boards[w3]);
+    //pretty(b.whiteBoard.boards[w4]);
+    make_move(b.whiteBoard, bestmove);
+    //bestmove.bits = 0;
     pretty(b.otherBoards[AllPieces]);
 
 }
@@ -634,17 +647,17 @@ void test_fail2(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -653,21 +666,21 @@ void test_fail2(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
 
     update_harms_clash(b);
     pretty(b.otherBoards[AllPieces]);
-    make_move(b, WHITE, 5369873843);
+    make_move(b.whiteBoard, Move{.bits = 5369873843});
     pretty(b.otherBoards[AllPieces]);
-    make_move(b, WHITE, 2152458530);
+    make_move(b.whiteBoard, Move{.bits = 2152458530});
     pretty(b.otherBoards[AllPieces]);
-    make_move(b, WHITE, 36511465602);
-    Moves a = get_moves(b, WHITE);
+    make_move(b.whiteBoard, Move{.bits = 36511465602});
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     print_board(b);
     
@@ -679,17 +692,17 @@ void test_fail3(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -698,38 +711,38 @@ void test_fail3(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
-    b.bo=1;
-    b.wo=1;
-    b.wl=1;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
+    b.blackBoard.o=1;
+    b.whiteBoard.o=1;
+    b.whiteBoard.l=1;
 
     update_harms_clash(b);
-    make_move(b, WHITE, 5369873843);
-    make_move(b, WHITE, 2152458530);
-    make_move(b, WHITE, 36511465602);
-    Moves a = get_moves(b, WHITE);
-    make_move(b, WHITE, 4661344);
-    make_move(b, WHITE, 1583328);
-    make_move(b, WHITE, 493008);
-    make_move(b, WHITE, 5383664);
-    make_move(b, WHITE, 5794064);
-    make_move(b, WHITE, 6220848);
-    make_move(b, WHITE, 2001936);
+    make_move(b.whiteBoard, Move{.bits = 5369873843});
+    make_move(b.whiteBoard, Move{.bits = 2152458530});
+    make_move(b.whiteBoard, Move{.bits = 36511465602});
+    Moves a = get_moves(b.whiteBoard);
+    make_move(b.whiteBoard, Move{.bits = 4661344});
+    make_move(b.whiteBoard, Move{.bits = 1583328});
+    make_move(b.whiteBoard, Move{.bits = 493008});
+    make_move(b.whiteBoard, Move{.bits = 5383664});
+    make_move(b.whiteBoard, Move{.bits = 5794064});
+    make_move(b.whiteBoard, Move{.bits = 6220848});
+    make_move(b.whiteBoard, Move{.bits = 2001936});
     print_board(b);
-    make_move(b, WHITE, 75368211346);
+    make_move(b.whiteBoard, Move{.bits = 75368211346});
 
-    a = get_moves(b, WHITE);
+    a = get_moves(b.whiteBoard);
     //print_move_list(a);
-    print_move(75368211346);
+    print_move(Move{.bits = 75368211346});
     //cout<<a[1044]<<endl;
     print_board(b);
     cout<<evaluate(b)<<endl;
-    for (auto it : b.white_harm_pairs){
+    for (auto it : b.whiteBoard.harm_pairs){
         cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
     }
     cout<<"\n";
@@ -744,17 +757,17 @@ void test_fail4(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b= Board();
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -763,21 +776,32 @@ void test_fail4(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
-    b.bo=1;
-    b.wo=1;
-    b.wl=1;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
+    b.blackBoard.o=1;
+    b.whiteBoard.o=1;
+    b.whiteBoard.l=1;
 
     update_harms_clash(b);
-    std::array<Move,12> moves = {8388737, 8390785, 9545856, 8390785, 4196737, 4198785, 5409152, 41008892226, 26265984, 41043399042, 30558600, 30124328};
+    std::array<Move,12> moves = {Move {.bits = 8388737}, 
+                                Move {.bits = 8390785}, 
+                                Move {.bits = 9545856}, 
+                                Move {.bits = 8390785}, 
+                                Move {.bits = 4196737}, 
+                                Move {.bits = 4198785}, 
+                                Move {.bits = 5409152}, 
+                                Move {.bits = 41008892226}, 
+                                Move {.bits = 26265984}, 
+                                Move {.bits = 41043399042}, 
+                                Move {.bits = 30558600}, 
+                                Move {.bits = 30124328}};
     for(Move m : moves){
         print_move(m);
-        make_move(b, BLACK, m);
+        make_move(b.blackBoard, m);
         print_board(b);
     }
     
@@ -791,17 +815,17 @@ void test_print_board(){
     w3b <<= i6;
     w3b |= Bitboard(1)<<i8;
     w3b |= Bitboard(1)<<g6;
-    Board b={0};
-    b.whiteAccents = (1<<Rock) | (1<<Knotweed) | (1<<Wheel) | (1<<Boat);
+    Board b;
+    b.whiteBoard.accents = {1, 1, 1, 1};
 
     Bitboard w3h(1);
     w3h <<= i10;
-    b.whiteBoards[harmw4] = w3h;
+    b.whiteBoard.boards[harmw4] = w3h;
 
-    b.whiteBoards[w3]=w3b;
+    b.whiteBoard.boards[w3]=w3b;
     Bitboard w4b = Bitboard(1)<<k9;
-    b.whiteBoards[w4]=w4b;
-    b.whiteBoards[allflowers] = w3b | w4b;
+    b.whiteBoard.boards[w4]=w4b;
+    b.whiteBoard.boards[allflowers] = w3b | w4b;
 
     Bitboard waccent(1);
     waccent <<= e3;
@@ -810,30 +834,35 @@ void test_print_board(){
     b.otherBoards[AllPieces]= waccent | w3b | w4b;
     //b.otherBoards[AllPieces] |= (Bitboard(1)<<h5)<<EAST;
     
-    b.ww3=2;
-    b.ww4=1;
-    b.ww5=3;
-    b.bw3=2;
-    b.bw4=1;
-    b.bw5=3;
+    b.whiteBoard.w3=2;
+    b.whiteBoard.w4=1;
+    b.whiteBoard.w5=3;
+    b.blackBoard.w3=2;
+    b.blackBoard.w4=1;
+    b.blackBoard.w5=3;
 
     update_harms_clash(b);
     pretty(b.otherBoards[AllPieces]);
     print_board(b);
-    print_move(5369873843);
-    make_move(b, WHITE, 5369873843);
+    //cout << "sizeof move" << sizeof(Move) << endl;
+    Move m1 = {.bits = 5369873843};
+    print_move(m1);
+    make_move(b.whiteBoard, m1);
     print_board(b);
-    print_move(2152458530);
-    make_move(b, WHITE, 2152458530);
+
+    Move m2 = {.bits = 2152458530};
+    print_move(m2);
+    make_move(b.whiteBoard, m2);
     print_board(b);
-    print_move(36511465602);
-    make_move(b, WHITE, 36511465602);
+    Move m3 = {.bits = 36511465602};
+    print_move(m3);
+    make_move(b.whiteBoard, m3);
     print_board(b);
 /*
-    Moves a = get_moves(b, WHITE);
+    Moves a = get_moves(b.whiteBoard);
     print_move_list(a);
     pretty(b.otherBoards[AllPieces]);
-    pretty(b.whiteBoards[allflowers]);
+    pretty(b.whiteBoard.boards[allflowers]);
     pretty(b.blackBoards[allflowers]);
   */  
 }
@@ -848,13 +877,13 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    test_abprune();
+    //test_abprune();
     //test_move_types();
     //comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
     //test_fail1();
-    //test_print_board();
+    test_print_board();
     return 1;
 }

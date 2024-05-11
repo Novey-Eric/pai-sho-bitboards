@@ -13,39 +13,47 @@ using std::array;
 namespace Paisho{
 
     typedef struct {
-        //save how many are in each hand
-        int bw3=3;
-        int bw4=3;
-        int bw5=3;
-        int br3=3;
-        int br4=3;
-        int br5=3;
-        bool bo=true;
-        bool bl=true;
-        bool bwild=false;
-        char blackAccents=0;
+        int rocks;
+        int knotweeds;
+        int wheels;
+        int boats;
+        int total_accents() const { return (this->rocks + this->knotweeds + this->wheels + this->boats); }
+    } AccentTiles;
 
-        int ww3=3;
-        int ww4=3;
-        int ww5=3;
-        int wr3=3;
-        int wr4=3;
-        int wr5=3;
-        bool wo=true;
-        bool wl=true;
-        bool wwild=false;
-        char whiteAccents=0;
-        bool whiteToMove=true;
-    
-        std::deque<std::pair<int, int>> white_harm_pairs;
-        std::deque<std::pair<int, int>> black_harm_pairs;
+    typedef struct TeamBoard {
 
-        array<Bitboard, NUM_BOARDS> whiteBoards;
-        array<Bitboard, NUM_BOARDS> blackBoards;
+        int w3;
+        int w4;
+        int w5;
+        int r3;
+        int r4;
+        int r5;
+        bool o;
+        bool l;
+        bool wild;
+        AccentTiles accents;
+        std::deque<std::pair<int, int>> harm_pairs;
+        array<Bitboard, NUM_BOARDS> boards;
+        array<Bitboard, NUM_BOARDS> *oppsBoards;
+        array<Bitboard, NUM_OTHER_BOARDS> *otherBoards;
+
+    } TeamBoard;
+
+
+    typedef struct Board {
+        TeamBoard whiteBoard;
+        TeamBoard blackBoard;
 
         array<Bitboard, NUM_OTHER_BOARDS> otherBoards;
 
+        Board () {
+            this->whiteBoard.otherBoards = &this->otherBoards;
+            this->blackBoard.otherBoards = &this->otherBoards;
+            this->whiteBoard.oppsBoards = &this->blackBoard.boards;
+            this->blackBoard.oppsBoards = &this->whiteBoard.boards;
+        }
     } Board;
+
 
     enum OtherBoards: int{
         Accents,Rocks,Knotweeds,
@@ -69,14 +77,12 @@ namespace Paisho{
     //Set these like 1<<Rock or something
     enum Accent: int{
         Rock,
-        Rock2,
         Knotweed,
-        Knotweed2,
         Wheel,
-        Wheel2,
         Boat,
-        Boat2,
     };
+
+
 
     const std::string AccentStrings[] = {"R", "R", "K", "K", "W", "W", "B", "B"};
 
@@ -147,41 +153,23 @@ namespace Paisho{
     const std::string BlackPieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
     const std::string WhitePieceStrings[] = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
 
-    // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
-    // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
-    // Total 47 bits
-    #define MOVE_TYPE_OFFSET (0)
-    #define MOVE_CAPTURE_OFFSET (3)
-    #define MOVE_S1_OFFSET (4)
-    #define MOVE_S2_OFFSET (13)
-    #define MOVE_PIECE_OFFSET (22)
-    #define MOVE_AUXPIECE_OFFSET (25)
-    //Here you need to start using uint64_t
-    #define MOVE_S3_OFFSET (28)
-    #define MOVE_S4_OFFSET (37)
-    #define MOVE_BOATMOVE_OFFSET (46)
+    typedef union {
+        struct {
+            uint64_t move_type : 3;
+            uint64_t capture : 1;
+            uint64_t s1 : 9;
+            uint64_t s2 : 9;
+            uint64_t piece : 3;
+            uint64_t auxpiece : 3;
+            uint64_t s3 : 9;
+            uint64_t s4 : 9;
+            uint64_t boatmove : 1;
+        } fields;
+        uint64_t bits;
+    } Move;
 
-    constexpr uint64_t MOVE_TYPE_MASK = (((uint64_t) 0b111));
-    constexpr uint64_t MOVE_CAPTURE_MASK = (((uint64_t) 0b1) << MOVE_CAPTURE_OFFSET);
-    constexpr uint64_t MOVE_S1_MASK = (((uint64_t) 0b111111111) << MOVE_S1_OFFSET);
-    constexpr uint64_t MOVE_S2_MASK = (((uint64_t) 0b111111111) << MOVE_S2_OFFSET);
-    constexpr uint64_t MOVE_PIECE_MASK = (((uint64_t) 0b111) << MOVE_PIECE_OFFSET);
-    constexpr uint64_t MOVE_AUXPIECE_MASK = (((uint64_t) 0b111) << MOVE_AUXPIECE_OFFSET);
-    constexpr uint64_t MOVE_S3_MASK = (((uint64_t) 0b111111111) << MOVE_S3_OFFSET);
-    constexpr uint64_t MOVE_S4_MASK = (((uint64_t) 0b111111111) << MOVE_S4_OFFSET);
-    constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
-    typedef uint64_t Move;
-
-    
-    //typedef cuda::std::vector<Move> Moves;
     typedef std::deque<Move> Moves;
-  //  #define MOVELIST_LEN (8000)
-/*
-    typedef struct {
-        Move movelist[MOVELIST_LEN];
-        int move_count;
-    } Moves;
-*/
+
 }//Paisho
 
 
