@@ -435,7 +435,7 @@ namespace Paisho{
                               ~(*b.otherBoards).at(Accents) & \
                               updated_harm & \
                               correct_color(bbflowerpiece) & \
-                              (~b.boards.at(allflowers) | cap_board);
+                              (~(b.boards.at(allflowers)) | cap_board);
 
                     //int t_dest = get_lsb(t_dests);
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
@@ -738,9 +738,9 @@ namespace Paisho{
 
             for (int i = 0; i < 8; i++){
                 get_flower_moves(b, piece_list[i], move_list);
-                get_harmony_place_moves(b, piece_list[i], move_list);
-                get_harmony_accent_moves(b, piece_list[i], move_list);
-                get_boat_flower_moves(b, piece_list[i], move_list);
+                //get_harmony_place_moves(b, piece_list[i], move_list);
+                //get_harmony_accent_moves(b, piece_list[i], move_list);
+                //get_boat_flower_moves(b, piece_list[i], move_list);
                 //get harmony boat moves
             }
             get_place_moves(b, move_list);
@@ -757,7 +757,6 @@ namespace Paisho{
         }
 
         void make_place_move(TeamBoard& b, int piece, int square){
-            Bitboard *team_board = &b.boards.at(0);
             switch(piece){
                 case w3:
                     b.w3--;
@@ -788,9 +787,8 @@ namespace Paisho{
             
             //Set all pieces board, set team board
             (*b.otherBoards).at(AllPieces).set(square);
-            team_board[allflowers].set(square);
-            team_board[piece].set(square);
-            
+            b.boards[allflowers].set(square);
+            b.boards[piece].set(square);            
         }
 
         void make_move_move(TeamBoard& b, int piece, int src, int dst, bool cap){
@@ -907,27 +905,27 @@ namespace Paisho{
         }
 
         void make_move(Board& b, int team, Move m){
-            TeamBoard teamboard;
+            TeamBoard *teamboard;
             if (team == WHITE)
-                teamboard = b.whiteBoard;
+                teamboard = &b.whiteBoard;
             else
-                teamboard = b.blackBoard;
+                teamboard = &b.blackBoard;
 
             if (m.fields.move_type == MOVE){
                 //std::cout<<"in move"<< std::endl;
-                make_move_move(teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.capture);
+                make_move_move(*teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.capture);
             }else if(m.fields.move_type == PLACE){
                 //std::cout<<"place"<< std::endl;
-                make_place_move(teamboard, m.fields.piece, m.fields.s1);
+                make_place_move(*teamboard, m.fields.piece, m.fields.s1);
             }else if(m.fields.move_type == HARMPLACE){
                 //std::cout<<"harmplace"<< std::endl;
-                make_harm_place_move(teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.auxpiece, m.fields.s3, m.fields.capture);
+                make_harm_place_move(*teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.auxpiece, m.fields.s3, m.fields.capture);
             }else if(m.fields.move_type == HARMACCENT && !m.fields.boatmove){
                 //std::cout<<"harmacc"<< std::endl;
-                make_harm_accent_move(teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.auxpiece, m.fields.s3, m.fields.capture);
+                make_harm_accent_move(*teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.auxpiece, m.fields.s3, m.fields.capture);
             }else if(m.fields.move_type == HARMACCENT && m.fields.boatmove){
                 //std::cout<<"harmacc boatmove"<< std::endl;
-                make_harm_accent_boatmove(teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.s3, m.fields.s4, m.fields.capture);
+                make_harm_accent_boatmove(*teamboard, m.fields.piece, m.fields.s1, m.fields.s2, m.fields.s3, m.fields.s4, m.fields.capture);
             }
             update_harms_clash(b);
         }
@@ -1017,7 +1015,6 @@ namespace Paisho{
                         }
                         if (!found){
                             b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-                            std::cout << "pushing1" << std::endl;
                         }
                     }
                         
@@ -1041,7 +1038,6 @@ namespace Paisho{
                             } 
                         }
                         if (!found){
-                            std::cout << "pushing2" << std::endl;
                             b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
                         }
                     }
@@ -1065,7 +1061,6 @@ namespace Paisho{
                         }
                         if (!found){
                             b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-                            std::cout << "pushing3" << std::endl;
 
                         }
                     }
@@ -1090,7 +1085,6 @@ namespace Paisho{
                         }
                         if (!found){
                             b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-                            std::cout << "pushing4" << std::endl;
 
                         }
                     }

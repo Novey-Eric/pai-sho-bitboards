@@ -31,7 +31,7 @@ namespace Paisho{
         bool o;
         bool l;
         bool wild;
-        AccentTiles accents;
+        AccentTiles accents = {0};
         std::deque<std::pair<int, int>> harm_pairs;
         array<Bitboard, NUM_BOARDS> boards;
         array<Bitboard, NUM_BOARDS> *oppsBoards;

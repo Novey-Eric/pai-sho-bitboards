@@ -62,7 +62,7 @@ int ply;
 
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
-            print_move_list(curr_moves);
+            //print_move_list(curr_moves);
             for(Move t_move : curr_moves){
                 //Paisho::print_move(t_move);
                 //std::cerr << std::hex << t_move.bits << std::endl;
@@ -70,10 +70,7 @@ int ply;
                 b_copy = b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
-                
                 Bitboards::make_move(b_copy, WHITE, t_move);
-
-                //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
                 ply--;
                 if (t_val > value){
@@ -274,14 +271,12 @@ int ply;
             score += b.boards[i].count()*piece_onboard_score(i);
             score += (b.boards[i] & ~Gates).count()*40; //has it moved out of the gate
         }
-        
 
         //black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
         score += (b.wild)*400;
 
         int accent_hand_weight = 100;
         score += b.accents.total_accents()*accent_hand_weight;
-
         //int center = i9;
         //check for harmonizing pieces on the board
         int harm_pieces_w = 30;
