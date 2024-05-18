@@ -41,8 +41,8 @@ namespace Paisho{
 
 
     typedef struct Board {
-        TeamBoard whiteBoard;
-        TeamBoard blackBoard;
+        TeamBoard whiteBoard = {0};
+        TeamBoard blackBoard = {0};
 
         array<Bitboard, NUM_OTHER_BOARDS> otherBoards;
 
@@ -71,7 +71,8 @@ namespace Paisho{
     // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
 
     enum Boards{
-        w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,harmlotus,
+        w3,w4,w5,r3,r4,r5,lotus,orchid,
+        harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,harmlotus,
         allflowers
     };
     //Set these like 1<<Rock or something
@@ -130,7 +131,7 @@ namespace Paisho{
         a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
     };    
 
-    const std::string SquareStrings[] = {
+    const std::array<std::string, 17*17> SquareStrings = {
         "A1","B1","C1","D1","E1","F1","G1","H1","I1","J1","K1","L1","M1","N1","O1","P1","Q1",
         "A2","B2","C2","D2","E2","F2","G2","H2","I2","J2","K2","L2","M2","N2","O2","P2","Q2",
         "A3","B3","C3","D3","E3","F3","G3","H3","I3","J3","K3","L3","M3","N3","O3","P3","Q3",
@@ -150,8 +151,8 @@ namespace Paisho{
         "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
     };    
 
-    const std::string BlackPieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
-    const std::string WhitePieceStrings[] = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
+    const array<std::string, 8> BlackPieceStrings = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
+    const array<std::string, 8> WhitePieceStrings = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
 
     typedef union {
         struct {
@@ -164,6 +165,7 @@ namespace Paisho{
             uint64_t s3 : 9;
             uint64_t s4 : 9;
             uint64_t boatmove : 1;
+            //Total of 47 bits
         } fields;
         uint64_t bits;
     } Move;

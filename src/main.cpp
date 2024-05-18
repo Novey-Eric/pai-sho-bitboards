@@ -391,20 +391,24 @@ void test_abprune(){
     update_harms_clash(b);
     Moves a = get_moves(b.whiteBoard);
     cout<<"move count "<< a.size()<<endl;
+    //print_move_list(a);
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
+    print_move(a[1353]);
+    print_board(b);
     make_move(b, WHITE, a[1353]);
+    std::cout << b.whiteBoard.boards[allflowers][j7] << std::endl;
+    print_board(b);
     cout<<"done making move"<<endl;
-    Move bestmove;
+    Move bestmove = {.bits = 0};
     auto start = high_resolution_clock::now();
     int eval = ab_prune(b, 4, -99999, 99999, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
-    cout<< "eval: " << eval << " found move: ";
+    cout<< "eval: " << eval << " found move: " << endl;
     print_move(bestmove);
-
 
 }
 
@@ -551,14 +555,14 @@ void comp_v_comp(){
 
     std::vector<Move> moves;
 
-    int player = BLACK;
+    int player = WHITE;
     update_harms_clash(b);
     while(evaluate(b) < 999999){
         Move bestmove;
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
-        std::cout<<"num moves: "<< get_moves(b.blackBoard).size() << std::endl;
-        int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
+        std::cout<<"num moves: "<< get_moves(b.whiteBoard).size() << std::endl;
+        int eval = ab_prune(b, 5, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
         print_move(bestmove);
@@ -867,6 +871,24 @@ void test_print_board(){
   */  
 }
 
+void test_print_moves(){
+
+    Move m1;
+    m1.fields.s1 = 1;
+    m1.fields.move_type = HARMACCENT;
+    m1.fields.capture=0;
+    m1.fields.s2=19;
+    m1.fields.piece=r3;
+    m1.fields.auxpiece=Boat;
+    m1.fields.s3=37;
+    m1.fields.s4=55;
+    m1.fields.boatmove=1;
+    print_move(m1);
+
+
+}
+
+
 int main(){
     //test_print_macros();
     //test_board_ops();
@@ -877,13 +899,14 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    //test_abprune();
+    test_abprune();
     //test_move_types();
     //comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
     //test_fail1();
-    test_print_board();
+    //test_print_board();
+    //test_print_moves();
     return 1;
 }

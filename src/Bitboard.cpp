@@ -46,22 +46,23 @@ namespace Paisho{
 
         switch(m.fields.move_type){
             case MOVE:
-                std::cout << SquareStrings[m.fields.s1] << "-" << SquareStrings[m.fields.s2];
+                std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
                 break;
             case PLACE:
-                std::cout << WhitePieceStrings[m.fields.piece] << " " << SquareStrings[m.fields.s1];
+                std::cout << WhitePieceStrings[m.fields.piece] << " " << SquareStrings.at(m.fields.s1);
                 break;
             case HARMPLACE:
-                std::cout << SquareStrings[m.fields.s1] << "-" << SquareStrings[m.fields.s2];
-                std::cout << "+" << WhitePieceStrings[m.fields.auxpiece] << " " << SquareStrings[m.fields.s3];
+                std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                std::cout << "+" << WhitePieceStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3);
                 break;
             case HARMACCENT:
                 if (m.fields.boatmove){
-                    std::cout << SquareStrings[m.fields.s1] << "-" << SquareStrings[m.fields.s2];
-                    std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings[m.fields.s3] << "-" << SquareStrings[m.fields.s4];
+                    std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                    std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3) << "-" << SquareStrings.at(m.fields.s4);
+                    //std::cout << std::dec << " " << m.fields.s4 << " " << SquareStrings.at(m.fields.s4);
                 } else{
-                    std::cout << SquareStrings[m.fields.s1] << "-" << SquareStrings[m.fields.s2];
-                    std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings[m.fields.s3];
+                    std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                    std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3);
                 }
                 break;
             default:
@@ -102,16 +103,16 @@ namespace Paisho{
         //do w3 first
         for (int i = 0; i < 8; i++){
             for(int sq = 0; sq < NUM_SQUARES; sq++){
-                if(b.whiteBoard.boards[i][sq]){
-                    sq_strs[sq] = WhitePieceStrings[i] + " ";
-                }else if (b.blackBoard.boards[i][sq]){
-                    sq_strs[sq] = BlackPieceStrings[i] + " ";
+                if(b.whiteBoard.boards.at(i)[sq]){
+                    sq_strs[sq] = WhitePieceStrings.at(i) + " ";
+                }else if (b.blackBoard.boards.at(i)[sq]){
+                    sq_strs[sq] = BlackPieceStrings.at(i) + " ";
                 }
             }
         }
 
         for(int i = 0; i < NUM_SQUARES; i++){
-           if(b.otherBoards[Accents][i]){
+           if(b.otherBoards.at(Accents).test(i)){
                 sq_strs[i] = " A ";
             }
         }
@@ -208,8 +209,8 @@ namespace Paisho{
         //takes flower as input and returns bitboard of every space it can harmonize with.
         Bitboard get_harm_pieces(const TeamBoard& b, int flower){
             Bitboard harm_board;
-            const Bitboard *t_board = &b.boards[0];
-            const Bitboard *opps_board = &(*(b.oppsBoards))[0];
+            const Bitboard *t_board = &b.boards.at(0);
+            const Bitboard *opps_board = &(*(b.oppsBoards)).at(0);
 
             switch(flower){
                 case w3:
@@ -248,33 +249,33 @@ namespace Paisho{
 
         Bitboard get_harm_board(const TeamBoard& b, int flower){
             Bitboard harm_board;
-            const Bitboard *opps_board = &(*(b.oppsBoards))[0];
+            const Bitboard *opps_board = &(*(b.oppsBoards)).at(0);
             
             switch(flower){
                 case w3:
-                    harm_board = b.boards[harmw4] | b.boards[harmr5] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmw4) | b.boards.at(harmr5) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 case w4:
-                    harm_board = b.boards[harmw3] | b.boards[harmw5] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmw3) | b.boards.at(harmw5) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 case w5:
-                    harm_board = b.boards[harmw4] | b.boards[harmr3] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmw4) | b.boards.at(harmr3) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 case r3:
-                    harm_board = b.boards[harmr4] | b.boards[harmw5] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmr4) | b.boards.at(harmw5) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 case r4:
-                    harm_board = b.boards[harmr5] | b.boards[harmr3] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmr5) | b.boards.at(harmr3) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 case r5:
-                    harm_board = b.boards[harmr4] | b.boards[harmw5] | b.boards[harmlotus] | opps_board[harmlotus];
+                    harm_board = b.boards.at(harmr4) | b.boards.at(harmw5) | b.boards.at(harmlotus) | opps_board[harmlotus];
                     break;
                 //Lotus only harmonizes with own team.fields.
                 case orchid:
                     harm_board = Illegal & Legal;
                     break;
                 case lotus:
-                    harm_board = b.boards[harmw3] | b.boards[harmw4] | b.boards[harmw5] | b.boards[harmr3] | b.boards[harmr4] | b.boards[harmr5];
+                    harm_board = b.boards.at(harmw3) | b.boards.at(harmw4) | b.boards.at(harmw5) | b.boards.at(harmr3) | b.boards.at(harmr4) | b.boards.at(harmr5);
                     break;
               default:
                     std::cout << "bad piece in get harm board" << std::endl;
@@ -289,8 +290,8 @@ namespace Paisho{
             const Bitboard *opps_board;
             bool wild;
 
-            t_board = &b.boards[0];
-            opps_board = &(*(b.oppsBoards))[0];
+            t_board = &b.boards.at(0);
+            opps_board = &(*(b.oppsBoards)).at(0);
             wild = b.wild;
 
             switch(bbpiece){
@@ -350,21 +351,21 @@ namespace Paisho{
 
 
         Bitboard get_clash_board(const TeamBoard& b, int piece){
-            const Bitboard *opps_board = &(*(b.oppsBoards))[0];
+            const Bitboard *opps_board = &(*(b.oppsBoards)).at(0);
             switch(piece){
-                case w3: return b.boards[harmr3] | opps_board[harmr3];
-                case w4: return b.boards[harmr4] | opps_board[harmr4];
-                case w5: return b.boards[harmr5] | opps_board[harmr5];
-                case r3: return b.boards[harmw3] | opps_board[harmw3];
-                case r4: return b.boards[harmw4] | opps_board[harmw4];
-                case r5: return b.boards[harmw5] | opps_board[harmw5];
+                case w3: return b.boards.at(harmr3) | opps_board[harmr3];
+                case w4: return b.boards.at(harmr4) | opps_board[harmr4];
+                case w5: return b.boards.at(harmr5) | opps_board[harmr5];
+                case r3: return b.boards.at(harmw3) | opps_board[harmw3];
+                case r4: return b.boards.at(harmw4) | opps_board[harmw4];
+                case r5: return b.boards.at(harmw5) | opps_board[harmw5];
                 default: return Bitboard(0);
             }
         }
 
         void get_flower_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list){
             const Bitboard *team_board;
-            team_board = &b.boards[0];
+            team_board = &b.boards.at(0);
 
 
             mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
@@ -377,14 +378,14 @@ namespace Paisho{
             for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
                 if (w3_copy[t_src]){
                     t_dests = mask_move_ptr(t_src) & \
-                              (~(*(b.otherBoards))[AllPieces] ^ cap_board) & 
+                              (~(*(b.otherBoards)).at(AllPieces) ^ cap_board) & 
                               (~clash_board) & correct_color(bbflowerpiece);
                     
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
                         if(t_dests[t_dest]){
                         //while (t_dest != -1){
                             int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                            Move t_move;
+                            Move t_move = { .bits = 0};
                             t_move.fields.move_type=MOVE;
                             t_move.fields.capture=cap_bit;
                             t_move.fields.piece=bbflowerpiece;
@@ -409,11 +410,9 @@ namespace Paisho{
             Bitboard cap_board = get_cap_board(b, bbflowerpiece);
 
             //Note have to add lotus to harm board cases
-            int pieces_in_hand[8];
+            int pieces_in_hand[4];
             int num_pieces = 0;
-            const Bitboard *teamboard;
         
-            teamboard = &b.boards[0];
             if (b.accents.rocks)
                 pieces_in_hand[num_pieces++] = Rock;
             if (b.accents.knotweeds)
@@ -423,8 +422,7 @@ namespace Paisho{
             if (b.accents.boats)
                 pieces_in_hand[num_pieces++] = Boat;
 
-
-            Bitboard w3_copy = teamboard[bbflowerpiece];
+            Bitboard w3_copy = b.boards.at(bbflowerpiece);
             //Go through each piece and generate moves for it
             Bitboard t_dests;
             Bitboard harm_pieces = get_harm_pieces(b, bbflowerpiece);
@@ -434,10 +432,10 @@ namespace Paisho{
                     Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
 
                     t_dests = mask_move_ptr(t_src) & \
-                              ~(*b.otherBoards)[Accents] & \
+                              ~(*b.otherBoards).at(Accents) & \
                               updated_harm & \
                               correct_color(bbflowerpiece) & \
-                              (~teamboard[allflowers] | cap_board);
+                              (~b.boards.at(allflowers) | cap_board);
 
                     //int t_dest = get_lsb(t_dests);
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
@@ -448,7 +446,7 @@ namespace Paisho{
                             for(int i = 0; i < num_pieces; i++){//For each aux piece in the player's hand
                                 int auxpiece = pieces_in_hand[i];
                                 if (auxpiece == Rock || auxpiece == Knotweed){
-                                    Bitboard post_move_bb = (*b.otherBoards)[AllPieces];
+                                    Bitboard post_move_bb = (*b.otherBoards).at(AllPieces);
                                     post_move_bb.reset(t_src);
                                     post_move_bb.set(t_dest);
                                     Bitboard rock_squares = ((post_move_bb >> EAST) |\
@@ -463,7 +461,7 @@ namespace Paisho{
                                     //int auxpiece_square = get_lsb(rock_squares);
                                     for(int auxpiece_square = 0; auxpiece_square<NUM_SQUARES; auxpiece_square++){
                                         if(rock_squares[auxpiece_square]){                    
-                                            Move t_move;
+                                            Move t_move = {.bits = 0};
                                             t_move.fields.move_type = HARMACCENT;
                                             t_move.fields.capture = cap_bit;
                                             t_move.fields.piece = bbflowerpiece;
@@ -471,13 +469,12 @@ namespace Paisho{
                                             t_move.fields.s2 = t_dest;
                                             t_move.fields.auxpiece = auxpiece;
                                             t_move.fields.s3 = auxpiece_square;
-
                                             move_list.push_back(t_move);
                                             //move_list[move_list.move_count++] = t_move;
                                         }
                                     }
                                 }else if (auxpiece == Wheel){
-                                    Bitboard post_move_bb = (*b.otherBoards)[AllPieces];
+                                    Bitboard post_move_bb = (*b.otherBoards).at(AllPieces);
                                     post_move_bb.reset(t_src);
                                     post_move_bb.set(t_dest);
                                     Bitboard wheel_squares = ((post_move_bb >> EAST) |\
@@ -505,7 +502,7 @@ namespace Paisho{
                                                         ((legal_bb & ~FileABB) << (NORTH - EAST))) &\
                                                         Legal & ~Gates;
                                             if (legal_bb.count() == 8){
-                                                Move t_move;
+                                                Move t_move = {.bits = 0};
                                                 t_move.fields.move_type = HARMACCENT;
                                                 t_move.fields.capture = cap_bit;
                                                 t_move.fields.piece = bbflowerpiece;
@@ -513,20 +510,18 @@ namespace Paisho{
                                                 t_move.fields.s2 = t_dest;
                                                 t_move.fields.auxpiece = auxpiece;
                                                 t_move.fields.s3 = auxpiece_square;
-                                                //std::cout << move_list.move_count << " ";
-                                                //print_move(t_move);
                                                 move_list.push_back(t_move);
                                             }
                                         }
                                     }
 
                                 }else if (auxpiece == Boat){
-                                    Bitboard all_accents = (*b.otherBoards)[Accents];
+                                    Bitboard all_accents = (*b.otherBoards).at(Accents);
                                     //int t_accent = get_lsb(all_accents);
                                     //while (t_accent != -1){
                                     for(int t_accent = 0; t_accent < NUM_SQUARES; t_accent++){
                                         if(all_accents[t_accent]){
-                                            Move t_move;
+                                            Move t_move = { .bits = 0};
                                             t_move.fields.move_type = HARMACCENT;
                                             t_move.fields.capture = cap_bit;
                                             t_move.fields.piece = bbflowerpiece;
@@ -546,7 +541,7 @@ namespace Paisho{
         }
 
         void get_harmony_place_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list){
-            const Bitboard *teamboard = &b.boards[0];
+            const Bitboard *teamboard = &b.boards.at(0);
 
             bool only_lotus_orc = false;
 
@@ -596,14 +591,14 @@ namespace Paisho{
                     t_dests = mask_move_ptr(t_src) & \
                               updated_harm & \
                               correct_color(bbflowerpiece) & \
-                              ~(*b.otherBoards)[Accents] & \
+                              ~(*b.otherBoards).at(Accents) & \
                               (~teamboard[allflowers] | cap_board);
 
                     //int t_dest = get_lsb(t_dests);
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
                         if(t_dests[t_dest]){
                             int cap_bit = cap_board[t_dest]; //If you are landing on a capturable piece, set bit to 1
-                            t_open_gates = Gates & ~(*b.otherBoards)[AllPieces];
+                            t_open_gates = Gates & ~(*b.otherBoards).at(AllPieces);
 
                             
                             //int t_open_gate = get_lsb(t_open_gates);
@@ -611,7 +606,7 @@ namespace Paisho{
                                 if(t_open_gates[t_open_gate]){
                                     for (int i = 0; i < num_pieces; i++){
                                         int piece_bits = pieces_in_hand[i];
-                                        Move t_move;
+                                        Move t_move = { .bits = 0};
                                         t_move.fields.move_type = HARMPLACE;
                                         t_move.fields.capture = cap_bit;
                                         t_move.fields.s1 = t_src;
@@ -649,12 +644,12 @@ namespace Paisho{
                 pieces_in_hand[num_pieces++] = r5;
 
 
-            Bitboard t_open_gates = Gates & ~(*b.otherBoards)[AllPieces];
+            Bitboard t_open_gates = Gates & ~(*b.otherBoards).at(AllPieces);
             int t_open_gate = get_lsb(t_open_gates);
             while (t_open_gate != -1){
                 for (int i = 0; i < num_pieces; i++){
                     int piece_bits = pieces_in_hand[i];
-                    Move t_move;
+                    Move t_move = { .bits = 0};
                     t_move.fields.move_type=PLACE;
                     t_move.fields.s1 = t_open_gate;
                     t_move.fields.piece = piece_bits;
@@ -668,11 +663,11 @@ namespace Paisho{
 
         void get_boat_flower_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list){
             const Bitboard *team_board;
-            const Bitboard *opps_board = &(*(b.oppsBoards))[0];
+            const Bitboard *opps_board = &(*(b.oppsBoards)).at(0);
             if(!b.accents.boats){
                 return;
             }
-            team_board = &b.boards[0];
+            team_board = &b.boards.at(0);
 
 
             mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
@@ -689,7 +684,7 @@ namespace Paisho{
                 t_dests = mask_move_ptr(t_src) & \
                           harm_board & \
                           correct_color(bbflowerpiece) & \
-                          ~(*b.otherBoards)[Accents] & \
+                          ~(*b.otherBoards).at(Accents) & \
                           (~team_board[allflowers] | cap_board);
 
                 int t_dest = get_lsb(t_dests);
@@ -711,7 +706,7 @@ namespace Paisho{
                                                 Legal & ~post_move_bb & ~Gates;
                         int s4_square = get_lsb(s4_squares);
                         while(s4_square != -1){
-                            Move t_move;
+                            Move t_move = { .bits = 0};
                             t_move.fields.move_type=HARMACCENT;
                             t_move.fields.capture=cap_bit;
                             t_move.fields.s1=t_src;
@@ -762,7 +757,7 @@ namespace Paisho{
         }
 
         void make_place_move(TeamBoard& b, int piece, int square){
-            Bitboard *team_board = &b.boards[0];
+            Bitboard *team_board = &b.boards.at(0);
             switch(piece){
                 case w3:
                     b.w3--;
@@ -792,18 +787,18 @@ namespace Paisho{
 
             
             //Set all pieces board, set team board
-            (*b.otherBoards)[AllPieces].set(square);
+            (*b.otherBoards).at(AllPieces).set(square);
             team_board[allflowers].set(square);
             team_board[piece].set(square);
             
         }
 
         void make_move_move(TeamBoard& b, int piece, int src, int dst, bool cap){
-            Bitboard *team_board;
-            Bitboard *opps_board;
+            //Bitboard *team_board;
+            //Bitboard *opps_board;
 
-            team_board = &b.boards[0];
-            opps_board = &(*(b.oppsBoards))[0];
+            //team_board = &b.boards.at(0);
+            //opps_board = &(*(b.oppsBoards)).at(0);
             if (piece == lotus)
                 b.wild = true;
 
@@ -812,16 +807,16 @@ namespace Paisho{
                 //Find which tile is being captured, and remove from opponents boards
                 //Maybe reset all boards?
                 for (int i = 0; i < NUM_BOARDS; i++)
-                    opps_board[i].reset(dst);
+                    (*b.oppsBoards).at(i).reset(dst);
             } else{
-                (*b.otherBoards)[AllPieces].set(dst); //if capturing piece, allpieces already set. only set if not capping.
+                (*b.otherBoards).at(AllPieces).set(dst); //if capturing piece, allpieces already set. only set if not capping.
             }
             
-            (*b.otherBoards)[AllPieces].reset(src);
-            team_board[piece].reset(src);
-            team_board[allflowers].reset(src);
-            team_board[piece].set(dst);
-            team_board[allflowers].set(dst);
+            (*b.otherBoards).at(AllPieces).reset(src);
+            b.boards.at(piece).reset(src);
+            b.boards.at(allflowers).reset(src);
+            b.boards.at(piece).set(dst);
+            b.boards.at(allflowers).set(dst);
 
         }
 
@@ -849,29 +844,41 @@ namespace Paisho{
             }
         
 
-            (*b.otherBoards)[Accents].set(auxsq);
-            (*b.otherBoards)[AllPieces].set(auxsq);
+            (*b.otherBoards).at(Accents).set(auxsq);
+            (*b.otherBoards).at(AllPieces).set(auxsq);
 
             if (auxpiece == Rock){
-                (*b.otherBoards)[Rocks].set(auxsq);
+                (*b.otherBoards).at(Rocks).set(auxsq);
             } else if (auxpiece == Wheel){
                 TeamBoard copy = b;
                 //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
                 int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
-                for(int t_board = 0; t_board < (2*NUM_BOARDS)+NUM_OTHER_BOARDS; t_board++){ //TODO: this can be optimized since half the boards are harmonies.
-                    b.boards[t_board][auxsq + hmoves[0]] = copy.boards[t_board][auxsq + hmoves[7]];
+                
+                for(int t_board = 0; t_board < NUM_BOARDS; t_board++){ //TODO: this can be optimized since half the boards are harmonies.
+                    b.boards.at(t_board)[auxsq + hmoves[0]] = copy.boards.at(t_board)[auxsq + hmoves[7]];
                     for (int t_move=1; t_move<8; t_move++){
-                        b.boards[t_board][auxsq + hmoves[t_move]] = copy.boards[t_board][auxsq + hmoves[t_move-1]];
-                        //this is SUPER cursed, going through all arrays in 
-                        //whiteboards and blackboards by doubling the length of the first
+                        b.boards.at(t_board)[auxsq + hmoves[t_move]] = copy.boards.at(t_board)[auxsq + hmoves[t_move-1]];
                     }
+
+                    (*b.oppsBoards).at(t_board)[auxsq + hmoves[0]] = (*copy.oppsBoards).at(t_board)[auxsq + hmoves[7]];
+                    for (int t_move=1; t_move<8; t_move++){
+                        (*b.oppsBoards).at(t_board)[auxsq + hmoves[t_move]] = (*copy.oppsBoards).at(t_board)[auxsq + hmoves[t_move-1]];
+                    }
+                }
+
+                for(int t_board = 0; t_board < NUM_OTHER_BOARDS; t_board++){
+                    (*b.otherBoards).at(t_board)[auxsq + hmoves[0]] = (*copy.otherBoards).at(t_board)[auxsq + hmoves[7]];
+                    for (int t_move=1; t_move<8; t_move++){
+                        (*b.otherBoards).at(t_board)[auxsq + hmoves[t_move]] = (*copy.otherBoards).at(t_board)[auxsq + hmoves[t_move-1]];
+                    }
+
                 }
                 
             } else if (auxpiece == Boat){
-                (*b.otherBoards)[Rocks].reset(auxsq);
-                (*b.otherBoards)[Knotweeds].reset(auxsq);
+                (*b.otherBoards).at(Rocks).reset(auxsq);
+                (*b.otherBoards).at(Knotweeds).reset(auxsq);
             }if (auxpiece == Knotweed){
-                (*b.otherBoards)[Knotweeds].set(auxsq);
+                (*b.otherBoards).at(Knotweeds).set(auxsq);
             }
 
         }
@@ -880,13 +887,19 @@ namespace Paisho{
             make_move_move(b, piece, src, dst, cap);
             b.accents.boats--;
 
-            (*b.otherBoards)[Accents].set(boatsq);
-            (*b.otherBoards)[AllPieces].set(boat_move_sq);
+            (*b.otherBoards).at(Accents).set(boatsq);
+            (*b.otherBoards).at(AllPieces).set(boat_move_sq);
             //Need all pieces move too
-            for(int t_board = 0; t_board < (2*NUM_BOARDS); t_board++){
-                if (b.boards[t_board][boatsq]){
-                    b.boards[t_board].set(boat_move_sq);
-                    b.boards[t_board].reset(boatsq);
+            for(int t_board = 0; t_board < NUM_BOARDS; t_board++){
+
+                if (b.boards.at(t_board)[boatsq]){
+                    b.boards.at(t_board).set(boat_move_sq);
+                    b.boards.at(t_board).reset(boatsq);
+                }
+
+                if ((*b.oppsBoards).at(t_board)[boatsq]){
+                    (*b.oppsBoards).at(t_board).set(boat_move_sq);
+                    (*b.oppsBoards).at(t_board).reset(boatsq);
                 }
                 //this is SUPER cursed, going through all arrays in 
                 //whiteboards and blackboards by doubling the length of the first
@@ -933,11 +946,11 @@ namespace Paisho{
             //HARM CASE
             //int t_piece = w3;
             Bitboard *teamboard;
-            std::deque<std::pair<int, int>> *team_harms;
-            teamboard = &(b.boards)[0];
-            team_harms = &b.harm_pairs;
+            //std::deque<std::pair<int, int>> *team_harms;
+            teamboard = &(b.boards).at(0);
+            //team_harms = &b.harm_pairs;
 
-            team_harms->clear();
+            b.harm_pairs.clear();
             //teamboard[harm_map(t_piece)] = Bitboard(0);
 
             teamboard[harmw3] = Bitboard(0);
@@ -986,7 +999,7 @@ namespace Paisho{
                 tmp_square = w3_piece + EAST;
                 current_row = w3_piece / 17;
 
-                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && b.otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square += EAST;
                 }
@@ -996,21 +1009,23 @@ namespace Paisho{
                     //if the final square you check is actually a piece you can harmonize with. Add it to the pairs.
                     if(harm_board[tmp_square]){
                         bool found = false;
-                        for(int i = 0; i < (*team_harms).size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == (*team_harms)[i]){
+                        for(int i = 0; i < b.harm_pairs.size(); i++){
+                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
                                 found = true;
                                 break;
                             } 
                         }
-                        if (!found)
-                            (*team_harms).push_back(std::pair<int, int>{w3_piece, tmp_square});
+                        if (!found){
+                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
+                            std::cout << "pushing1" << std::endl;
+                        }
                     }
                         
                     //if [tmp_square], then add {w3_piece, tmp_square} to harmpairs
                 }
 
                 tmp_square = w3_piece - EAST;
-                while(tmp_square/17 == current_row && tmp_square >= 0 && b.otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square/17 == current_row && tmp_square >= 0 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square -= EAST;
                 }
@@ -1019,19 +1034,21 @@ namespace Paisho{
 
                     if(harm_board[tmp_square]){
                         bool found = false;
-                        for(int i = 0; i < (*team_harms).size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == (*team_harms)[i]){
+                        for(int i = 0; i < b.harm_pairs.size(); i++){
+                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
                                 found = true;
                                 break;
                             } 
                         }
-                        if (!found)
-                            (*team_harms).push_back(std::pair<int, int>{w3_piece, tmp_square});
+                        if (!found){
+                            std::cout << "pushing2" << std::endl;
+                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
+                        }
                     }
                 }
 
                 tmp_square = w3_piece + NORTH;
-                while(tmp_square < NUM_SQUARES && b.otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square < NUM_SQUARES && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square += NORTH;
                 }
@@ -1040,20 +1057,23 @@ namespace Paisho{
 
                     if(harm_board[tmp_square]){
                         bool found = false;
-                        for(int i = 0; i < (*team_harms).size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == (*team_harms)[i]){
+                        for(int i = 0; i < b.harm_pairs.size(); i++){
+                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
                                 found = true;
                                 break;
                             } 
                         }
-                        if (!found)
-                            (*team_harms).push_back(std::pair<int, int>{w3_piece, tmp_square});
+                        if (!found){
+                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
+                            std::cout << "pushing3" << std::endl;
+
+                        }
                     }
                 }
 
 
                 tmp_square = w3_piece - NORTH;
-                while(tmp_square >= 0 && b.otherBoards[AllPieces][tmp_square] == 0){ //left first
+                while(tmp_square >= 0 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
                     teamboard[harm_ind].set(tmp_square);
                     tmp_square -= NORTH;
                 }
@@ -1062,14 +1082,17 @@ namespace Paisho{
 
                     if(harm_board[tmp_square]){
                         bool found = false;
-                        for(int i = 0; i < (*team_harms).size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == (*team_harms)[i]){
+                        for(int i = 0; i < b.harm_pairs.size(); i++){
+                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
                                 found = true;
                                 break;
                             } 
                         }
-                        if (!found)
-                            (*team_harms).push_back(std::pair<int, int>{w3_piece, tmp_square});
+                        if (!found){
+                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
+                            std::cout << "pushing4" << std::endl;
+
+                        }
                     }
                 }
                 //std::cout<<"w3 pieces after loop" <<std::endl;
@@ -1093,7 +1116,7 @@ namespace Paisho{
         //take harmboard index as input, return bitbord of which pieces can harmonize with that piece
         Bitboard reverse_harm_lookup(const TeamBoard& b, int harm_index){
             Bitboard ret;
-            const Bitboard *teamboard = &b.boards[0];
+            const Bitboard *teamboard = &b.boards.at(0);
 
             switch(harm_index){
                 case harmr3:

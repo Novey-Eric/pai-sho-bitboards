@@ -42,31 +42,35 @@ int ply;
         if (depth <= 0 || std::abs(eval) >= 999999){
             eval += depth;
             //cout << "eval dur: " << dur_eval.count() << endl;
-            //std::cout<<"eval: "<<eval<<std::endl;
             return eval;
         }
         Board b_copy;
         int value;
         Moves curr_moves;
-        Move out_move;
+        Move out_move = {.bits = 0};
         //Moves ordered_moves;
 
         if (player == WHITE){
             value = -9999999;
 
             curr_moves = Bitboards::get_moves(b.whiteBoard);
+            //Paisho::print_move_list(curr_moves);
+            //cerr << "getmoves" << endl;
             if(!curr_moves.size())
                 value = 0;
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
-            for(auto t_move : curr_moves){
+            print_move_list(curr_moves);
+            for(Move t_move : curr_moves){
+                //Paisho::print_move(t_move);
+                //std::cerr << std::hex << t_move.bits << std::endl;
             //for(int i = 0; i < curr_moves.size(); i++){
                 b_copy = b;
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
-
+                
                 Bitboards::make_move(b_copy, WHITE, t_move);
 
                 //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
@@ -89,7 +93,7 @@ int ply;
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
 
-            for(auto t_move : curr_moves){
+            for(Move t_move : curr_moves){
                 b_copy = b;
                 ply++;
                 Bitboards::make_move(b_copy, BLACK, t_move);
@@ -270,9 +274,9 @@ int ply;
             score += b.boards[i].count()*piece_onboard_score(i);
             score += (b.boards[i] & ~Gates).count()*40; //has it moved out of the gate
         }
+        
 
         //black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
-        
         score += (b.wild)*400;
 
         int accent_hand_weight = 100;
