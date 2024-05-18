@@ -67,7 +67,7 @@ int ply;
                 //Paisho::print_move(t_move);
                 //std::cerr << std::hex << t_move.bits << std::endl;
             //for(int i = 0; i < curr_moves.size(); i++){
-                b_copy = b;
+                b_copy = Board(b);
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
                 Bitboards::make_move(b_copy, WHITE, t_move);
@@ -91,7 +91,7 @@ int ply;
             //order_moves(&curr_moves, &ordered_moves);
 
             for(Move t_move : curr_moves){
-                b_copy = b;
+                b_copy = Board(b);
                 ply++;
                 Bitboards::make_move(b_copy, BLACK, t_move);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);

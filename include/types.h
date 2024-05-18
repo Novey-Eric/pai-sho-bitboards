@@ -52,6 +52,16 @@ namespace Paisho{
             this->whiteBoard.oppsBoards = &this->blackBoard.boards;
             this->blackBoard.oppsBoards = &this->whiteBoard.boards;
         }
+
+        Board(const Board& t){
+            whiteBoard = t.whiteBoard;
+            blackBoard = t.blackBoard;
+            otherBoards = t.otherBoards;
+            this->whiteBoard.otherBoards = &this->otherBoards;
+            this->blackBoard.otherBoards = &this->otherBoards;
+            this->whiteBoard.oppsBoards = &this->blackBoard.boards;
+            this->blackBoard.oppsBoards = &this->whiteBoard.boards;
+        }
     } Board;
 
 
@@ -82,8 +92,6 @@ namespace Paisho{
         Wheel,
         Boat,
     };
-
-
 
     const std::string AccentStrings[] = {"R", "K", "W", "B"};
 

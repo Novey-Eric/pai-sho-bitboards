@@ -388,16 +388,16 @@ void test_abprune(){
     b.blackBoard.w4=1;
     b.blackBoard.w5=3;
 
-    update_harms_clash(b);
+    update_harms_clash(b);    
     Moves a = get_moves(b.whiteBoard);
     cout<<"move count "<< a.size()<<endl;
     //print_move_list(a);
     //pretty(b.otherBoards[AllPieces]);
 
     cout<<"making move"<<endl;
-    print_move(a[1353]);
+    print_move(a[50]);
     print_board(b);
-    make_move(b, WHITE, a[1353]);
+    make_move(b, WHITE, a[50]);
     std::cout << b.whiteBoard.boards[allflowers][j7] << std::endl;
     print_board(b);
     cout<<"done making move"<<endl;
@@ -562,7 +562,7 @@ void comp_v_comp(){
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
         std::cout<<"num moves: "<< get_moves(b.whiteBoard).size() << std::endl;
-        int eval = ab_prune(b, 5, -9999999, 9999999, player, bestmove);
+        int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
         print_move(bestmove);
@@ -899,9 +899,9 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    test_abprune();
+    //test_abprune();
     //test_move_types();
-    //comp_v_comp();
+    comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
