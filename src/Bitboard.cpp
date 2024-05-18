@@ -738,9 +738,9 @@ namespace Paisho{
 
             for (int i = 0; i < 8; i++){
                 get_flower_moves(b, piece_list[i], move_list);
-                //get_harmony_place_moves(b, piece_list[i], move_list);
-                //get_harmony_accent_moves(b, piece_list[i], move_list);
-                //get_boat_flower_moves(b, piece_list[i], move_list);
+                get_harmony_place_moves(b, piece_list[i], move_list);
+                get_harmony_accent_moves(b, piece_list[i], move_list);
+                get_boat_flower_moves(b, piece_list[i], move_list);
                 //get harmony boat moves
             }
             get_place_moves(b, move_list);
