@@ -85,7 +85,7 @@ namespace Paisho{
 
 
 
-    const std::string AccentStrings[] = {"R", "R", "K", "K", "W", "W", "B", "B"};
+    const std::string AccentStrings[] = {"R", "K", "W", "B"};
 
     enum Team{
         WHITE,
