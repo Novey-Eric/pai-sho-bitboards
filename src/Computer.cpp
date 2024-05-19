@@ -287,7 +287,7 @@ int ply;
             score += n_harm_pieces*harm_pieces_w;
         }
 
-        for (int i = 4; i < NUM_SQUARES-4; i++){
+        for (int i = 4; i < NUM_SQUARES-3; i++){
             if(b.boards[allflowers].test(i) == 1){
                 float r = get_radius(i);
                 if(r <= 3){
