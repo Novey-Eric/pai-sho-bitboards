@@ -197,12 +197,10 @@ int ply;
         //the map should be (square, corners_shared) pairs
   
         std::map<int, int> square_cnt;
-        int harm_cnt = 0;
-        const std::set<std::pair<int, int>> *team_pairs = &b.harm_pairs;
-        
+        int harm_cnt = 0;        
 
         int doub_cnt = 0;
-        for (auto i : *team_pairs){
+        for (auto i : b.harm_pairs){
             int q1 = get_quadrant(i.first);
             int q2 = get_quadrant(i.second);
             if (q1 != q2 && q1 != -1 && q2 != -1){
