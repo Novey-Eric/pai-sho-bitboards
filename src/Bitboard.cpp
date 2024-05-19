@@ -941,152 +941,106 @@ namespace Paisho{
 
 
         void find_harms(TeamBoard& b){
-            //HARM CASE
-            //int t_piece = w3;
-            Bitboard *teamboard;
-            //std::deque<std::pair<int, int>> *team_harms;
-            teamboard = &(b.boards).at(0);
-            //team_harms = &b.harm_pairs;
 
             b.harm_pairs.clear();
             //teamboard[harm_map(t_piece)] = Bitboard(0);
 
-            teamboard[harmw3] = Bitboard(0);
-            teamboard[harmw4] = Bitboard(0);
-            teamboard[harmw5] = Bitboard(0);
-            teamboard[harmr3] = Bitboard(0);
-            teamboard[harmr4] = Bitboard(0);
-            teamboard[harmr5] = Bitboard(0);
+            b.boards[harmw3] = Bitboard(0);
+            b.boards[harmw4] = Bitboard(0);
+            b.boards[harmw5] = Bitboard(0);
+            b.boards[harmr3] = Bitboard(0);
+            b.boards[harmr4] = Bitboard(0);
+            b.boards[harmr5] = Bitboard(0);
             int piece_ind[18];
             int piece_count = 0;
-            Bitboard flowers_copy = teamboard[allflowers] & ~Gates & ~teamboard[orchid];
-            //pretty(flowers_copy);
-            //int t_teampiece = get_lsb(flowers_copy);
-            for(int t_teampiece = 0; t_teampiece < NUM_SQUARES; t_teampiece++){
-                if (flowers_copy[t_teampiece]){
+            Bitboard flowers_copy = b.boards[allflowers] & ~Gates & ~b.boards[orchid];
+            //make it while(piece_cout < flowers_copy.count()){}
+            int total_pieces = flowers_copy.count();
+            int t_teampiece = 0;
+            while(piece_count < total_pieces){
+                if (flowers_copy.test(t_teampiece) == 1){
                     piece_ind[piece_count++]=t_teampiece;
                     //std::cout << "piece count " << piece_count << std::endl;
                 }
+                t_teampiece++;
             }
 
             //go through all pieces once. Find all white or black pieces. Then just check those squares instead of getlsb every time
-
-
             int tmp_square;
             int current_row;
             //int w3_piece = get_lsb(w3_pieces);
-            int w3_piece;
+            int current_piece;
+            //Current piece is the piece position
+            //For each piece on the team's ALLFLOWERS board.
+            
             for(int i = 0; i < piece_count; i++){
-            //while(w3_piece != -1){ //for each r3 piece on the board:
-                w3_piece = piece_ind[i];
-                Bitboard w3_pieces;
+                current_piece = piece_ind[i];
+                Bitboard current_pieces;
                 int t_piece = 0;
-                for(t_piece = 0; t_piece <= 6; t_piece++){
-                    if (teamboard[t_piece][w3_piece]){
-                        w3_pieces = teamboard[t_piece];
-                        break;
-                    }
-                }
-                    
-                //Bitboard get_harm_pieces(Board *b, int team, int flower){
-                //Bitboard reverse_harm_lookup(Board *b, int harm_index, int team){
-                //returns bitboard of pieces that can harmonize with t_piece
-                Bitboard harm_board = reverse_harm_lookup(b, harm_map(t_piece)) & ~Gates;
+                //t_piece is the piece TYPE
+                //Look for current piece on t_piece board
+                while(b.boards.at(t_piece).test(current_piece) == 0)
+                    t_piece++;
+                current_pieces = b.boards.at(t_piece);
+                //Once you find which t_piece is correct,
+                //Set current pieces to the current pieces to this board
+
                 int harm_ind = harm_map(t_piece);
+                Bitboard harm_board = reverse_harm_lookup(b, harm_ind) & ~Gates;
                 //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
-                tmp_square = w3_piece + EAST;
-                current_row = w3_piece / 17;
+                tmp_square = current_piece + EAST;
+                current_row = current_piece / 17;
 
                 while(tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
                     tmp_square += EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square < NUM_SQUARES-1){
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards.at(harm_ind).set(tmp_square);
 
                     //if the final square you check is actually a piece you can harmonize with. Add it to the pairs.
-                    if(harm_board[tmp_square]){
-                        bool found = false;
-                        for(int i = 0; i < b.harm_pairs.size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
-                                found = true;
-                                break;
-                            } 
-                        }
-                        if (!found){
-                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-                        }
+                    if(harm_board[tmp_square] && !b.harm_pairs.contains(std::pair<int, int>(tmp_square, current_piece))){
+                        b.harm_pairs.insert(std::pair<int, int>{current_piece, tmp_square});
                     }
-                        
-                    //if [tmp_square], then add {w3_piece, tmp_square} to harmpairs
+                    //if [tmp_square], then add {current_piece, tmp_square} to harmpairs
                 }
 
-                tmp_square = w3_piece - EAST;
+                tmp_square = current_piece - EAST;
                 while(tmp_square/17 == current_row && tmp_square >= 0 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
                     tmp_square -= EAST;
                 }
                 if (tmp_square/17 == current_row && tmp_square >= 0){
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square]){
-                        bool found = false;
-                        for(int i = 0; i < b.harm_pairs.size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
-                                found = true;
-                                break;
-                            } 
-                        }
-                        if (!found){
-                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-                        }
+                    if(harm_board[tmp_square] && !b.harm_pairs.contains(std::pair<int, int>(tmp_square, current_piece))){
+                        b.harm_pairs.insert(std::pair<int, int>{current_piece, tmp_square});
                     }
                 }
 
-                tmp_square = w3_piece + NORTH;
+                tmp_square = current_piece + NORTH;
                 while(tmp_square < NUM_SQUARES && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
                     tmp_square += NORTH;
                 }
                 if (tmp_square < NUM_SQUARES){
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square]){
-                        bool found = false;
-                        for(int i = 0; i < b.harm_pairs.size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
-                                found = true;
-                                break;
-                            } 
-                        }
-                        if (!found){
-                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-
-                        }
+                    if(harm_board[tmp_square] && !b.harm_pairs.contains(std::pair<int, int>(tmp_square, current_piece))){
+                        b.harm_pairs.insert(std::pair<int, int>{current_piece, tmp_square});
                     }
                 }
 
-
-                tmp_square = w3_piece - NORTH;
+                tmp_square = current_piece - NORTH;
                 while(tmp_square >= 0 && (*b.otherBoards).at(AllPieces)[tmp_square] == 0){ //left first
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
                     tmp_square -= NORTH;
                 }
                 if (tmp_square >= 0){
-                    teamboard[harm_ind].set(tmp_square);
+                    b.boards[harm_ind].set(tmp_square);
 
-                    if(harm_board[tmp_square]){
-                        bool found = false;
-                        for(int i = 0; i < b.harm_pairs.size(); i++){
-                            if(std::pair<int, int>{tmp_square, w3_piece} == b.harm_pairs.at(i)){
-                                found = true;
-                                break;
-                            } 
-                        }
-                        if (!found){
-                            b.harm_pairs.push_back(std::pair<int, int>{w3_piece, tmp_square});
-
-                        }
+                    if(harm_board[tmp_square] && !b.harm_pairs.contains(std::pair<int, int>(tmp_square, current_piece))){
+                        b.harm_pairs.insert(std::pair<int, int>{current_piece, tmp_square});
                     }
                 }
                 //std::cout<<"w3 pieces after loop" <<std::endl;

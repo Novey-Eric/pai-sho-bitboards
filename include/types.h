@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <array>
 #include <deque>
+#include <set>
 
 #define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
@@ -32,7 +33,8 @@ namespace Paisho{
         bool l;
         bool wild;
         AccentTiles accents = {0};
-        std::deque<std::pair<int, int>> harm_pairs;
+
+        std::set<std::pair<int, int>> harm_pairs;
         array<Bitboard, NUM_BOARDS> boards;
         array<Bitboard, NUM_BOARDS> *oppsBoards;
         array<Bitboard, NUM_OTHER_BOARDS> *otherBoards;

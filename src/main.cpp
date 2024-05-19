@@ -403,7 +403,7 @@ void test_abprune(){
     cout<<"done making move"<<endl;
     Move bestmove = {.bits = 0};
     auto start = high_resolution_clock::now();
-    int eval = ab_prune(b, 4, -99999, 99999, WHITE, bestmove);
+    int eval = ab_prune(b, 3, -99999, 99999, WHITE, bestmove);
     auto after_mm = high_resolution_clock::now();
     auto duration_mm = duration_cast<microseconds>(after_mm-start);
     cout << "minimax duration: " << duration_mm.count() << endl;
@@ -915,9 +915,9 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    //test_abprune();
+    test_abprune();
     //test_move_types();
-    comp_v_comp();
+    //comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();

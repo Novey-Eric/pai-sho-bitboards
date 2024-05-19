@@ -198,8 +198,8 @@ int ply;
   
         std::map<int, int> square_cnt;
         int harm_cnt = 0;
-        const std::deque<std::pair<int, int>> *team_pairs = &b.harm_pairs;
-
+        const std::set<std::pair<int, int>> *team_pairs = &b.harm_pairs;
+        
 
         int doub_cnt = 0;
         for (auto i : *team_pairs){
@@ -287,11 +287,10 @@ int ply;
             int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index).count();
             n_harm_pieces = std::min(n_harm_pieces, n_piece);
             score += n_harm_pieces*harm_pieces_w;
-
         }
 
-        for (int i = 0; i < NUM_SQUARES; i++){
-            if(b.boards[allflowers][i]){
+        for (int i = 4; i < NUM_SQUARES-4; i++){
+            if(b.boards[allflowers].test(i) == 1){
                 float r = get_radius(i);
                 if(r <= 3){
                     score += 50;
