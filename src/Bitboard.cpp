@@ -541,11 +541,9 @@ namespace Paisho{
         }
 
         void get_harmony_place_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list){
-            const Bitboard *teamboard = &b.boards.at(0);
-
             bool only_lotus_orc = false;
 
-            if ((teamboard[allflowers] & Gates).any()){
+            if ((b.boards[allflowers] & Gates).any()){
                 only_lotus_orc = true;
                 //Trying to harmony place with a growing tile in gate
             }
@@ -579,7 +577,7 @@ namespace Paisho{
                 pieces_in_hand[num_pieces++] = lotus;
 
 
-            Bitboard w3_copy = teamboard[bbflowerpiece];
+            Bitboard w3_copy = b.boards.at(bbflowerpiece);
             //Go through each piece and generate moves for it
             Bitboard t_dests;
             Bitboard t_open_gates;
@@ -592,7 +590,7 @@ namespace Paisho{
                               updated_harm & \
                               correct_color(bbflowerpiece) & \
                               ~(*b.otherBoards).at(Accents) & \
-                              (~teamboard[allflowers] | cap_board);
+                              (~b.boards[allflowers] | cap_board);
 
                     //int t_dest = get_lsb(t_dests);
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
@@ -1064,38 +1062,35 @@ namespace Paisho{
         //take harmboard index as input, return bitbord of which pieces can harmonize with that piece
         Bitboard reverse_harm_lookup(const TeamBoard& b, int harm_index){
             Bitboard ret;
-            const Bitboard *teamboard = &b.boards.at(0);
-
             switch(harm_index){
                 case harmr3:
-                    ret = teamboard[r4] | teamboard[w5];
+                    ret = b.boards[r4] | b.boards[w5];
                     break;
                 case harmr4:
-                    ret = teamboard[r5] | teamboard[r3];
+                    ret = b.boards[r5] | b.boards[r3];
                     break;
                 case harmr5:
-                    ret = teamboard[w3] | teamboard[r4];
+                    ret = b.boards[w3] | b.boards[r4];
                     break;
                 case harmw3:
-                    ret = teamboard[w4] | teamboard[r5];
+                    ret = b.boards[w4] | b.boards[r5];
                     break;
                 case harmw4:
-                    ret = teamboard[w5] | teamboard[w3];
+                    ret = b.boards[w5] | b.boards[w3];
                     break;
                 case harmw5:
-                    ret = teamboard[w5] | teamboard[r3];
+                    ret = b.boards[w5] | b.boards[r3];
                     break;
                 case harmlotus:
-                    ret = teamboard[allflowers];
+                    ret = b.boards[allflowers];
                     break;
             }
             return ret;
         }
 
         int check_win(const Board& b){
-            return -1;
+            return -1; //TODO: implement
         }
-
 
         Bitboard mask_2_move(int square){
             Bitboard bb(0);
