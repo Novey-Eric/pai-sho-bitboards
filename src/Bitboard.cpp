@@ -897,8 +897,6 @@ namespace Paisho{
                     (*b.oppsBoards).at(t_board).set(boat_move_sq);
                     (*b.oppsBoards).at(t_board).reset(boatsq);
                 }
-                //this is SUPER cursed, going through all arrays in 
-                //whiteboards and blackboards by doubling the length of the first
             }
         }
 
