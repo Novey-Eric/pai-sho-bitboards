@@ -39,6 +39,7 @@ namespace Paisho{
         array<Bitboard, NUM_BOARDS> *oppsBoards;
         array<Bitboard, NUM_OTHER_BOARDS> *otherBoards;
 
+
     } TeamBoard;
 
 
@@ -80,7 +81,7 @@ namespace Paisho{
     };
 
     // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
-    // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
+    // BUT: Harm<piece> means there is a <piece> on this spot and you have to check to see if the landing piece harmonizes with it
 
     enum Boards{
         w3,w4,w5,r3,r4,r5,lotus,orchid,

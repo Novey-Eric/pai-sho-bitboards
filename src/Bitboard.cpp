@@ -286,35 +286,29 @@ namespace Paisho{
 
         Bitboard get_cap_board(const TeamBoard& b, int bbpiece){
             Bitboard cap_board;
-            const Bitboard *t_board;
-            const Bitboard *opps_board;
-            bool wild;
-
-            t_board = &b.boards.at(0);
-            opps_board = &(*(b.oppsBoards)).at(0);
-            wild = b.wild;
+            bool wild = b.wild;
 
             switch(bbpiece){
                 case w3:
-                    cap_board = t_board[r3];
+                    cap_board = (*b.oppsBoards)[r3];
                     break;
                 case w4:
-                    cap_board = t_board[r4];
+                    cap_board = (*b.oppsBoards)[r4];
                     break;
                 case w5:
-                    cap_board = t_board[r5];
+                    cap_board = (*b.oppsBoards)[r5];
                     break;
                 case r3:
-                    cap_board = t_board[w3];
+                    cap_board = (*b.oppsBoards)[w3];
                     break;
                 case r4:
-                    cap_board = t_board[w4];
+                    cap_board = (*b.oppsBoards)[w4];
                     break;
                 case r5:
-                    cap_board = t_board[w4];
+                    cap_board = (*b.oppsBoards)[w5];
                     break;
                 case orchid:
-                    cap_board = wild ? opps_board[allflowers] : Illegal & Legal;
+                    cap_board = wild ? (*b.oppsBoards)[allflowers] : Illegal & Legal;
                     break;
                 case lotus:
                     cap_board = Illegal & Legal;
@@ -364,21 +358,18 @@ namespace Paisho{
         }
 
         void get_flower_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list){
-            const Bitboard *team_board;
-            team_board = &b.boards.at(0);
-
 
             mask_ptr mask_move_ptr = mask_move_map(bbflowerpiece);
             Bitboard cap_board = get_cap_board(b, bbflowerpiece);
             Bitboard clash_board = get_clash_board(b, bbflowerpiece);
-            Bitboard w3_copy = team_board[bbflowerpiece];
+            Bitboard w3_copy = b.boards[bbflowerpiece];
 
             //Go through each piece and generate moves for it
             Bitboard t_dests;
             for(int t_src = 0; t_src < NUM_SQUARES; t_src++){
                 if (w3_copy[t_src]){
-                    t_dests = mask_move_ptr(t_src) & \
-                              (~(*(b.otherBoards)).at(AllPieces) ^ cap_board) & 
+                    t_dests = mask_move_ptr(t_src) & 
+                              (~((*b.otherBoards).at(AllPieces)) ^ cap_board) & 
                               (~clash_board) & correct_color(bbflowerpiece);
                     
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
@@ -586,11 +577,12 @@ namespace Paisho{
                 if (w3_copy[t_src]){
                 //while (t_src != -1){ //First look at quiet moves only
                     Bitboard updated_harm = remove_duplicate_harm(harm_pieces, harm_board, t_src);
-                    t_dests = mask_move_ptr(t_src) & \
-                              updated_harm & \
-                              correct_color(bbflowerpiece) & \
-                              ~(*b.otherBoards).at(Accents) & \
-                              (~b.boards[allflowers] | cap_board);
+                    t_dests = mask_move_ptr(t_src) & 
+                              updated_harm & 
+                              correct_color(bbflowerpiece) & 
+                              //~(*b.otherBoards).at(Accents) & 
+                              (~((*b.otherBoards).at(AllPieces)) ^ cap_board);
+                              //(~b.boards[allflowers] | cap_board);
 
                     //int t_dest = get_lsb(t_dests);
                     for(int t_dest = 0; t_dest < NUM_SQUARES; t_dest++){
@@ -847,7 +839,8 @@ namespace Paisho{
                 (*b.otherBoards).at(Rocks).set(auxsq);
             } else if (auxpiece == Wheel){
                 TeamBoard copy = b;
-                //int hmoves[8] = {EAST, EAST+NORTH, NORTH, NORTH+WEST, WEST, SOUTH+WEST, SOUTH, SOUTH+EAST};
+                array<Bitboard, NUM_BOARDS> opps_copy = *b.oppsBoards;
+                array<Bitboard, NUM_OTHER_BOARDS> other_copy = *b.otherBoards;
                 int hmoves[8] = {SOUTH+EAST, SOUTH, SOUTH+WEST, WEST, NORTH+WEST, NORTH, EAST+NORTH, EAST};
                 
                 for(int t_board = 0; t_board < NUM_BOARDS; t_board++){ //TODO: this can be optimized since half the boards are harmonies.
@@ -856,16 +849,16 @@ namespace Paisho{
                         b.boards.at(t_board)[auxsq + hmoves[t_move]] = copy.boards.at(t_board)[auxsq + hmoves[t_move-1]];
                     }
 
-                    (*b.oppsBoards).at(t_board)[auxsq + hmoves[0]] = (*copy.oppsBoards).at(t_board)[auxsq + hmoves[7]];
+                    (*b.oppsBoards).at(t_board)[auxsq + hmoves[0]] = opps_copy.at(t_board)[auxsq + hmoves[7]];
                     for (int t_move=1; t_move<8; t_move++){
-                        (*b.oppsBoards).at(t_board)[auxsq + hmoves[t_move]] = (*copy.oppsBoards).at(t_board)[auxsq + hmoves[t_move-1]];
+                        (*b.oppsBoards).at(t_board)[auxsq + hmoves[t_move]] = opps_copy.at(t_board)[auxsq + hmoves[t_move-1]];
                     }
                 }
 
                 for(int t_board = 0; t_board < NUM_OTHER_BOARDS; t_board++){
-                    (*b.otherBoards).at(t_board)[auxsq + hmoves[0]] = (*copy.otherBoards).at(t_board)[auxsq + hmoves[7]];
+                    (*b.otherBoards).at(t_board)[auxsq + hmoves[0]] = other_copy.at(t_board)[auxsq + hmoves[7]];
                     for (int t_move=1; t_move<8; t_move++){
-                        (*b.otherBoards).at(t_board)[auxsq + hmoves[t_move]] = (*copy.otherBoards).at(t_board)[auxsq + hmoves[t_move-1]];
+                        (*b.otherBoards).at(t_board)[auxsq + hmoves[t_move]] = other_copy.at(t_board)[auxsq + hmoves[t_move-1]];
                     }
 
                 }
@@ -873,6 +866,8 @@ namespace Paisho{
             } else if (auxpiece == Boat){
                 (*b.otherBoards).at(Rocks).reset(auxsq);
                 (*b.otherBoards).at(Knotweeds).reset(auxsq);
+                (*b.otherBoards).at(Accents).reset(auxsq);
+                (*b.otherBoards).at(AllPieces).reset(auxsq);
             }if (auxpiece == Knotweed){
                 (*b.otherBoards).at(Knotweeds).set(auxsq);
             }
