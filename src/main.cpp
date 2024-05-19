@@ -555,28 +555,44 @@ void comp_v_comp(){
 
     std::vector<Move> moves;
 
-    int player = WHITE;
     update_harms_clash(b);
     while(evaluate(b) < 999999){
         Move bestmove;
         //pretty(b.otherBoards[AllPieces]);
         print_board(b);
         std::cout<<"num moves: "<< get_moves(b.whiteBoard).size() << std::endl;
-        int eval = ab_prune(b, 2, -9999999, 9999999, player, bestmove);
+        int eval = ab_prune(b, 2, -9999999, 9999999, WHITE, bestmove);
         cout<< "eval: " << eval << " found move: ";
         moves.push_back(bestmove);
         print_move(bestmove);
-        make_move(b, player, bestmove);
+        make_move(b, WHITE, bestmove);
         cout<< "moves list: ";
         for (Move move: moves){
             cout<<move.bits<<", ";
         }
         cout << endl;
-        cout<< "black harms: ";
+
+        Move bestmove2;
+        //pretty(b.otherBoards[AllPieces]);
+        print_board(b);
+        std::cout<<"num moves: "<< get_moves(b.blackBoard).size() << std::endl;
+        eval = ab_prune(b, 2, -9999999, 9999999, BLACK, bestmove2);
+        cout<< "eval: " << eval << " found move: ";
+        moves.push_back(bestmove2);
+        print_move(bestmove2);
+        make_move(b, BLACK, bestmove2);
+        cout<< "moves list: ";
+        for (Move move: moves){
+            cout<<move.bits<<", ";
+        }
+        cout << endl;
+
+        /*cout<< "black harms: ";
         for (auto it : b.blackBoard.harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
         cout<<endl;
+        */
         //player = player==WHITE ? BLACK : WHITE;
     }
     print_board(b);
