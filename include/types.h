@@ -1,3 +1,6 @@
+/*
+This file defines a lot of types and constants used in bitboards.
+*/
 
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
@@ -36,13 +39,20 @@ namespace Paisho{
 
         std::set<std::pair<int, int>> harm_pairs;
         array<Bitboard, NUM_BOARDS> boards;
-        array<Bitboard, NUM_BOARDS> *oppsBoards;
+        TeamBoard *oppsBoards;
+        //array<Bitboard, NUM_BOARDS> *oppsBoards;
         array<Bitboard, NUM_OTHER_BOARDS> *otherBoards;
-
 
     } TeamBoard;
 
 
+    /*
+    Board is something that represents a physical board and state of the entire game
+    It contains a TeamBoard for the white and black players
+    otherBoards represents bitboards that aren't specific to a player. Like accent tiles and AllPieces
+    TeamBoards still keep pointers to the other board since some info might be needed in some functions.
+    Not sure this is the *best* way of doing this.
+    */
     typedef struct Board {
         TeamBoard whiteBoard = {0};
         TeamBoard blackBoard = {0};
@@ -52,8 +62,8 @@ namespace Paisho{
         Board () {
             this->whiteBoard.otherBoards = &this->otherBoards;
             this->blackBoard.otherBoards = &this->otherBoards;
-            this->whiteBoard.oppsBoards = &this->blackBoard.boards;
-            this->blackBoard.oppsBoards = &this->whiteBoard.boards;
+            this->whiteBoard.oppsBoards = &this->blackBoard;
+            this->blackBoard.oppsBoards = &this->whiteBoard;
         }
 
         Board(const Board& t){
@@ -62,8 +72,8 @@ namespace Paisho{
             otherBoards = t.otherBoards;
             this->whiteBoard.otherBoards = &this->otherBoards;
             this->blackBoard.otherBoards = &this->otherBoards;
-            this->whiteBoard.oppsBoards = &this->blackBoard.boards;
-            this->blackBoard.oppsBoards = &this->whiteBoard.boards;
+            this->whiteBoard.oppsBoards = &this->blackBoard;
+            this->blackBoard.oppsBoards = &this->whiteBoard;
         }
     } Board;
 
@@ -80,8 +90,16 @@ namespace Paisho{
         HARMACCENT
     };
 
-    // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
-    // BUT: Harm<piece> means there is a <piece> on this spot and you have to check to see if the landing piece harmonizes with it
+    /*
+    This enum is used for indexing into a teamboard.boards[]
+    each piece represents all of that team's pieces. So whiteboards.boards[w3] are all the white w3 pieces.
+
+    Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
+    Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
+
+    allflowers does not include accents, but does include lotus and orchid
+    */
+
 
     enum Boards{
         w3,w4,w5,r3,r4,r5,lotus,orchid,
@@ -109,6 +127,9 @@ namespace Paisho{
         REDFLOWER
     };
 
+    /*
+    Arbitrary values to be tuned for evaluating positions.
+    */
     enum Value: int{
         VAL_DRAW = 0,
         VAL_INF=10000,
@@ -165,6 +186,15 @@ namespace Paisho{
     const array<std::string, 8> BlackPieceStrings = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
     const array<std::string, 8> WhitePieceStrings = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
 
+    /*
+    I thought this would be more readable instead of using bit shifting notation
+    But it turns out this may be less portable, so I'm not sure this is best.
+    Maybe more testing needs to be done.
+    */
+
+   /*
+   An integer representation of a single move. Struct can be used to set individual fields, or use the bits
+   */
     typedef union {
         struct {
             uint64_t move_type : 3;

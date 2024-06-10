@@ -126,6 +126,8 @@ void test_gen_moves(){
     b.whiteBoard.w3=2;
     b.whiteBoard.w4=1;
     b.whiteBoard.w5=3;
+    b.whiteBoard.o=1;
+    b.whiteBoard.l=1;
     
     Moves a = get_moves(b.whiteBoard);
     cout<<"move count "<< a.size()<<endl;
@@ -550,8 +552,8 @@ void comp_v_comp(){
     b.blackBoard.w3=3;
     b.blackBoard.w4=3;
     b.blackBoard.w5=3;
-    b.blackBoard.l=1;
-    b.blackBoard.o=1;
+    b.whiteBoard.l=1;
+    b.whiteBoard.o=1;
 
     std::vector<Move> moves;
 
@@ -572,8 +574,12 @@ void comp_v_comp(){
         }
         cout << endl;
 
+        for (auto it : b.whiteBoard.harm_pairs){
+            cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
+        }
+        cout<<endl;
+
         Move bestmove2;
-        //pretty(b.otherBoards[AllPieces]);
         print_board(b);
         std::cout<<"num moves: "<< get_moves(b.blackBoard).size() << std::endl;
         eval = ab_prune(b, 2, -9999999, 9999999, BLACK, bestmove2);
@@ -765,9 +771,7 @@ void test_fail3(){
     for (auto it : b.whiteBoard.harm_pairs){
         cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
     }
-    cout<<"\n";
-    
-    
+    cout<<"\n";    
 }
 
 
@@ -827,8 +831,6 @@ void test_fail4(){
     
 }
 
-
-
 void test_print_board(){
     
     Bitboard w3b(1);
@@ -878,13 +880,6 @@ void test_print_board(){
     print_move(m3);
     make_move(b, WHITE, m3);
     print_board(b);
-/*
-    Moves a = get_moves(b.whiteBoard);
-    print_move_list(a);
-    pretty(b.otherBoards[AllPieces]);
-    pretty(b.whiteBoard.boards[allflowers]);
-    pretty(b.blackBoards[allflowers]);
-  */  
 }
 
 void test_print_moves(){
@@ -900,12 +895,20 @@ void test_print_moves(){
     m1.fields.s4=55;
     m1.fields.boatmove=1;
     print_move(m1);
-
-
 }
 
-
 int main(){
+    /*
+    These are mostly test functions,
+    functions called *_fail* are functions
+    that found a case that fails and I was using these functions to test if it was fixed.
+
+    comp_v_comp is a function to test either one computer moving
+    over and over again, or two computers facing each other.
+
+    The first test* functions were probably written while
+    making the features
+    */
     //test_print_macros();
     //test_board_ops();
     //test_lsb();
@@ -915,9 +918,9 @@ int main(){
     //test_harm_clashes();
     //test_total_harms();
     //test_minimax();
-    test_abprune();
+    //test_abprune();
     //test_move_types();
-    //comp_v_comp();
+    comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
