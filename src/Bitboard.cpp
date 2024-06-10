@@ -47,21 +47,29 @@ namespace Paisho{
         switch(m.fields.move_type){
             case MOVE:
                 std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                if (m.fields.capture)
+                    std::cout << "'";
                 break;
             case PLACE:
                 std::cout << WhitePieceStrings[m.fields.piece] << " " << SquareStrings.at(m.fields.s1);
                 break;
             case HARMPLACE:
                 std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                if (m.fields.capture)
+                    std::cout << "'";
                 std::cout << "+" << WhitePieceStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3);
                 break;
             case HARMACCENT:
                 if (m.fields.boatmove){
                     std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                    if (m.fields.capture)
+                    std::cout << "'";
                     std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3) << "-" << SquareStrings.at(m.fields.s4);
                     //std::cout << std::dec << " " << m.fields.s4 << " " << SquareStrings.at(m.fields.s4);
                 } else{
                     std::cout << SquareStrings.at(m.fields.s1) << "-" << SquareStrings.at(m.fields.s2);
+                    if (m.fields.capture)
+                    std::cout << "'";
                     std::cout << "+" << AccentStrings[m.fields.auxpiece] << " " << SquareStrings.at(m.fields.s3);
                 }
                 break;
@@ -214,7 +222,6 @@ namespace Paisho{
         */
         Bitboard get_harm_pieces(const TeamBoard& b, int flower){
             Bitboard harm_board;
-            //const Bitboard *t_board = &b.boards.at(0);
             const Bitboard *opps_board = &b.oppsBoards->boards.at(0);
             Bitboard lotus_harms = b.boards[harmlotus] | opps_board[harmlotus];
             switch(flower){
@@ -277,7 +284,7 @@ namespace Paisho{
                     break;
                 //Lotus only harmonizes with own team.fields.
                 case orchid:
-                    harm_board = Illegal & Legal;
+                    harm_board = Bitboard(0);
                     break;
                 case lotus:
                     harm_board = b.boards.at(harmw3) | b.boards.at(harmw4) | b.boards.at(harmw5) | b.boards.at(harmr3) | b.boards.at(harmr4) | b.boards.at(harmr5);
@@ -316,10 +323,10 @@ namespace Paisho{
                     cap_board = b.oppsBoards->wild ? opps_boards[w5] | opps_boards[orchid] : opps_boards[w5];
                     break;
                 case orchid:
-                    cap_board = b.wild ? opps_boards[allflowers] : Illegal & Legal;
+                    cap_board = b.wild ? opps_boards[allflowers] : Bitboard(0);
                     break;
                 case lotus:
-                    cap_board = Illegal & Legal;
+                    cap_board = Bitboard(0);
                     break;
               default:
                     std::cout << "bad piece in get cap board" << std::endl;
