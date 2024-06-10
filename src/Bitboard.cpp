@@ -223,25 +223,25 @@ namespace Paisho{
         Bitboard get_harm_pieces(const TeamBoard& b, int flower){
             Bitboard harm_board;
             const Bitboard *opps_board = &b.oppsBoards->boards.at(0);
-            Bitboard lotus_harms = b.boards[harmlotus] | opps_board[harmlotus];
+            Bitboard lotus_harms = b.boards[lotus] | opps_board[lotus];
             switch(flower){
                 case w3:
-                    harm_board = b.boards[harmw4] | b.boards[harmr5] | lotus_harms;
+                    harm_board = b.boards[w4] | b.boards[r5] | lotus_harms;
                     break;
                 case w4:
-                    harm_board = b.boards[harmw3] | b.boards[harmw5] | lotus_harms;
+                    harm_board = b.boards[w3] | b.boards[w5] | lotus_harms;
                     break;
                 case w5:
-                    harm_board = b.boards[harmw4] | b.boards[harmr3] | lotus_harms;
+                    harm_board = b.boards[w4] | b.boards[r3] | lotus_harms;
                     break;
                 case r3:
-                    harm_board = b.boards[harmr4] | b.boards[harmw5] | lotus_harms;
+                    harm_board = b.boards[r4] | b.boards[w5] | lotus_harms;
                     break;
                 case r4:
-                    harm_board = b.boards[harmr5] | b.boards[harmr3] | lotus_harms;
+                    harm_board = b.boards[r5] | b.boards[r3] | lotus_harms;
                     break;
                 case r5:
-                    harm_board = b.boards[harmr4] | b.boards[harmw5] | lotus_harms;
+                    harm_board = b.boards[r4] | b.boards[w5] | lotus_harms;
                     break;
                 //Lotus only harmonizes with own team.fields.
                 case orchid:
