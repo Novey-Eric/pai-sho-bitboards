@@ -1,12 +1,12 @@
 
 #include <algorithm>
-#include "Bitboard.h"
-#include "types.h"
 #include <iostream>
 #include <ostream>
 #include <cstring>
-#include<string>
+#include <string>
 #include <chrono>
+#include "Bitboard.h"
+#include "types.h"
 
 using namespace std;
 using namespace std::chrono;

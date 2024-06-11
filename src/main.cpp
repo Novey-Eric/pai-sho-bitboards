@@ -2,11 +2,11 @@
 #include <iostream>
 #include <ostream>
 #include <strings.h>
-#include"Computer.h"
-#include"types.h"
-#include"Bitboard.h"
 #include <chrono>
 #include <vector>
+#include "Computer.h"
+#include "types.h"
+#include "Bitboard.h"
 
 using namespace std::chrono;
 using std::cout;
@@ -880,6 +880,14 @@ void test_print_board(){
     print_move(m3);
     make_move(b, WHITE, m3);
     print_board(b);
+    cout << "tier1: " << endl;
+    pretty(tier1);
+    cout << "tier2: " << endl;
+    pretty(tier2);
+    cout << "tier3: " << endl;
+    pretty(tier3);
+    cout << "tier4: " << endl;
+    pretty(tier4);
 }
 
 void test_print_moves(){
@@ -920,12 +928,12 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    comp_v_comp();
+    //comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
     //test_fail1();
-    //test_print_board();
+    test_print_board();
     //test_print_moves();
     return 1;
 }
