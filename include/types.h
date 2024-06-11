@@ -1,3 +1,6 @@
+/*
+This file defines a lot of types and constants used in bitboards.
+*/
 
 #ifndef TYPES_INCLUDED
 #define TYPES_INCLUDED
@@ -5,6 +8,7 @@
 #include <unordered_map>
 #include <array>
 #include <deque>
+#include <set>
 
 #define NUM_OTHER_BOARDS (15)
 #define NUM_BOARDS (16)
@@ -13,38 +17,66 @@ using std::array;
 namespace Paisho{
 
     typedef struct {
-        //save how many are in each hand
-        int bw3;
-        int bw4;
-        int bw5;
-        int br3;
-        int br4;
-        int br5;
-        bool bo;
-        bool bl;
-        bool bwild;
-        char blackAccents;
+        int rocks;
+        int knotweeds;
+        int wheels;
+        int boats;
+        int total_accents() const { return (this->rocks + this->knotweeds + this->wheels + this->boats); }
+    } AccentTiles;
 
-        int ww3;
-        int ww4;
-        int ww5;
-        int wr3;
-        int wr4;
-        int wr5;
-        bool wo;
-        bool wl;
-        bool wwild;
-        char whiteAccents;
-    
-        std::deque<std::pair<int, int>> white_harm_pairs;
-        std::deque<std::pair<int, int>> black_harm_pairs;
+    typedef struct TeamBoard {
 
-        array<Bitboard, NUM_BOARDS> whiteBoards;
-        array<Bitboard, NUM_BOARDS> blackBoards;
+        int w3;
+        int w4;
+        int w5;
+        int r3;
+        int r4;
+        int r5;
+        bool o;
+        bool l;
+        bool wild;
+        AccentTiles accents = {0};
+
+        std::set<std::pair<int, int>> harm_pairs;
+        array<Bitboard, NUM_BOARDS> boards;
+        TeamBoard *oppsBoards;
+        //array<Bitboard, NUM_BOARDS> *oppsBoards;
+        array<Bitboard, NUM_OTHER_BOARDS> *otherBoards;
+
+    } TeamBoard;
+
+
+    /*
+    Board is something that represents a physical board and state of the entire game
+    It contains a TeamBoard for the white and black players
+    otherBoards represents bitboards that aren't specific to a player. Like accent tiles and AllPieces
+    TeamBoards still keep pointers to the other board since some info might be needed in some functions.
+    Not sure this is the *best* way of doing this.
+    */
+    typedef struct Board {
+        TeamBoard whiteBoard = {0};
+        TeamBoard blackBoard = {0};
 
         array<Bitboard, NUM_OTHER_BOARDS> otherBoards;
 
+        Board () {
+            this->whiteBoard.otherBoards = &this->otherBoards;
+            this->blackBoard.otherBoards = &this->otherBoards;
+            this->whiteBoard.oppsBoards = &this->blackBoard;
+            this->blackBoard.oppsBoards = &this->whiteBoard;
+        }
+
+        Board(const Board& t){
+            whiteBoard = t.whiteBoard;
+            blackBoard = t.blackBoard;
+            otherBoards = t.otherBoards;
+            this->whiteBoard.otherBoards = &this->otherBoards;
+            this->blackBoard.otherBoards = &this->otherBoards;
+            this->whiteBoard.oppsBoards = &this->blackBoard;
+            this->blackBoard.oppsBoards = &this->whiteBoard;
+        }
     } Board;
+
 
     enum OtherBoards: int{
         Accents,Rocks,Knotweeds,
@@ -58,26 +90,31 @@ namespace Paisho{
         HARMACCENT
     };
 
-    // Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
-    // BUT: Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
+    /*
+    This enum is used for indexing into a teamboard.boards[]
+    each piece represents all of that team's pieces. So whiteboards.boards[w3] are all the white w3 pieces.
+
+    Harm<piece> means there is a <piece> on this row/column and you have to check to see if the landing piece harmonizes with it
+    Note: Clash<piece> means that if <piece> moves onto this spot, it will clash with something else on the row/column
+
+    allflowers does not include accents, but does include lotus and orchid
+    */
+
 
     enum Boards{
-        w3,w4,w5,r3,r4,r5,lotus,orchid,harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,harmlotus,
+        w3,w4,w5,r3,r4,r5,lotus,orchid,
+        harmr3,harmr4,harmr5,harmw3,harmw4,harmw5,harmlotus,
         allflowers
     };
     //Set these like 1<<Rock or something
     enum Accent: int{
         Rock,
-        Rock2,
         Knotweed,
-        Knotweed2,
         Wheel,
-        Wheel2,
         Boat,
-        Boat2,
     };
 
-    const std::string AccentStrings[] = {"R", "R", "K", "K", "W", "W", "B", "B"};
+    const std::string AccentStrings[] = {"R", "K", "W", "B"};
 
     enum Team{
         WHITE,
@@ -90,6 +127,9 @@ namespace Paisho{
         REDFLOWER
     };
 
+    /*
+    Arbitrary values to be tuned for evaluating positions.
+    */
     enum Value: int{
         VAL_DRAW = 0,
         VAL_INF=10000,
@@ -123,7 +163,7 @@ namespace Paisho{
         a17,b17,c17,d17,e17,f17,g17,h17,i17,j17,k17,l17,m17,n17,o17,p17,q17,
     };    
 
-    const std::string SquareStrings[] = {
+    const std::array<std::string, 17*17> SquareStrings = {
         "A1","B1","C1","D1","E1","F1","G1","H1","I1","J1","K1","L1","M1","N1","O1","P1","Q1",
         "A2","B2","C2","D2","E2","F2","G2","H2","I2","J2","K2","L2","M2","N2","O2","P2","Q2",
         "A3","B3","C3","D3","E3","F3","G3","H3","I3","J3","K3","L3","M3","N3","O3","P3","Q3",
@@ -143,42 +183,36 @@ namespace Paisho{
         "A17","B17","C17","D17","E17","F17","G17","H17","I17","J17","K17","L17","M17","N17","O17","P17","Q17"
     };    
 
-    const std::string BlackPieceStrings[] = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
-    const std::string WhitePieceStrings[] = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
+    const array<std::string, 8> BlackPieceStrings = {"w3", "w4", "w5", "r3", "r4", "r5", " l", " o"};
+    const array<std::string, 8> WhitePieceStrings = {"W3", "W4", "W5", "R3", "R4", "R5", " L", " O"};
 
-    // {move_type: 3 bits}, {capture: 1 bit}, {s1: 9 bits}, {s2: 9 bits},
-    // {Piece: 3 bits}, {aux_piece: 3 bits}, {s3: 9 bits}, {s4: 9 bits}, {boatmove: 1 bit}
-    // Total 47 bits
-    #define MOVE_TYPE_OFFSET (0)
-    #define MOVE_CAPTURE_OFFSET (3)
-    #define MOVE_S1_OFFSET (4)
-    #define MOVE_S2_OFFSET (13)
-    #define MOVE_PIECE_OFFSET (22)
-    #define MOVE_AUXPIECE_OFFSET (25)
-    //Here you need to start using uint64_t
-    #define MOVE_S3_OFFSET (28)
-    #define MOVE_S4_OFFSET (37)
-    #define MOVE_BOATMOVE_OFFSET (46)
+    /*
+    I thought this would be more readable instead of using bit shifting notation
+    But it turns out this may be less portable, so I'm not sure this is best.
+    Maybe more testing needs to be done.
+    */
 
-    constexpr uint64_t MOVE_TYPE_MASK = (((uint64_t) 0b111));
-    constexpr uint64_t MOVE_CAPTURE_MASK = (((uint64_t) 0b1) << MOVE_CAPTURE_OFFSET);
-    constexpr uint64_t MOVE_S1_MASK = (((uint64_t) 0b111111111) << MOVE_S1_OFFSET);
-    constexpr uint64_t MOVE_S2_MASK = (((uint64_t) 0b111111111) << MOVE_S2_OFFSET);
-    constexpr uint64_t MOVE_PIECE_MASK = (((uint64_t) 0b111) << MOVE_PIECE_OFFSET);
-    constexpr uint64_t MOVE_AUXPIECE_MASK = (((uint64_t) 0b111) << MOVE_AUXPIECE_OFFSET);
-    constexpr uint64_t MOVE_S3_MASK = (((uint64_t) 0b111111111) << MOVE_S3_OFFSET);
-    constexpr uint64_t MOVE_S4_MASK = (((uint64_t) 0b111111111) << MOVE_S4_OFFSET);
-    constexpr uint64_t MOVE_BOATMOVE_MASK = (((uint64_t) 0b1) << MOVE_BOATMOVE_OFFSET);
-    typedef uint64_t Move;
+   /*
+   An integer representation of a single move. Struct can be used to set individual fields, or use the bits
+   */
+    typedef union {
+        struct {
+            uint64_t move_type : 3;
+            uint64_t capture : 1;
+            uint64_t s1 : 9;
+            uint64_t s2 : 9;
+            uint64_t piece : 3;
+            uint64_t auxpiece : 3;
+            uint64_t s3 : 9;
+            uint64_t s4 : 9;
+            uint64_t boatmove : 1;
+            //Total of 47 bits
+        } fields;
+        uint64_t bits;
+    } Move;
 
     typedef std::deque<Move> Moves;
-  //  #define MOVELIST_LEN (8000)
-/*
-    typedef struct {
-        Move movelist[MOVELIST_LEN];
-        int move_count;
-    } Moves;
-*/
+
 }//Paisho
 
 

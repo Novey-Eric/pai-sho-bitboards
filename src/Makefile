@@ -1,12 +1,16 @@
 
-FLAGS := -I../include -g -Wall
+FLAGS := -I../include -g -Wall -std=c++20 
+CXX := g++
 
-all: Computer.o Bitboard.o main.o
-	g++ ./build/main.o ./build/Bitboard.o ./build/Computer.o -o ./build/paisho $(FLAGS)
+build/paisho: build/Computer.o build/Bitboard.o build/main.o
+	$(CXX) $^ -o $@ $(FLAGS)
 
-main.o: main.cpp
-	g++ -c main.cpp -o ./build/main.o $(FLAGS)
-Computer.o: Computer.cpp
-	g++ -c Computer.cpp -o ./build/Computer.o $(FLAGS)
-Bitboard.o: Bitboard.cpp
-	g++ -c Bitboard.cpp -o ./build/Bitboard.o $(FLAGS)
+build/main.o: main.cpp ../include/Computer.h ../include/types.h ../include/Bitboard.h
+	$(CXX) -c $< -o $@ $(FLAGS)
+build/Computer.o: Computer.cpp ../include/Computer.h ../include/types.h
+	$(CXX) -c $< -o $@ $(FLAGS)
+build/Bitboard.o: Bitboard.cpp ../include/Bitboard.h ../include/types.h
+	$(CXX) -c $< -o $@ $(FLAGS)
+
+clean:
+	rm build/*

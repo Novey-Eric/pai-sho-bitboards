@@ -192,28 +192,28 @@ namespace Paisho{
 
         void update_harms_clash(Board& b);
         int check_win(const Board& b); //returns WHITE, BLACK or -1
-        Bitboard reverse_harm_lookup(const Board& b, int harm_index, int team);
+        Bitboard reverse_harm_lookup(const TeamBoard& b, int harm_index);
 
         void print_board(const Board& b);
         void pretty(const Bitboard b);
         int get_lsb(const Bitboard b);
 
-        void get_flower_moves(const Board& b, int team, const int bbflowerpiece, Moves& move_list);
-        void get_harmony_accent_moves(const Board& b, int team, int bbflowerpiece, Moves& move_list);
-        void get_harmony_place_moves(const Board& b, int team, int bbflowerpiece, Moves& move_list);
-        void get_place_moves(const Board& b, int team, Moves& move_list);
-        void get_boat_flower_moves(const Board& b, int team, int bbflowerpiece, Moves& move_list);
-        Moves get_moves(const Board& b, int color);
+        void get_flower_moves(const TeamBoard& b, const int bbflowerpiece, Moves& move_list);
+        void get_harmony_accent_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list);
+        void get_harmony_place_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list);
+        void get_place_moves(const TeamBoard& b, Moves& move_list);
+        void get_boat_flower_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list);
+        Moves get_moves(const TeamBoard& b);
 
-        void make_place_move(Board& b, int team, int piece, int square);
-        void make_move_move(Board& b, int team, int piece, int src, int dst, bool cap);
-        void make_harm_place_move(Board& b, int team, int piece, int src, int dst, int auxflower, int placesq, bool cap);
-        void make_harm_accent_move(Board& b, int team, int piece, int src, int dst, int auxpiece, int auxsq, bool cap);
-        void make_harm_accent_boatmove(Board& b, int team, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap);
+        void make_place_move(TeamBoard& b, int piece, int square);
+        void make_move_move(TeamBoard& b, int piece, int src, int dst, bool cap);
+        void make_harm_place_move(TeamBoard& b, int piece, int src, int dst, int auxflower, int placesq, bool cap);
+        void make_harm_accent_move(TeamBoard& b, int piece, int src, int dst, int auxpiece, int auxsq, bool cap);
+        void make_harm_accent_boatmove(TeamBoard& b, int piece, int src, int dst, int boatsq, int boat_move_sq, bool cap);
 
         void make_move(Board& b, int team, Move m);
 
-        void find_harms(Board& b, int team);
+        void find_harms(TeamBoard& b);
 
 
     } //namespace bitboards

@@ -14,13 +14,13 @@ using namespace Bitboards;
 int ply;
     
     bool compare_moves(const Move& first, const Move& second){
-        bool spec1 = (((first & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
-            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
-            ((first & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == lotus) ||\
-            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == orchid) ||\
-            ((first & MOVE_AUXPIECE_MASK) >> MOVE_AUXPIECE_OFFSET == lotus) ||\
-            ((first & MOVE_TYPE_MASK) >> MOVE_TYPE_OFFSET == PLACE) \
-            );
+        bool spec1 = (first.fields.capture || \
+                    first.fields.piece == orchid || \
+                    first.fields.piece == lotus || \
+                    first.fields.auxpiece == orchid || \
+                    first.fields.auxpiece == lotus || \
+                    first.fields.move_type == PLACE \
+                    );
 /*
         bool spec2 = (((*t_move & MOVE_CAPTURE_MASK) >> MOVE_CAPTURE_OFFSET) ||\
             ((*t_move & MOVE_PIECE_MASK) >> MOVE_PIECE_OFFSET == orchid) ||\
@@ -42,34 +42,35 @@ int ply;
         if (depth <= 0 || std::abs(eval) >= 999999){
             eval += depth;
             //cout << "eval dur: " << dur_eval.count() << endl;
-            //std::cout<<"eval: "<<eval<<std::endl;
             return eval;
         }
         Board b_copy;
         int value;
         Moves curr_moves;
-        Move out_move;
+        Move out_move = {.bits = 0};
         //Moves ordered_moves;
 
         if (player == WHITE){
             value = -9999999;
 
-            curr_moves = Bitboards::get_moves(b, WHITE);
+            curr_moves = Bitboards::get_moves(b.whiteBoard);
+            //Paisho::print_move_list(curr_moves);
+            //cerr << "getmoves" << endl;
             if(!curr_moves.size())
                 value = 0;
             //cout << "get_moves dur: " << dur_get_moves.count() << " movecnt: " << curr_moves.move_count<< endl;
 
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
-            for(auto t_move : curr_moves){
+            //print_move_list(curr_moves);
+            for(Move t_move : curr_moves){
+                //Paisho::print_move(t_move);
+                //std::cerr << std::hex << t_move.bits << std::endl;
             //for(int i = 0; i < curr_moves.size(); i++){
-                b_copy = b;
+                b_copy = Board(b);
                 //std::cout<< "total moves: " << curr_moves.move_count << " at: " << i << " with depth " << depth << std::endl;
                 ply++;
-
-                Bitboards::make_move(b_copy, player, t_move);
-
-                //Bitboards::make_move(&b_copy, player, ordered_moves.movelist[i]);
+                Bitboards::make_move(b_copy, WHITE, t_move);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, BLACK, out_move);
                 ply--;
                 if (t_val > value){
@@ -83,16 +84,16 @@ int ply;
 
         } else{
             value = 9999999;
-            curr_moves = Bitboards::get_moves(b, BLACK);
+            curr_moves = Bitboards::get_moves(b.blackBoard);
             if(!curr_moves.size())
                 value = 0;
             //curr_moves.sort();
             //order_moves(&curr_moves, &ordered_moves);
 
-            for(auto t_move : curr_moves){
-                b_copy = b;
+            for(Move t_move : curr_moves){
+                b_copy = Board(b);
                 ply++;
-                Bitboards::make_move(b_copy, player, t_move);
+                Bitboards::make_move(b_copy, BLACK, t_move);
                 int t_val = ab_prune(b_copy, depth-1, alpha, beta, WHITE, out_move);
                 ply--;
                 if (t_val < value){
@@ -188,7 +189,7 @@ int ply;
     }
 
     
-    int eval_helper_harms(const Board& b, int team){
+    int eval_helper_harms(const TeamBoard& b){
         //keep a map of all the corners registered so far. 
         //Start at one of the corners, remove the connection in the bitboard to another corner.
         //register that new corner
@@ -196,16 +197,10 @@ int ply;
         //the map should be (square, corners_shared) pairs
   
         std::map<int, int> square_cnt;
-        int harm_cnt = 0;
-        const std::deque<std::pair<int, int>> *team_pairs;
-        if (team == WHITE){
-            team_pairs = &b.white_harm_pairs;
-        } else{
-            team_pairs = &b.black_harm_pairs;
-        }
+        int harm_cnt = 0;        
 
         int doub_cnt = 0;
-        for (auto i : *team_pairs){
+        for (auto i : b.harm_pairs){
             int q1 = get_quadrant(i.first);
             int q2 = get_quadrant(i.second);
             if (q1 != q2 && q1 != -1 && q2 != -1){
@@ -268,69 +263,51 @@ int ply;
         return 200*harm_cnt + 300*doub_cnt + win_bonus;
     }
 
-
-    int evaluate(const Board& b){
-        //Do white first
-        int white_score = 0;
-        int black_score = 0;
-
+    int eval_helper(const TeamBoard& b){
+        int score = 0;
         for(int i = 0; i <= 7; i++){
-            white_score += b.whiteBoards[i].count()*piece_onboard_score(i);
-            white_score += (b.whiteBoards[i] & ~Gates).count()*40; //has it moved out of the gate
-            black_score += b.blackBoards[i].count()*piece_onboard_score(i);
-            black_score += (b.blackBoards[i] & ~Gates).count()*40;
+            score += b.boards[i].count()*piece_onboard_score(i);
+            score += (b.boards[i] & ~Gates).count()*40; //has it moved out of the gate
         }
 
         //black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
-        
-        white_score += (b.wwild)*400;
-        black_score += (b.bwild)*400;
+        score += (b.wild)*400;
 
         int accent_hand_weight = 100;
-        white_score += __builtin_popcount(b.whiteAccents)*accent_hand_weight;
-        black_score += __builtin_popcount(b.blackAccents)*accent_hand_weight;
-
+        score += b.accents.total_accents()*accent_hand_weight;
         //int center = i9;
         //check for harmonizing pieces on the board
         int harm_pieces_w = 30;
         for(int i = 0; i <= 5; i++){
             int harm_index = Bitboards::harm_map(i);
 
-            int n_piece = b.whiteBoards[i].count();
-            int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index, WHITE).count();
+            int n_piece = b.boards[i].count();
+            int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index).count();
             n_harm_pieces = std::min(n_harm_pieces, n_piece);
-            white_score += n_harm_pieces*harm_pieces_w;
-
-            int bn_piece = b.blackBoards[i].count();
-            int bn_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index, BLACK).count();
-            bn_harm_pieces = std::min(bn_harm_pieces, bn_piece);
-            black_score += bn_harm_pieces*harm_pieces_w;
+            score += n_harm_pieces*harm_pieces_w;
         }
 
-        for (int i = 0; i < NUM_SQUARES; i++){
-            if(b.whiteBoards[allflowers][i]){
+        for (int i = 4; i < NUM_SQUARES-3; i++){
+            if(b.boards[allflowers].test(i) == 1){
                 float r = get_radius(i);
                 if(r <= 3){
-                    white_score += 50;
+                    score += 50;
                 } else if (r <= 5){
-                    white_score += 20;
+                    score += 20;
                 }
             }
-            if(b.blackBoards[allflowers][i]){
-                float r = get_radius(i);
-                if(r <= 3){
-                    black_score += 50;
-                } else if (r <= 5){
-                    black_score += 20;
-                }
-            }
-    
         }
-        
+        score += eval_helper_harms(b);
+        return score;
+    }
 
-        white_score += eval_helper_harms(b, WHITE);
-        black_score += eval_helper_harms(b, BLACK);
 
+
+    int evaluate(const Board& b){
+        int white_score = 0;
+        int black_score = 0;
+        white_score += eval_helper(b.whiteBoard);
+        black_score += eval_helper(b.blackBoard);
         return white_score - black_score;
     }
 
