@@ -12,8 +12,9 @@ namespace Paisho{
     constexpr int wild_w = 400;
     constexpr int accent_hand_w = 60;
     constexpr int harm_pieces_w = 30;
-    constexpr int double_harm_w = 600;
-    constexpr int triple_harm_w = 600;
+    constexpr int across_cent_harm_w = 150;
+    constexpr int double_harm_w = 300;
+    constexpr int triple_harm_w = 400;
     constexpr int win = 1000000;
 
     constexpr int piece_onboard_score(int piece){

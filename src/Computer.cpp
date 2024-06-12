@@ -208,7 +208,7 @@ int ply;
                 harm_cnt++;
                 if(square_cnt.count(i.first)){
                     square_cnt[i.first]++;
-                } else{ 
+                } else { 
                     square_cnt[i.first] = 1;
                 }
                 if(square_cnt.count(i.second)){
@@ -224,7 +224,7 @@ int ply;
             }
         }
 
-
+        //probably fix this heap of nonsense.
         int win_bonus = 0;
         if(doub_cnt >= 4){
             for (auto i = square_cnt.begin(); i != square_cnt.end(); i++){//if using ordered map this will be guaranteed bottom right
@@ -252,7 +252,7 @@ int ply;
                             r4 = m->first/17;
                             c4 = m->first%17;
                             if(r1 == r2 && r3 == r4 && c4 == c2 && c1 == c3){
-                                win_bonus = 999999;
+                                win_bonus = win;
                             }
                         }
                     }
@@ -261,7 +261,7 @@ int ply;
         }
         
 
-        return 200*harm_cnt + 300*doub_cnt + win_bonus;
+        return across_cent_harm_w*harm_cnt + double_harm_w*doub_cnt + win_bonus;
     }
 
     int eval_helper(const TeamBoard& b){
