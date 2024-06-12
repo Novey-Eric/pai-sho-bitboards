@@ -574,6 +574,7 @@ void comp_v_comp(){
         }
         cout << endl;
 
+        cout << "white harms: \n";
         for (auto it : b.whiteBoard.harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
@@ -593,13 +594,11 @@ void comp_v_comp(){
         }
         cout << endl;
 
-        /*cout<< "black harms: ";
+        cout << "black harms: \n";
         for (auto it : b.blackBoard.harm_pairs){
             cout<< "("<<SquareStrings[it.first] << ", "<<SquareStrings[it.second]<<"), ";
         }
         cout<<endl;
-        */
-        //player = player==WHITE ? BLACK : WHITE;
     }
     print_board(b);
 }
@@ -928,12 +927,12 @@ int main(){
     //test_minimax();
     //test_abprune();
     //test_move_types();
-    //comp_v_comp();
+    comp_v_comp();
     //test_fail2();
     //test_fail3();
     //test_fail4();
     //test_fail1();
-    test_print_board();
+    //test_print_board();
     //test_print_moves();
     return 1;
 }
