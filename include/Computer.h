@@ -5,16 +5,24 @@
 
 namespace Paisho{
 
+    constexpr int tier1_w = 50;
+    constexpr int tier2_w = 30;
+    constexpr int tier3_w = 20;
+    constexpr int tier4_w = 10;
+    constexpr int wild_w = 400;
+    constexpr int accent_hand_w = 60;
+    constexpr int harm_pieces_w = 30;
+
     constexpr int piece_onboard_score(int piece){
         switch(piece){
-            case w3: return 30;
-            case w4: return 35;
-            case w5: return 40;
-            case r3: return 30;
-            case r4: return 35;
-            case r5: return 40;
-            case lotus: return 250;
-            case orchid: return 200;
+            case w3: return 20;
+            case w4: return 25;
+            case w5: return 30;
+            case r3: return 20;
+            case r4: return 25;
+            case r5: return 30;
+            case lotus: return 150;
+            case orchid: return 100;
             default: return 0;
         }
     }

@@ -218,7 +218,7 @@ namespace Paisho{
 
     namespace Bitboards{
         /*
-        takes flower as input and returns bitboard of every space it can harmonize with.
+        takes flower as input and returns bitboard of every piece it can harmonize with.
         */
         Bitboard get_harm_pieces(const TeamBoard& b, int flower){
             Bitboard harm_board;
@@ -985,7 +985,6 @@ namespace Paisho{
             int piece_ind[18];
             int piece_count = 0;
             Bitboard flowers_copy = b.boards[allflowers] & ~Gates & ~b.boards[orchid];
-            //make it while(piece_cout < flowers_copy.count()){}
             int total_pieces = flowers_copy.count();
             int t_teampiece = 0;
             while(piece_count < total_pieces){
@@ -999,7 +998,6 @@ namespace Paisho{
             //go through all pieces once. Find all white or black pieces. Then just check those squares instead of getlsb every time
             int tmp_square;
             int current_row;
-            //int w3_piece = get_lsb(w3_pieces);
             int current_piece;
             //Current piece is the piece position
             //For each piece on the team's ALLFLOWERS board.
@@ -1016,8 +1014,8 @@ namespace Paisho{
                 //Once you find which t_piece is correct,
                 //Set current pieces to the current pieces to this board
 
+                Bitboard harm_board = get_harm_pieces(b, t_piece) & ~Gates;
                 int harm_ind = harm_map(t_piece);
-                Bitboard harm_board = reverse_harm_lookup(b, harm_ind) & ~Gates;
                 //std::cout<<"tpiece " << t_piece << " " << "harm ind " << harm_ind<<std::endl;
                 tmp_square = current_piece + EAST;
                 current_row = current_piece / 17;
@@ -1091,36 +1089,6 @@ namespace Paisho{
         void update_harms_clash(Board& b){
             find_harms(b.whiteBoard);
             find_harms(b.blackBoard);
-        }
-
-
-        //take harmboard index as input, return bitbord of which pieces can harmonize with that piece
-        Bitboard reverse_harm_lookup(const TeamBoard& b, int harm_index){
-            Bitboard ret;
-            switch(harm_index){
-                case harmr3:
-                    ret = b.boards[r4] | b.boards[w5];
-                    break;
-                case harmr4:
-                    ret = b.boards[r5] | b.boards[r3];
-                    break;
-                case harmr5:
-                    ret = b.boards[w3] | b.boards[r4];
-                    break;
-                case harmw3:
-                    ret = b.boards[w4] | b.boards[r5];
-                    break;
-                case harmw4:
-                    ret = b.boards[w5] | b.boards[w3];
-                    break;
-                case harmw5:
-                    ret = b.boards[w5] | b.boards[r3];
-                    break;
-                case harmlotus:
-                    ret = b.boards[allflowers];
-                    break;
-            }
-            return ret;
         }
 
         int check_win(const Board& b){

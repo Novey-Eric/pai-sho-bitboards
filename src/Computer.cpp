@@ -1,4 +1,5 @@
-#include"Computer.h"
+#include "Computer.h"
+#include "Bitboard.h"
 #include <cstring>
 #include <chrono>
 #include <iostream>
@@ -265,38 +266,26 @@ int ply;
 
     int eval_helper(const TeamBoard& b){
         int score = 0;
+        //Go through each flower board, and give it position points
         for(int i = 0; i <= 7; i++){
-            score += b.boards[i].count()*piece_onboard_score(i);
-            score += (b.boards[i] & ~Gates).count()*40; //has it moved out of the gate
+            score += b.boards.at(i).count()*piece_onboard_score(i);
+            score += (b.boards.at(i) & tier1).count()*tier1_w;
+            score += (b.boards.at(i) & tier2).count()*tier2_w;
+            score += (b.boards.at(i) & tier3).count()*tier3_w;
+            score += (b.boards.at(i) & tier4).count()*tier4_w;
         }
 
-        //black_score += b.blackBoards[lotus].count()*piece_onboard_score(lotus);
-        score += (b.wild)*400;
+        score += (b.wild)*wild_w;
+        score += b.accents.total_accents()*accent_hand_w;
 
-        int accent_hand_weight = 100;
-        score += b.accents.total_accents()*accent_hand_weight;
-        //int center = i9;
         //check for harmonizing pieces on the board
-        int harm_pieces_w = 30;
         for(int i = 0; i <= 5; i++){
-            int harm_index = Bitboards::harm_map(i);
-
-            int n_piece = b.boards[i].count();
-            int n_harm_pieces = Bitboards::reverse_harm_lookup(b, harm_index).count();
+            int n_piece = b.boards.at(i).count();
+            int n_harm_pieces = get_harm_pieces(b, i).count();
             n_harm_pieces = std::min(n_harm_pieces, n_piece);
             score += n_harm_pieces*harm_pieces_w;
         }
 
-        for (int i = 4; i < NUM_SQUARES-3; i++){
-            if(b.boards[allflowers].test(i) == 1){
-                float r = get_radius(i);
-                if(r <= 3){
-                    score += 50;
-                } else if (r <= 5){
-                    score += 20;
-                }
-            }
-        }
         score += eval_helper_harms(b);
         return score;
     }

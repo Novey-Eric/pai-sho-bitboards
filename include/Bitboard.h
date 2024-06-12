@@ -192,11 +192,12 @@ namespace Paisho{
 
         void update_harms_clash(Board& b);
         int check_win(const Board& b); //returns WHITE, BLACK or -1
-        Bitboard reverse_harm_lookup(const TeamBoard& b, int harm_index);
 
         void print_board(const Board& b);
         void pretty(const Bitboard b);
         int get_lsb(const Bitboard b);
+        Bitboard get_harm_pieces(const TeamBoard& b, int flower);
+
 
         void get_flower_moves(const TeamBoard& b, const int bbflowerpiece, Moves& move_list);
         void get_harmony_accent_moves(const TeamBoard& b, int bbflowerpiece, Moves& move_list);
